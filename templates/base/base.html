@@ -7,9 +7,10 @@
     <title>petista</title>
     <link rel="stylesheet" href="{% static 'css/main.css'  %}" />
   </head>
-  <body>
-
-    {% block 'main' %}
+  <body dir="rtl">
+    {% include 'category/category_list.html' %}
+    
+    {% block content %}
       
     {% endblock %}
     
