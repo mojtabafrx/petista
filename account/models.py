@@ -23,7 +23,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     user_type = models.IntegerField(
         choices=USER_TYPES,
-        default='N',
+        default=1,
         null=True,
         blank=True
     )
@@ -36,14 +36,22 @@ class Profile(models.Model):
 
 class VerificationCode(models.Model):
     REGISTRATION_VERIFY = 1
+    LOGIN_OTP = 2
+    PASSWORD_RESET = 3
+    PHONE_CHANGE = 4
 
     VERIFICATIONCODE_TYPE = (
         (REGISTRATION_VERIFY, 'ثبت نام'),
+        (LOGIN_OTP, 'ورود یکبار مصرف'),
+        (PASSWORD_RESET, 'بازیابی رمز عبور'),
+        (PHONE_CHANGE, 'تغییر شماره تلفن'),
         
     )
 
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4())
-    code_type= models.IntegerField(choices=VERIFICATIONCODE_TYPE)
-    profile = models.ForeignKey(Profile,on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    code_type = models.IntegerField(choices=VERIFICATIONCODE_TYPE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
     date_created = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)  # افزودن فیلد انقضا
+    is_used = models.BooleanField(default=False)  # افزودن فیلد وضعیت استفاده

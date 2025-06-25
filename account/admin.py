@@ -5,7 +5,8 @@ from .models import Profile
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user','user_type','phone_number','user__is_active']
-
+    list_display = ['user','user_type','phone_number']
+    def active(self, obj):
+        return obj.User.is_active
 
 admin.site.register(Profile,ProfileAdmin)
