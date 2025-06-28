@@ -28,3 +28,6 @@ def make_image_function(name):
         print(dir)
         return dir
     return upload_image
+
+
+

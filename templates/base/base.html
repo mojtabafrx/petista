@@ -16,10 +16,18 @@
   {% include 'category/category_list.html' %}
 
 
+  <!-- محتوای اصلی -->
+  <main class="container my-5">
+    {% block content %}{% endblock %}
+  </main>
 
-    {% block content %}
-    {% endblock %}
-  </div>
+  <!-- پاورقی -->
+  <footer class="bg-light py-4">
+    <div class="container text-center">
+        <p>کلیه حقوق محفوظ است © 2023</p>
+    </div>
+  </footer>
+  
 
 </body>
 

@@ -25,7 +25,8 @@ urlpatterns = [
     path('',include('home.urls') , name="home"),
     path('captcha/', include('captcha.urls')),
     path('account/' , include('account.urls')),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    path('products/',include('product.urls'), name="product"),
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 

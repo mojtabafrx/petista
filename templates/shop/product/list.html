@@ -1,0 +1,134 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}محصولات{% if category %} - {{ category.title }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- سایدبار دسته‌بندی‌ها -->
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">دسته‌بندی‌ها</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'product:product_list' %}" 
+                   class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                    همه دسته‌بندی‌ها
+                </a>
+                {% for cat in categories %}
+                    <a href="{% url 'product:product_list_by_category' cat.slug %}" 
+                       class="list-group-item list-group-item-action {% if category and cat.id == category.id %}active{% endif %}">
+                        {{ cat.title }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- لیست محصولات -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                {% if category %}
+                    {{ category.title }}
+                {% else %}
+                    همه محصولات
+                {% endif %}
+            </h2>
+            <div class="d-flex">
+                <!-- دکمه‌های مرتب‌سازی -->
+            </div>
+        </div>
+
+        <div class="row">
+            {% for product in page_obj %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% if product.additional_images %}
+                            <img src="{{ product.additional_images.all.0.image.url }}" 
+                                 class="card-img-top" 
+                                 alt="{{ product.title }}"
+                                 style="height: 200px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" 
+                                 style="height: 200px;">
+                                <span class="text-muted">بدون تصویر</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">
+                                    {{ product.title }}
+                                </a>
+                            </h5>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="text-success fw-bold">
+                                    {{ product.base_price|floatformat:"0" }} تومان
+                                </span>
+                                
+                                <span class="badge {% if product.status == 1 %}bg-success{% else %}bg-danger{% endif %}">
+                                    {{ product.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-white">
+                            <div class="d-grid">
+                                <a href='{% url "product:product_detail" product.id product.slug %}' class="btn btn-outline-primary">
+                                    مشاهده جزئیات
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        محصولی یافت نشد
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- صفحه‌بندی -->
+        {% if page_obj.paginator.num_pages > 1 %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">&laquo; ابتدا</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -48,7 +48,7 @@ INSTALLED_APPS = [
 
 
     #local
-    'category.apps.CategoryConfig',
+    'product.apps.CategoryConfig',
     'home.apps.HomeConfig',
     'account.apps.AccountConfig',
     'captcha',
@@ -78,7 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'category.context_processors.menu.menu_context',
+                'product.context_processors.menu.menu_context',
             ],
         },
     },
@@ -137,6 +137,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+MEDIA_URL ='media/'
+MEDIA_ROOT = 'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
