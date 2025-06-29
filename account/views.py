@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login  as default_login, authenticate
+from django.contrib.auth import login  as default_login, authenticate , logout as auth_logout
 from django.contrib.auth.models import User
 from .forms import SignupForm, VerificationForm , PasswordLoginForm, OTPLoginForm
 from .models import Profile , VerificationCode
@@ -8,7 +8,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.contrib import messages
 
 def signup(request):
     if request.method == 'POST':
@@ -217,3 +217,10 @@ def resend_otp(request):
             return JsonResponse({'success': False, 'error': 'کد تأیید یافت نشد'})
     
     return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+
+
+def logout(request):
+    """ویو ساده برای خروج کاربر"""
+    auth_logout(request)
+    messages.success(request, 'شما با موفقیت از سیستم خارج شدید.')
+    return redirect('home:home')

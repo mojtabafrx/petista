@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'account.apps.AccountConfig',
     'captcha',
+    'user_panel.apps.UserPanelConfig'
 ]
 
 
@@ -161,6 +162,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # بعد از لاگین
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/panel/'
 LOGOUT_REDIRECT_URL = 'home:home'
 
