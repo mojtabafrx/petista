@@ -5,6 +5,8 @@ from account.models import Profile
 from product.models import Category, Product
 from .models import SellerProduct
 from django.core.paginator import Paginator
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
 
 
 @user_panel_access
@@ -105,4 +107,72 @@ def delete_product(request):
         except SellerProduct.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'محصول یافت نشد'})
     
+    return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+
+# اضافه کردن ویو برای دریافت اطلاعات محصول جهت ویرایش
+@user_panel_access
+@seller_required
+def get_product_details(request):
+    """دریافت جزئیات محصول فروشنده برای ویرایش"""
+    product_id = request.GET.get('product_id')
+    try:
+        product = SellerProduct.objects.get(id=product_id, seller=request.user)
+        return JsonResponse({
+            'success': True,
+            'product': {
+                'id': product.id,
+                'price': product.price,
+                'stock': product.stock
+            }
+        })
+    except SellerProduct.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'محصول یافت نشد'})
+
+# اضافه کردن ویو برای ذخیره تغییرات ویرایش
+@user_panel_access
+@seller_required
+def edit_seller_product(request):
+    """ویرایش محصول فروشنده"""
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        price = request.POST.get('price')
+        stock = request.POST.get('stock')
+        
+        try:
+            product = SellerProduct.objects.get(id=product_id, seller=request.user)
+            product.price = price
+            product.stock = stock
+            product.save()
+            return JsonResponse({'success': True, 'message': 'تغییرات با موفقیت ذخیره شد'})
+        except SellerProduct.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'محصول یافت نشد'})
+    
+    return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+
+
+@user_panel_access
+def change_password(request):
+    """ویو تغییر رمز عبور"""
+    context = {
+        'user_type': request.user.profile.user_type,
+        'section': 'change_password'
+    }
+    return render(request, 'user_panel/dashboard.html', context)
+
+@user_panel_access
+def change_password_ajax(request):
+    """تغییر رمز عبور با AJAX"""
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # بروزرسانی session برای جلوگیری از خروج کاربر
+            update_session_auth_hash(request, user)
+            return JsonResponse({'success': True, 'message': 'رمز عبور شما با موفقیت تغییر یافت'})
+        else:
+            errors = []
+            for field, field_errors in form.errors.items():
+                for error in field_errors:
+                    errors.append(error)
+            return JsonResponse({'success': False, 'errors': errors})
     return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})

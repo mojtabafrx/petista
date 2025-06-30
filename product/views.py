@@ -79,3 +79,7 @@ def product_detail(request, id, slug):
         'related_products': related_products,
     }
     return render(request, 'shop/product/detail.html', context)
+
+
+from django.shortcuts import get_object_or_404
+

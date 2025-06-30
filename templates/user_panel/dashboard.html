@@ -41,7 +41,8 @@
                 </a>
                 {% endif %}
                 
-                <a href="#" class="list-group-item list-group-item-action">
+                
+                <a href="{% url 'user_panel:change_password' %}" class="list-group-item list-group-item-action {% if section == 'change_password' %}active{% endif %}">
                     <i class="fas fa-key me-2"></i> تغییر رمز عبور
                 </a>
                 <a href="{% url 'account:logout' %}" class="list-group-item list-group-item-action">
@@ -75,8 +76,8 @@
             </div>
             
             <!-- بخش فروشنده: ثبت محصول جدید -->
-            {% if user.profile.user_type == 3 %}
-            <div id="add-product-section" class="card mb-4" style="display: {% if section == 'dashboard' %}block{% else %}none{% endif %};">
+            {% if user.profile.user_type == 3 and section == 'dashboard' %}
+            <div id="add-product-section" class="card mb-4" >
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i> ثبت محصول جدید</h4>
                 </div>
@@ -124,8 +125,8 @@
             {% endif %}
             
             <!-- بخش فروشنده: محصولات من -->
-            {% if user.profile.user_type == 3 %}
-            <div id="my-products-section" class="card mb-4" style="display: {% if section == 'my_products' %}block{% else %}none{% endif %};">
+            {% if user.profile.user_type == 3 and section == 'my_products' %}
+            <div id="my-products-section" class="card mb-4" >
                 <div class="card-header bg-info text-white">
                     <h4 class="mb-0"><i class="fas fa-boxes me-2"></i> محصولات من</h4>
                 </div>
@@ -218,9 +219,11 @@
                             </div>
                             <h5 class="text-muted">شما هنوز هیچ محصولی ثبت نکرده‌اید!</h5>
                             <p class="text-muted">برای شروع، از بخش ثبت محصول جدید استفاده کنید</p>
-                            <button id="show-add-product-btn" class="btn btn-primary mt-3">
-                                <i class="fas fa-plus-circle me-2"></i> ثبت محصول جدید
-                            </button>
+                            <a href="{% url 'user_panel:dashboard' %}">
+                                <button id="show-add-product-btn" class="btn btn-primary mt-3">
+                                    <i class="fas fa-plus-circle me-2"></i> ثبت محصول جدید
+                                </button>
+                            </a>
                         </div>
                     {% endif %}
                 </div>
@@ -330,6 +333,41 @@
                 </div>
             </div>
             {% endif %}
+
+            <!-- بخش تغییر رمز عبور (برای همه کاربران) -->
+            <div id="change-password-section" class="card mb-4" style="display: {% if section == 'change_password' %}block{% else %}none{% endif %};">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="mb-0"><i class="fas fa-key me-2"></i> تغییر رمز عبور</h4>
+                </div>
+                <div class="card-body">
+                    <form id="change-password-form">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label">رمز عبور فعلی</label>
+                            <input type="password" name="old_password" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">رمز عبور جدید</label>
+                            <input type="password" name="new_password1" class="form-control" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">تکرار رمز عبور جدید</label>
+                            <input type="password" name="new_password2" class="form-control" required>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i> ذخیره تغییرات
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            
         </div>
     </div>
 </div>
@@ -468,10 +506,97 @@ $(document).ready(function() {
             });
         }
     });
+
+    // ویرایش محصول: پر کردن مودال با اطلاعات فعلی
+    $(document).on('click', '.edit-product', function() {
+        const productId = $(this).data('id');
+        
+        // درخواست AJAX برای دریافت اطلاعات محصول
+        $.get('{% url "user_panel:get_product_details" %}', {product_id: productId}, function(response) {
+            if (response.success) {
+                $('#edit-product-id').val(response.product.id);
+                $('#edit-price').val(response.product.price);
+                $('#edit-stock').val(response.product.stock);
+                $('#editProductModal').modal('show');
+            } else {
+                showMessage('خطا در دریافت اطلاعات محصول', false);
+            }
+        }).fail(function() {
+            showMessage('خطا در ارتباط با سرور', false);
+        });
+    });
+
+    // ذخیره تغییرات ویرایش
+    $('#save-edit-btn').click(function() {
+        const formData = {
+            'product_id': $('#edit-product-id').val(),
+            'price': $('#edit-price').val(),
+            'stock': $('#edit-stock').val(),
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        };
+        
+        // نمایش پیام در حال پردازش
+        showMessage('در حال ذخیره تغییرات...', true);
+        
+        $.post('{% url "user_panel:edit_seller_product" %}', formData, function(response) {
+            if (response.success) {
+                showMessage(response.message, true);
+                $('#editProductModal').modal('hide');
+                // به‌روزرسانی ردیف در جدول
+                updateProductRow(formData.product_id, formData.price, formData.stock);
+            } else {
+                showMessage(response.error, false);
+            }
+        }).fail(function() {
+            showMessage('خطا در ارتباط با سرور', false);
+        });
+    });
+    
+    // تابع به‌روزرسانی ردیف در جدول
+    function updateProductRow(productId, newPrice, newStock) {
+        const row = $(`tr:has(button.edit-product[data-id="${productId}"])`);
+        row.find('td:eq(2)').text(newPrice); // ستون قیمت
+        row.find('td:eq(3)').text(newStock); // ستون موجودی
+        
+        // به‌روزرسانی وضعیت موجودی
+        const statusBadge = row.find('td:eq(4) .badge');
+        if (newStock > 0) {
+            statusBadge.removeClass('bg-danger').addClass('bg-success').text('موجود');
+        } else {
+            statusBadge.removeClass('bg-success').addClass('bg-danger').text('ناموجود');
+        }
+    }
+
+
+    // قسمت تغییر رمز عبور کاربر
+    $('#change-password-form').submit(function(e) {
+        e.preventDefault();
+        const formData = $(this).serialize();
+        
+        showMessage('در حال تغییر رمز عبور...', true);
+        
+        $.post('{% url "user_panel:change_password_ajax" %}', formData, function(response) {
+            if (response.success) {
+                showMessage(response.message, true);
+                // ریست کردن فرم
+                $('#change-password-form')[0].reset();
+            } else {
+                let errorMessage = 'خطا در تغییر رمز عبور: ';
+                if (response.errors) {
+                    errorMessage += response.errors.join('<br>');
+                } else {
+                    errorMessage += 'لطفاً اطلاعات را بررسی کنید';
+                }
+                showMessage(errorMessage, false);
+            }
+        }).fail(function() {
+            showMessage('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید', false);
+        });
+    });
 });
 </script>
 
-<!-- مودال ویرایش محصول (نمونه) -->
+<!-- تغییرات در مودال ویرایش -->
 <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -481,22 +606,22 @@ $(document).ready(function() {
             </div>
             <div class="modal-body">
                 <form id="edit-product-form">
-                    <input type="hidden" id="edit-product-id" name="id">
+                    <input type="hidden" id="edit-product-id" name="product_id">
                     
                     <div class="mb-3">
                         <label class="form-label">قیمت (تومان)</label>
-                        <input type="number" id="edit-price" name="price" class="form-control" required>
+                        <input type="number" id="edit-price" name="price" class="form-control" required min="1">
                     </div>
                     
                     <div class="mb-3">
                         <label class="form-label">موجودی</label>
-                        <input type="number" id="edit-stock" name="stock" class="form-control" required>
+                        <input type="number" id="edit-stock" name="stock" class="form-control" required min="0">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">لغو</button>
-                <button type="button" class="btn btn-primary">ذخیره تغییرات</button>
+                <button type="button" id="save-edit-btn" class="btn btn-primary">ذخیره تغییرات</button>
             </div>
         </div>
     </div>
