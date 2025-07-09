@@ -33,8 +33,11 @@
                 
                 <!-- منو برای کاربران عادی -->
                 {% if user.profile.user_type == 1 %}
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="fas fa-shopping-cart me-2"></i> سفارشات من
+                <a href="{% url 'user_panel:view_cart' %}" class="list-group-item list-group-item-action {% if section == 'cart' %}active{% endif %}">
+                    <i class="fas fa-shopping-cart me-2"></i> سبد خرید
+                </a>
+                <a href="{% url 'user_panel:my_orders' %}" class="list-group-item list-group-item-action {% if section == 'my_orders' %}active{% endif %}">
+                    <i class="fas fa-list me-2"></i> سفارشات من
                 </a>
                 <a href="#" class="list-group-item list-group-item-action">
                     <i class="fas fa-heart me-2"></i> علاقه‌مندی‌ها
@@ -334,6 +337,236 @@
             </div>
             {% endif %}
 
+            <!-- بخش سبد خرید (برای کاربران عادی) -->
+            {% if user.profile.user_type == 1 and section == 'cart' %}
+            <div id="cart-section" class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-shopping-cart me-2"></i> سبد خرید شما</h4>
+                </div>
+                <div class="card-body">
+                    {% if cart and cart.items.all %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>محصول</th>
+                                    <th>فروشنده</th>
+                                    <th>قیمت واحد</th>
+                                    <th>تعداد</th>
+                                    <th>قیمت کل</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in cart.items.all %}
+                                <tr>
+                                    <td>{{ item.seller_product.product.title }}</td>
+                                    <td>{{ item.seller_product.seller.get_username }}</td>
+                                    <td>{{ item.unit_price|floatformat:0 }} تومان</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <button class="btn btn-sm btn-outline-secondary decrement" data-id="{{ item.id }}">-</button>
+                                            <span class="mx-2 item-quantity">{{ item.quantity }}</span>
+                                            <button class="btn btn-sm btn-outline-secondary increment" data-id="{{ item.id }}">+</button>
+                                        </div>
+                                    </td>
+                                    <td class="item-total">{{ item.total_price|floatformat:0 }} تومان</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger remove-item" data-id="{{ item.id }}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-primary">
+                                    <td colspan="4" class="text-end"><strong>جمع کل سبد خرید:</strong></td>
+                                    <td colspan="2"><strong class="cart-total">{{ cart.total_price|floatformat:0 }} تومان</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <a href="{% url 'product:product_list' %}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-arrow-left me-2"></i> ادامه خرید
+                        </a>
+                        <button class="btn btn-success">
+                            <i class="fas fa-check me-2"></i> پرداخت نهایی
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-shopping-cart fa-4x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">سبد خرید شما خالی است</h5>
+                        <p class="text-muted">برای افزودن محصول به سبد خرید از فروشگاه دیدن کنید</p>
+                        <a href="{% url 'product:product_list' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-store me-2"></i> بازگشت به فروشگاه
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- بخش سفارشات من (برای کاربران عادی) -->
+            {% if user.profile.user_type == 1 and section == 'my_orders' %}
+            <div id="orders-section" class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-list me-2"></i> سفارشات من</h4>
+                </div>
+                <div class="card-body">
+                    {% if orders_page and orders_page.object_list %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>شماره سفارش</th>
+                                        <th>تاریخ سفارش</th>
+                                        <th>مبلغ کل</th>
+                                        <th>وضعیت</th>
+                                        <th>کد رهگیری</th>
+                                        <th>جزئیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders_page %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.created_at|date:"Y/m/d H:i" }}</td>
+                                        <td>{{ order.total_price|floatformat:0 }} تومان</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if order.status == 'delivered' %}bg-success
+                                                {% elif order.status == 'cancelled' %}bg-danger
+                                                {% elif order.status == 'shipped' %}bg-primary
+                                                {% else %}bg-warning text-dark{% endif %}">
+                                                {{ order.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ order.tracking_code|default:"-" }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-info view-order-details" data-id="{{ order.id }}">
+                                                <i class="fas fa-eye me-1"></i> مشاهده
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- صفحه‌بندی -->
+                        {% if orders_page.paginator.num_pages > 1 %}
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if orders_page.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1" aria-label="First">
+                                        <span aria-hidden="true">&laquo;&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders_page.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% for num in orders_page.paginator.page_range %}
+                                    {% if num == orders_page.number %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                    {% elif num > orders_page.number|add:'-3' and num < orders_page.number|add:'3' %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if orders_page.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders_page.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders_page.paginator.num_pages }}" aria-label="Last">
+                                        <span aria-hidden="true">&raquo;&raquo;</span>
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="fas fa-box-open fa-4x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">شما هنوز هیچ سفارشی ثبت نکرده‌اید!</h5>
+                            <p class="text-muted">برای شروع خرید، از فروشگاه دیدن کنید</p>
+                            <a href="{% url 'product:product_list' %}" class="btn btn-primary mt-3">
+                                <i class="fas fa-store me-2"></i> بازگشت به فروشگاه
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- مودال جزئیات سفارش -->
+            <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">جزئیات سفارش #<span id="order-id"></span></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="order-summary">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <strong>تاریخ سفارش:</strong> <span id="order-date"></span>
+                                    </div>
+                                    <div>
+                                        <strong>وضعیت:</strong> <span id="order-status" class="badge"></span>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <strong>کد رهگیری:</strong> <span id="tracking-code"></span>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>محصول</th>
+                                            <th>فروشنده</th>
+                                            <th>قیمت واحد</th>
+                                            <th>تعداد</th>
+                                            <th>قیمت کل</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="order-items">
+                                        <!-- آیتم‌های سفارش اینجا بارگذاری می‌شوند -->
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-primary">
+                                            <td colspan="4" class="text-end"><strong>جمع کل:</strong></td>
+                                            <td><strong id="order-total"></strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             <!-- بخش تغییر رمز عبور (برای همه کاربران) -->
             <div id="change-password-section" class="card mb-4" style="display: {% if section == 'change_password' %}block{% else %}none{% endif %};">
                 <div class="card-header bg-warning text-white">
@@ -593,6 +826,157 @@ $(document).ready(function() {
             showMessage('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید', false);
         });
     });
+
+    // اسکریپت‌های سبد خرید
+    $(document).ready(function() {
+        // افزایش تعداد
+        $('.increment').click(function() {
+            const itemId = $(this).data('id');
+            updateCartItem(itemId, 'increment');
+        });
+
+        // کاهش تعداد
+        $('.decrement').click(function() {
+            const itemId = $(this).data('id');
+            updateCartItem(itemId, 'decrement');
+        });
+
+        // حذف آیتم
+        $('.remove-item').click(function() {
+            const itemId = $(this).data('id');
+            removeCartItem(itemId);
+        });
+
+        function updateCartItem(itemId, action) {
+            $.post('{% url "user_panel:update_cart_item" 0 %}'.replace('0', itemId),
+                {
+                    action: action,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        // به‌روزرسانی تعداد و قیمت در ردیف
+                        const row = $(`button[data-id="${itemId}"]`).closest('tr');
+                        row.find('.item-quantity').text(response.new_quantity);
+                        row.find('.item-total').text(response.item_total + ' تومان');
+
+                        // به‌روزرسانی جمع کل سبد خرید
+                        $('.cart-total').text(response.cart_total + ' تومان');
+                    }
+                }
+            );
+        }
+
+        function removeCartItem(itemId) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این محصول را از سبد خرید حذف کنید؟')) return;
+
+            $.post('{% url "user_panel:remove_cart_item" 0 %}'.replace('0', itemId),
+                {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        // حذف ردیف از جدول
+                        const row = $(`button[data-id="${itemId}"]`).closest('tr');
+                        row.fadeOut(400, function() { $(this).remove(); });
+
+                        // به‌روزرسانی جمع کل سبد خرید
+                        $('.cart-total').text(response.cart_total + ' تومان');
+
+                        // به‌روزرسانی تعداد آیتم‌ها در هدر
+                        $('.cart-count').text(response.cart_items_count);
+
+                        // اگر سبد خرید خالی شد، نمایش پیام
+                        if (response.cart_items_count == 0) {
+                            location.reload();
+                        }
+                    }
+                }
+            );
+        }
+
+        // افزودن به سبد خرید (در صفحات محصولات)
+        $('.add-to-cart').click(function() {
+            const productId = $(this).data('id');
+
+            // اگر کاربر وارد نشده باشد
+            {% if not request.user.is_authenticated %}
+                alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
+                window.location.href = "{% url 'account:login' %}";
+                return;
+            {% endif %}
+
+            // درخواست AJAX برای افزودن به سبد خرید
+            $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
+                {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        // به‌روزرسانی تعداد آیتم‌ها در هدر
+                        $('.cart-count').text(response.cart_items_count);
+
+                        // نمایش پیام موفقیت
+                        alert(response.message);
+                    } else {
+                        alert('خطا در افزودن محصول به سبد خرید');
+                    }
+                }
+            );
+        });
+    });
+
+    // مشاهده جزئیات سفارش
+    $(document).on('click', '.view-order-details', function() {
+        const orderId = $(this).data('id');
+
+        // درخواست AJAX برای دریافت جزئیات سفارش
+        $.get(`/user_panel/orders/${orderId}/details/`, function(response) {
+            if (response.success) {
+                // پر کردن اطلاعات سفارش
+                $('#order-id').text(response.order.id);
+                $('#order-date').text(response.order.created_at);
+                $('#order-status').text(response.order.status_display)
+                    .removeClass()
+                    .addClass('badge ' + getStatusClass(response.order.status));
+                $('#tracking-code').text(response.order.tracking_code || '-');
+                $('#order-total').text(response.order.total_price + ' تومان');
+
+                // پاک کردن آیتم‌های قبلی
+                $('#order-items').empty();
+
+                // افزودن آیتم‌های سفارش
+                response.items.forEach(item => {
+                    $('#order-items').append(`
+                        <tr>
+                            <td>${item.product_title}</td>
+                            <td>${item.seller_username}</td>
+                            <td>${item.price} تومان</td>
+                            <td>${item.quantity}</td>
+                            <td>${item.total_price} تومان</td>
+                        </tr>
+                    `);
+                });
+
+                // نمایش مودال
+                $('#orderDetailsModal').modal('show');
+            } else {
+                showMessage('خطا در دریافت جزئیات سفارش', false);
+            }
+        }).fail(function() {
+            showMessage('خطا در ارتباط با سرور', false);
+        });
+    });
+
+    // تابع کمکی برای کلاس وضعیت سفارش
+    function getStatusClass(status) {
+        switch(status) {
+            case 'delivered': return 'bg-success';
+            case 'cancelled': return 'bg-danger';
+            case 'shipped': return 'bg-primary';
+            default: return 'bg-warning text-dark';
+        }
+    }
 });
 </script>
 

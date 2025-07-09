@@ -1,4 +1,6 @@
 from django import template
+from django.urls import reverse
+
 from product.models import Category
 
 register = template.Library()
@@ -14,6 +16,8 @@ def make_category(menu_list):
     string = '<ul class = "navbar-nav me-auto mb-2 mb-lg-0">'
     for category in category:
         string+=backward_tree(category)
+
+    string += f'<li class="nav-item"><a class="nav-link" href="{reverse("user_panel:dashboard")}">پنل کاربری</a></li>'
     string+="</ul>"
     return string
 
