@@ -46,6 +46,7 @@ def product_list(request, category_slug=None):
         'categories': categories,
         'page_obj': page_obj,
     }
+    # return JsonResponse({})
     return render(request, 'shop/product/list.html', context)
 
 def product_detail(request, id, slug):
