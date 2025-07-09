@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta 
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,9 @@ SECRET_KEY = 'django-insecure-ib0kv+291ud6qzt0)irc^r2t#k(eb)dp+q#xgp0e%!g#p)wm^$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*'
+]
 
 
 # Application definition
@@ -35,25 +38,33 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages',
+    'django.contrib.messages', 
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'api',
 
 
-    #Crispy
+    # Crispy
     'crispy_forms',
     "crispy_bootstrap4",
 
-    #Bootstrap
+    # Bootstrap
     'bootstrap5',
 
 
-    #local
+    # local_mojtaba
     'product.apps.CategoryConfig',
     'home.apps.HomeConfig',
     'account.apps.AccountConfig',
     'captcha',
+
+    # local_kasra
+    'administrator.apps.AdministratorConfig',
+
 ]
 
+ALLOW_UNICODE_SLUGS = True
 
 
 MIDDLEWARE = [
@@ -97,6 +108,26 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES' :[
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME_LATE_USER': timedelta(days=30),
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -137,7 +168,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-MEDIA_URL ='media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = 'media/'
 
 # Default primary key field type
@@ -146,8 +177,7 @@ MEDIA_ROOT = 'media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-
-#Crispy forms setting ->
+# Crispy forms setting ->
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
@@ -163,4 +193,3 @@ AUTHENTICATION_BACKENDS = [
 # بعد از لاگین
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = 'home:home'
-

@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -13,10 +15,15 @@ class Profile(models.Model):
     NORMAL_USER = 1
     PRODUCER_USER = 2
     SELLER_USER = 3
+    ADMIN_USER = 4
+    MARKERE_USER = 5
+
     USER_TYPES = (
         (1, 'خریدار معمولی'),
         (2, 'تولیدکننده'),
         (3, 'فروشنده'),
+        (4, 'ادمین'),
+        (5, 'بازاریاب'),
     )
 
 
@@ -55,3 +62,6 @@ class VerificationCode(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)  # افزودن فیلد انقضا
     is_used = models.BooleanField(default=False)  # افزودن فیلد وضعیت استفاده
+
+    def is_valid(self):
+        return not self.is_used and timezone.now() < self.expires_at

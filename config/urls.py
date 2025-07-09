@@ -15,18 +15,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path , include
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 app_name = "home"
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('home.urls') , name="home"),
+    path('', include('home.urls'), name="home"),
     path('captcha/', include('captcha.urls')),
-    path('account/' , include('account.urls')),
-    path('products/',include('product.urls'), name="product"),
-]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('account/', include('account.urls')),
+    path('products/', include('product.urls'), name="product"),
+    path('administrator/', include('administrator.urls')),
+    path('api/', include('api.urls') ),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-
-
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

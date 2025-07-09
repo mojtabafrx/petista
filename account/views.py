@@ -10,6 +10,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 
+
+
 def signup(request):
     if request.method == 'POST':
         form = SignupForm(request.POST)
@@ -17,6 +19,7 @@ def signup(request):
             # ساخت کاربر جدید
             user = form.save(commit=False)
             user.username = form.cleaned_data['phone_number'] # استفاده از شماره تلفن به عنوان نام کاربری
+            # user.password = form.cleaned_data['password1']
             user.is_active=False 
             user.save()
             

@@ -1,321 +1,229 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل مدیریت کالاها</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #f5f7fa;
-            color: #333;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        .admin-panel {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-        @media (min-width: 992px) {
-            .admin-panel {
-                grid-template-columns: 1fr 2fr;
-            }
-        }
-        .card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #555;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        .btn-danger {
-            background-color: #e74c3c;
-        }
-        .btn-danger:hover {
-            background-color: #c0392b;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px 15px;
-            text-align: right;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: #555;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .product-image {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
-        .toast {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 25px;
-            border-radius: 4px;
-            color: white;
-            z-index: 1000;
-            animation: fadeIn 0.3s;
-        }
-        .toast.success {
-            background-color: #27ae60;
-        }
-        .toast.error {
-            background-color: #e74c3c;
-        }
-        .toast.info {
-            background-color: #3498db;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; top: 0; }
-            to { opacity: 1; top: 20px; }
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #7f8c8d;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>پنل مدیریت کالاها</h1>
-        
-        <div class="admin-panel">
-            <!-- فرم افزودن کالای جدید -->
-            <div class="card">
-                <h2>افزودن کالای جدید</h2>
-                <form id="productForm">
-                    <div class="form-group">
-                        <label for="name">نام کالا</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="price">قیمت (تومان)</label>
-                        <input type="number" id="price" name="price" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="category">دسته‌بندی</label>
-                        <select id="category" name="category" required>
-                            <option value="">انتخاب کنید</option>
-                            <option value="بهداشتی">الکترونیکی</option>
-                            <option value="خوراکی">پوشاک</option>
-                            <option value="اسباب بازی">خواربار</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="stock">موجودی انبار</label>
-                        <input type="number" id="stock" name="stock" value="0">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="image">آدرس تصویر</label>
-                        <input type="text" id="image" name="image" placeholder="https://example.com/image.jpg">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description">توضیحات</label>
-                        <textarea id="description" name="description"></textarea>
-                    </div>
-                    
-                    <button type="submit">افزودن کالا</button>
-                </form>
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">افزودن محصول جدید</h1>
+    <form method="post" enctype="multipart/form-data" id="product-form">
+        {% csrf_token %}
+
+        <!-- اطلاعات اصلی محصول -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                اطلاعات پایه محصول
             </div>
-            
-            <!-- لیست کالاها -->
-            <div class="card">
-                <h2>لیست کالاها (<span id="productCount">0</span>)</h2>
-                <div id="productsTable">
-                    <div class="empty-state">هیچ کالایی ثبت نشده است</div>
+            <div class="card-body">
+                <div class="row">
+                    {% for field in form %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-    </div>
 
+        <!-- بخش تصاویر -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                تصاویر محصول
+            </div>
+            <div class="card-body">
+                <div id="image-formset">
+                    {{ image_formset.management_form }}
 
-    
-    <script>
-        // ذخیره کالاها در آرایه
-        let products = [];
-        
-        // المنت‌های مهم
-        const productForm = document.getElementById('productForm');
-        const productsTable = document.getElementById('productsTable');
-        const productCount = document.getElementById('productCount');
-        
-        // رویداد ثبت فرم
-        productForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // جمع‌آوری داده‌های فرم
-            const formData = new FormData(productForm);
-            const product = {
-                id: Date.now(),
-                name: formData.get('name'),
-                price: parseFloat(formData.get('price')),
-                category: formData.get('category'),
-                stock: parseInt(formData.get('stock')) || 0,
-                image: formData.get('image'),
-                description: formData.get('description')
-            };
-            
-            // اعتبارسنجی
-            if (!product.name || !product.price || !product.category) {
-                showToast('لطفاً نام، قیمت و دسته‌بندی کالا را وارد کنید', 'error');
-                return;
-            }
-            
-            // افزودن کالا به لیست
-            products.push(product);
-            
-            // به‌روزرسانی لیست
-            updateProductsList();
-            
-            // نمایش پیام موفقیت
-            showToast('کالا با موفقیت اضافه شد', 'success');
-            
-            // پاک کردن فرم
-            productForm.reset();
+                    <!-- منطقه درگ و دراپ -->
+                    <div id="drop-area" class="border-dashed p-5 text-center mb-4">
+                        <i class="bi bi-cloud-upload fs-1"></i>
+                        <p class="fs-5">تصاویر را اینجا بکشید و رها کنید</p>
+                        <p>یا</p>
+                        <button type="button" class="btn btn-primary" id="browse-btn">
+                            انتخاب تصاویر
+                        </button>
+                        <input type="file" id="file-input" multiple accept="image/*" hidden>
+                    </div>
+
+                    <!-- پیش‌نمایش تصاویر -->
+                    <div id="image-preview" class="row"></div>
+
+                    <!-- فرم‌های پنهان برای تصاویر -->
+                    <div id="hidden-forms" style="display:none;">
+                        {% for form in image_formset %}
+                        <div class="image-form">
+                            {{ form.id }}
+                            {{ form.image }}
+                            {{ form.alt_text }}
+                            {{ form.DELETE }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-lg">
+            ذخیره محصول
+        </button>
+    </form>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+<style>
+    .border-dashed {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+
+    .border-dashed.drag-over {
+        background-color: #f0f9ff;
+        border-color: #0d6efd;
+    }
+
+    .preview-image {
+        position: relative;
+        margin: 10px;
+        width: 150px;
+        height: 150px;
+    }
+
+    .preview-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: rgba(255, 0, 0, 0.7);
+        color: white;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropArea = document.getElementById('drop-area');
+        const fileInput = document.getElementById('file-input');
+        const browseBtn = document.getElementById('browse-btn');
+        const imagePreview = document.getElementById('image-preview');
+        const hiddenForms = document.getElementById('hidden-forms');
+        const totalForms = document.getElementById('id_additional_images-TOTAL_FORMS');
+        let formCount = parseInt(totalForms.value);
+
+        // فعال‌سازی درگ و دراپ
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
         });
-        
-        // تابع به‌روزرسانی لیست کالاها
-        function updateProductsList() {
-            productCount.textContent = products.length;
-            
-            if (products.length === 0) {
-                productsTable.innerHTML = '<div class="empty-state">هیچ کالایی ثبت نشده است</div>';
-                return;
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('drag-over');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('drag-over');
+        }
+
+        // پردازش فایل‌های انداخته شده
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // باز کردن دیالوگ انتخاب فایل با کلیک روی دکمه
+        browseBtn.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function () {
+            handleFiles(this.files);
+        });
+
+        // پردازش فایل‌ها و نمایش پیش‌نمایش
+        function handleFiles(files) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.match('image.*')) continue;
+
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'col-md-2 preview-image';
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" alt="پیش‌نمایش">
+                        <div class="delete-btn" data-index="${formCount}">×</div>
+                        `;
+                    imagePreview.appendChild(previewDiv);
+
+                    // ایجاد فرم جدید در فرم‌ست
+                    const formTemplate = hiddenForms.querySelector('.image-form').cloneNode(true);
+                    formTemplate.innerHTML = formTemplate.innerHTML.replace(/-\d+-/g, `-${formCount}-`);
+
+                    const imageInput = formTemplate.querySelector('input[type="file"]');
+                    const altInput = formTemplate.querySelector('input[type="text"]');
+
+                    // تنظیم فایل در input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    imageInput.files = dataTransfer.files;
+
+                    // تنظیم متن جایگزین
+                    altInput.value = file.name.split('.')[0];
+
+                    hiddenForms.appendChild(formTemplate);
+
+                    // افزایش شمارنده فرم‌ها
+                    formCount++;
+                    totalForms.value = formCount;
+                };
+
+                reader.readAsDataURL(file);
             }
-            
-            // ساخت جدول
-            let tableHTML = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>نام</th>
-                            <th>دسته‌بندی</th>
-                            <th>قیمت</th>
-                            <th>موجودی</th>
-                            <th>عملیات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-            
-            products.forEach(product => {
-                tableHTML += `
-                    <tr>
-                        <td>
-                            <div style="display: flex; align-items: center;">
-                                ${product.image ? `<img src="${product.image}" class="product-image" alt="${product.name}">` : ''}
-                                <div style="margin-right: 10px;">
-                                    <div style="font-weight: 500;">${product.name}</div>
-                                    ${product.description ? `<div style="font-size: 0.8em; color: #666;">${product.description.substring(0, 30)}${product.description.length > 30 ? '...' : ''}</div>` : ''}
-                                </div>
-                            </div>
-                        </td>
-                        <td>${product.category}</td>
-                        <td>${product.price.toLocaleString()} تومان</td>
-                        <td>${product.stock}</td>
-                        <td>
-                            <div class="actions">
-                                <button onclick="deleteProduct(${product.id})" class="btn-danger">حذف</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-            
-            productsTable.innerHTML = tableHTML;
         }
-        
-        // تابع حذف کالا
-        function deleteProduct(id) {
-            products = products.filter(product => product.id !== id);
-            updateProductsList();
-            showToast('کالا حذف شد', 'info');
-        }
-        
-        // تابع نمایش پیام
-        function showToast(message, type) {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
+
+        // حذف تصویر
+        imagePreview.addEventListener('click', function (e) {
+            if (e.target.classList.contains('delete-btn')) {
+                const index = e.target.getAttribute('data-index');
+                e.target.parentElement.remove();
+
+                // علامت‌گذاری فرم برای حذف
+                const deleteInput = document.querySelector(`#id_images-${index}-DELETE`);
+                if (deleteInput) {
+                    deleteInput.value = 'on';
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
