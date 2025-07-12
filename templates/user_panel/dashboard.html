@@ -392,9 +392,13 @@
                         <a href="{% url 'product:product_list' %}" class="btn btn-outline-primary me-2">
                             <i class="fas fa-arrow-left me-2"></i> ادامه خرید
                         </a>
-                        <button class="btn btn-success">
-                            <i class="fas fa-check me-2"></i> پرداخت نهایی
-                        </button>
+                        <!-- تغییر دکمه پرداخت به فرم POST -->
+                        <form id="checkout-form" method="post" action="{% url 'user_panel:checkout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success" id="checkout-btn">
+                                <i class="fas fa-check me-2"></i> پرداخت نهایی
+                            </button>
+                        </form>
                     </div>
                     {% else %}
                     <div class="text-center py-5">
@@ -977,6 +981,36 @@ $(document).ready(function() {
             default: return 'bg-warning text-dark';
         }
     }
+
+    // پرداخت نهایی
+    $('#checkout-form').submit(function(e) {
+        e.preventDefault();
+
+        showMessage('در حال پردازش سفارش...', true);
+
+        $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    showMessage(response.message, true);
+
+                    // هدایت به صفحه سفارشات بعد از 3 ثانیه
+                    setTimeout(function() {
+                        window.location.href = "{% url 'user_panel:my_orders' %}";
+                    }, 3000);
+                } else {
+                    showMessage(response.error, false);
+                }
+            },
+            error: function() {
+                showMessage('خطا در ارتباط با سرور', false);
+            }
+        });
+    });
+
+
 });
 </script>
 

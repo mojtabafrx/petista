@@ -8,7 +8,8 @@ from .models import SellerProduct , Cart , CartItem ,Order, OrderItem
 from django.core.paginator import Paginator
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-
+from django.db import transaction
+from django.views.decorators.http import require_POST
 
 @user_panel_access
 def dashboard(request):
@@ -26,7 +27,6 @@ def dashboard(request):
     return render(request, 'user_panel/dashboard.html', context)
 
 @user_panel_access
-@seller_required
 def get_products(request):
     """دریافت محصولات با AJAX بر اساس دسته‌بندی"""
     category_id = request.GET.get('category_id')
@@ -347,3 +347,64 @@ def order_details(request, order_id):
         },
         'items': items_list
     })
+
+
+@user_panel_access
+@require_POST
+@transaction.atomic
+def checkout(request):
+    """پرداخت نهایی و ایجاد سفارش"""
+    cart = get_object_or_404(Cart, user=request.user, is_active=True)
+
+    # بررسی وجود آیتم در سبد خرید
+    if cart.items.count() == 0:
+        return JsonResponse({'success': False, 'error': 'سبد خرید شما خالی است'})
+
+    # بررسی موجودی کافی برای همه محصولات
+    for item in cart.items.all():
+        if item.seller_product.stock < item.quantity:
+            return JsonResponse({
+                'success': False,
+                'error': f'موجودی کافی برای محصول {item.seller_product.product.title} وجود ندارد'
+            })
+
+    try:
+        # ایجاد سفارش جدید
+        order = Order.objects.create(
+            user=request.user,
+            total_price=cart.total_price(),
+            status='processing'  # وضعیت اولیه: در حال پردازش
+        )
+
+        # ایجاد آیتم‌های سفارش
+        for cart_item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                seller_product=cart_item.seller_product,
+                quantity=cart_item.quantity,
+                price=cart_item.seller_product.price
+            )
+
+            # کاهش موجودی محصول
+            seller_product = cart_item.seller_product
+            seller_product.stock -= cart_item.quantity
+            seller_product.save()
+
+        # غیرفعال کردن سبد خرید فعلی
+        cart.is_active = False
+        cart.save()
+
+        # ایجاد سبد خرید جدید برای کاربر
+        Cart.objects.create(user=request.user)
+
+        return JsonResponse({
+            'success': True,
+            'message': 'سفارش شما با موفقیت ثبت شد',
+            'order_id': order.id
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': f'خطا در ثبت سفارش: {str(e)}'
+        })
