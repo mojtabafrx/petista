@@ -10,11 +10,15 @@ from django.utils import timezone
 import random
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
-
+from django.db.models import Avg, Count, Sum
 from django.contrib.auth.models import User
+from .serializer import ProductSerializer
+from rest_framework import generics
+from product.models import Product
+
 @api_view(['PUT', 'GET', 'DELETE'])
-# @permision()
 def Product_detail(request, pk):
+
     try:
         product = Product.objects.get(pk=pk)
 
@@ -37,8 +41,16 @@ def Product_detail(request, pk):
     elif request.method == 'DELETE':
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
-#api
+
+
+class ProductListAPIView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+
 
 class ProtectedView(APIView):
     permissionclass = [IsAuthenticated]
@@ -50,7 +62,7 @@ class OTPLoginView(APIView):
     authentication_classes = []
     permission_classes = []
     def post(self, request):
-        print(request.data)
+        print("$"*80,request.data)
         serializer = OTPSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
@@ -61,7 +73,7 @@ class SendOTPView(APIView):
     permission_classes = []
     def post(self, request):
 
-        print("hjkn")
+        print("$"*80,request.data)
         serializer = PhoneSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -122,3 +134,9 @@ class VerifyOTPView(APIView):
             'user_id': profile.user.id,
             'phone': profile.phone_number
         }, status=status.HTTP_200_OK)
+
+
+class HealthCheckView(APIView) :
+    permission_classes = []
+    def head(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)

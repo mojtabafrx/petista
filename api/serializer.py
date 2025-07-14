@@ -1,3 +1,5 @@
+from pyexpat import model
+
 from product.models import Product
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -8,6 +10,22 @@ class ProductSerializer(serializers.ModelSerializer) :
     class Meta :
         model = Product
         fields = "__all__"
+
+
+class AllProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["title", "description", "base_price"]
+
+# class AllProductSerializer(serializers.ModelSerializer) :
+#     class Meta :
+#         model = Product
+#         fields = ['id','title','base_price','stock',]
+#     def GetPicture(self):
+#         pitureid = """(SELECT SUM(available_count) FROM user_panel_sellerproduct
+#                     WHERE product_id = product_product.id AND available_count > 0
+#                     AND price = (SELECT MIN(price) FROM user_panel_sellerproduct
+#                     WHERE product_id = product_product.id AND available_count > 0)"""
 
 
 # serializers.py
