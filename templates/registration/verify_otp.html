@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ارسال مجدد کد
   resendBtn.addEventListener('click', function() {
     // ارسال درخواست AJAX برای ارسال مجدد کد
-    fetch('{% url "resend_otp" %}', {
+    fetch('{% url "account:resend_otp" %}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -898,7 +898,6 @@ $(document).ready(function() {
                 }
             );
         }
-
         // افزودن به سبد خرید (در صفحات محصولات)
         $('.add-to-cart').click(function() {
             const productId = $(this).data('id');
@@ -917,16 +916,22 @@ $(document).ready(function() {
                 },
                 function(response) {
                     if (response.success) {
+
                         // به‌روزرسانی تعداد آیتم‌ها در هدر
                         $('.cart-count').text(response.cart_items_count);
 
                         // نمایش پیام موفقیت
                         alert(response.message);
                     } else {
-                        alert('خطا در افزودن محصول به سبد خرید');
+                        // نمایش خطای خاص برگشتی از سرور
+                        alert(response.error || 'خطا در افزودن محصول به سبد خرید');
                     }
                 }
-            );
+            ).fail(function(xhr) {
+                // مدیریت خطاهای شبکه/سرور
+                alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید');
+                console.error('Error:', xhr.responseText);
+            });
         });
     });
 

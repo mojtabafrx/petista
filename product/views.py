@@ -20,17 +20,22 @@ def product_list(request, category_slug=None):
     products = products.annotate(
         min_price=RawSQL(
             """
-            (SELECT MIN(price) FROM user_panel_sellerproduct
-             WHERE product_id = product_product.id AND available_count > 0)
+            (SELECT COALESCE(
+                (SELECT MIN(price) 
+                 FROM user_panel_sellerproduct 
+                 WHERE product_id = product_product.id AND available_count > 0),
+                0
+            ) AS min_price)
             """, []
         ),
         total_available=RawSQL(
             """
+            (SELECT COALESCE(
             (SELECT SUM(available_count) FROM user_panel_sellerproduct 
              WHERE product_id = product_product.id AND available_count > 0
              AND price = (SELECT MIN(price) FROM user_panel_sellerproduct
                           WHERE product_id = product_product.id AND available_count > 0)
-            )
+            ) , 0) AS total_available)
             """, []
         )
     ).order_by('-created_at')
@@ -82,5 +87,4 @@ def product_detail(request, id, slug):
     return render(request, 'shop/product/detail.html', context)
 
 
-from django.shortcuts import get_object_or_404
 

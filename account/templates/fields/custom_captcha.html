@@ -1,0 +1,115 @@
+{% load i18n %}
+{% spaceless %}
+{#<div class="form-group">#}
+{#  <label class="control-label">{{ label }}</label>#}
+{#  <div class="form-group">#}
+{#    <div class="input-group mb-3">#}
+{#      <div class="input-group-prepend">#}
+{#        {% if audio %}#}
+{#            <a title="{% trans "Play CAPTCHA as audio file" %}" href="{{ audio }}"></a>#}
+{#        {% endif %}#}
+{#        <img src="{{ image }}" alt="captcha" class="captcha" />#}
+{#      </div>#}
+{#      {% include "django/forms/widgets/multiwidget.html" %}#}
+{#    </div>#}
+{#  </div>#}
+{#</div>#}
+{##}
+{#<div class="captcha-box">#}
+{#    <!-- نمایش تصویر کپچا -->#}
+{#    <img src="{{ image }}" alt="captcha" class="captcha" style="width: 90%"/>#}
+{##}
+{#</div>#}
+{#<div class="captcha-input-group">#}
+{#    <input type="text" placeholder="کد امنیتی" required  />#}
+{#    <button type="button" class="refresh-button">#}
+{#        <i class="nf nf-fa-refresh"></i>#}
+{#    </button>#}
+{#</div>#}
+
+<div class="captcha-box">
+  <img src="{{ image }}" alt="captcha" class="captcha" style="width: 70%" id="{{ widget.attrs.id }}-image"/>
+</div>
+<div class="captcha-input-group">
+  {% include "django/forms/widgets/multiwidget.html" %}
+
+  <button type="button" class="refresh-button" id="{{ widget.attrs.id }}-refresh">
+    <i class="nf nf-fa-refresh"></i>
+  </button>
+</div>
+
+<script>
+document.getElementById('{{ widget.attrs.id }}-refresh').addEventListener('click', function() {
+  fetch('{% url "captcha-refresh" %}', {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    // آپدیت تصویر
+    const image = document.getElementById('{{ widget.attrs.id }}-image');
+    image.src = data.image_url + '?t=' + new Date().getTime();
+
+    // آپدیت فیلد مخفی
+    document.getElementById('{{ widget.attrs.id }}_0').value = data.key;
+
+    // ریست کردن فیلد ورودی
+    document.getElementById('{{ widget.attrs.id }}_1').value = '';
+  })
+  .catch(error => console.error('Error:', error));
+});
+{#</script>#}
+{#<div class="captcha-box">#}
+{#    <!-- نمایش تصویر کپچا -->#}
+{#    <img src="{{ image }}" alt="captcha" class="captcha" style="width: 90%" id="{{ widget.attrs.id }}-image"/>#}
+{#</div>#}
+{#<div class="captcha-input-group">#}
+{#    <!-- فیلد مخفی برای کلید کپچا -->#}
+{#    {% include "django/forms/widgets/multiwidget.html" %}#}
+{#    <!-- فیلد ورودی کاربر -->#}
+{##}
+{#    <!-- دکمه تازه‌سازی -->#}
+{#    <button type="button" class="refresh-button" id="{{ widget.attrs.id }}-refresh">#}
+{#        <i class="nf nf-fa-refresh"></i>#}
+{#    </button>#}
+{#</div>#}
+{#<!-- اسکریپت تازه‌سازی کپچا -->#}
+{##}
+{#<script>#}
+{#document.getElementById('{{ widget.attrs.id }}-refresh').addEventListener('click', function() {#}
+{#    // ایجاد درخواست با هدرهای صحیح#}
+{#    fetch('{% url "captcha-refresh" %}', {#}
+{#        method: 'GET',#}
+{#        headers: {#}
+{#            'X-Requested-With': 'XMLHttpRequest',#}
+{#            'Accept': 'application/json'#}
+{#        }#}
+{#    })#}
+{#    .then(response => {#}
+{#        if (!response.ok) {#}
+{#            throw new Error('Network response was not ok: ' + response.status);#}
+{#        }#}
+{#        return response.json();#}
+{#    })#}
+{#    .then(data => {#}
+{#        // آپدیت تصویر#}
+{#        const timestamp = new Date().getTime();#}
+{#        const imageUrl = data.image_url + '?t=' + timestamp;#}
+{#        document.getElementById('{{ widget.attrs.id }}-image').src = imageUrl;#}
+{##}
+{#        // آپدیت کلید مخفی#}
+{#        document.getElementById('{{ widget.attrs.id }}-key').value = data.key;#}
+{##}
+{#        // ریست کردن فیلد ورودی#}
+{#        document.getElementById('{{ widget.attrs.id }}-input').value = '';#}
+{#    })#}
+{#    .catch(error => {#}
+{#        console.error('Error refreshing CAPTCHA:', error);#}
+{#        alert('خطا در تازه‌سازی کپچا. لطفاً صفحه را مجدداً بارگذاری کنید.');#}
+{#    });#}
+{# } ); #}
+</script>
+{% endspaceless %}

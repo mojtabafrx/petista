@@ -55,7 +55,7 @@ def add_seller_product(request):
             SellerProduct.objects.update_or_create(
                 seller=request.user,
                 product=product,
-                defaults={'price': price, 'stock': stock}
+                defaults={'price': price, 'stock': stock , 'available_count': stock}
             )
             return JsonResponse({'success': True, 'message': 'محصول با موفقیت ثبت شد'})
         except Product.DoesNotExist:
@@ -183,8 +183,8 @@ def change_password_ajax(request):
 def view_cart(request):
     """نمایش سبد خرید"""
     # یافتن سبد خرید فعال کاربر
+    # cart = Cart.objects.get_or_create(user=request.user, is_active=True)
     cart = get_object_or_404(Cart, user=request.user, is_active=True)
-
     context = {
         'cart': cart,
         'user_type': request.user.profile.user_type,
@@ -195,54 +195,78 @@ def view_cart(request):
 @user_panel_access
 def add_to_cart(request, product_id):
     """افزودن محصول به سبد خرید"""
-    product = Product.objects.filter( id=product_id)
-    cart = get_object_or_404(Cart, user=request.user, is_active=True)
-    product = product.annotate(
-        min_price=RawSQL(
-            """
-            (SELECT MIN(price) FROM user_panel_sellerproduct
-             WHERE product_id = product_product.id AND available_count > 0)
-            """, []
-        ),
-        total_available=RawSQL(
-            """
-            (SELECT SUM(available_count) FROM user_panel_sellerproduct 
-             WHERE product_id = product_product.id AND available_count > 0
-             AND price = (SELECT MIN(price) FROM user_panel_sellerproduct
-                          WHERE product_id = product_product.id AND available_count > 0)
+    try:
+        with transaction.atomic():
+            product = Product.objects.select_for_update().filter(id=product_id)
+            # cart = get_object_or_404(Cart, user=request.user, is_active=True)
+            product = product.annotate(
+                min_price=RawSQL(
+                    """
+                    (SELECT MIN(price) FROM user_panel_sellerproduct
+                     WHERE product_id = product_product.id AND available_count > 0)
+                    """, []
+                ),
+                total_available=RawSQL(
+                    """
+                    (SELECT SUM(available_count) FROM user_panel_sellerproduct 
+                     WHERE product_id = product_product.id AND available_count > 0
+                     AND price = (SELECT MIN(price) FROM user_panel_sellerproduct
+                                  WHERE product_id = product_product.id AND available_count > 0)
+                    )
+                    """, []
+                )
+            ).order_by('-created_at').first()
+            # seller_product = SellerProduct.objects.filter(price=product.min_price).first()
+            # یافتن محصول با کمترین قیمت و موجودی کافی
+            seller_product = SellerProduct.objects.select_for_update().filter(
+                product_id=product_id,
+                available_count__gt=0,
+                price=product.min_price
+            ).order_by('price').first()
+
+            if not seller_product:
+                return JsonResponse({'success': False, 'error': 'موجودی محصول کافی نیست'})
+
+            # کاهش available_count
+
+            seller_product.available_count -= 1
+            seller_product.save()
+
+            # یافتن سبد خرید فعال کاربر یا ایجاد یک سبد جدید
+            cart, created = Cart.objects.get_or_create(
+                user=request.user,
+                is_active=True,
+                defaults={'user': request.user}
             )
-            """, []
-        )
-    ).order_by('-created_at').first()
-    seller_product = SellerProduct.objects.filter(price = product.min_price).first()
 
-    # یافتن سبد خرید فعال کاربر یا ایجاد یک سبد جدید
-    cart, created = Cart.objects.get_or_create(
-        user=request.user,
-        is_active=True,
-        defaults={'user': request.user}
-    )
+            # بررسی آیا محصول قبلاً در سبد وجود دارد
+            cart_item, item_created = CartItem.objects.get_or_create(
+                cart=cart,
+                seller_product=seller_product,
+                defaults={
+                    'seller_product': seller_product,
+                    'quantity': 1
+                }
+            )
 
-    # بررسی آیا محصول قبلاً در سبد وجود دارد
-    cart_item, item_created = CartItem.objects.get_or_create(
-        cart=cart,
-        seller_product=seller_product,
-        defaults={
-            'seller_product': seller_product,
-            'quantity': 1
-        }
-    )
+            # اگر محصول قبلاً در سبد وجود داشته، تعداد را افزایش می‌دهیم
+            if not item_created:
+                cart_item.quantity += 1
+                cart_item.save()
 
-    # اگر محصول قبلاً در سبد وجود داشته، تعداد را افزایش می‌دهیم
-    if not item_created:
-        cart_item.quantity += 1
-        cart_item.save()
+            return JsonResponse({
+                'success': True,
+                'message': 'محصول به سبد خرید اضافه شد',
+                'cart_items_count': cart.total_items()
+            })
 
-    return JsonResponse({
-        'success': True,
-        'message': 'محصول به سبد خرید اضافه شد',
-        'cart_items_count': cart.total_items()
-    })
+    except Exception as e:
+        # برگرداندن خطا با جزئیات
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+
 
 
 @user_panel_access
@@ -260,34 +284,61 @@ def cart_detail(request):
 @user_panel_access
 def update_cart_item(request, item_id):
     """به‌روزرسانی آیتم سبد خرید"""
-    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
 
-    action = request.POST.get('action')
-    if action == 'increment':
-        cart_item.quantity += 1
-    elif action == 'decrement' and cart_item.quantity > 1:
-        cart_item.quantity -= 1
-    cart_item.save()
+    try:
+        with transaction.atomic():
+            cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+            seller_product = SellerProduct.objects.select_for_update().get(id=cart_item.seller_product.id)
 
-    return JsonResponse({
-        'success': True,
-        'new_quantity': cart_item.quantity,
-        'item_total': cart_item.total_price(),
-        'cart_total': cart_item.cart.total_price()
-    })
+            action = request.POST.get('action')
+            if action == 'increment':
+                if seller_product.available_count > 0:
+                    seller_product.available_count -= 1
+                    seller_product.save()
+                    cart_item.quantity += 1
+                    cart_item.save()
+                else:
+                    return JsonResponse({'success': False, 'error': 'موجودی کافی نیست'})
+
+            elif action == 'decrement' and cart_item.quantity > 1:
+                seller_product.available_count += 1
+                seller_product.save()
+                cart_item.quantity -= 1
+                cart_item.save()
+
+            return JsonResponse({
+                'success': True,
+                'new_quantity': cart_item.quantity,
+                'item_total': cart_item.total_price(),
+                'cart_total': cart_item.cart.total_price()
+            })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 
 @user_panel_access
 def remove_cart_item(request, item_id):
     """حذف آیتم از سبد خرید"""
-    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
-    cart_item.delete()
+    try:
+        with transaction.atomic():
+            cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+            seller_product = SellerProduct.objects.select_for_update().get(id=cart_item.seller_product.id)
 
-    return JsonResponse({
-        'success': True,
-        'cart_total': cart_item.cart.total_price(),
-        'cart_items_count': cart_item.cart.total_items()
-    })
+            # برگرداندن موجودی
+            seller_product.available_count += cart_item.quantity
+            seller_product.save()
+
+            cart_item.delete()
+
+            return JsonResponse({
+                'success': True,
+                'cart_total': cart_item.cart.total_price(),
+                'cart_items_count': cart_item.cart.total_items()
+            })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 
 
@@ -362,7 +413,7 @@ def checkout(request):
 
     # بررسی موجودی کافی برای همه محصولات
     for item in cart.items.all():
-        if item.seller_product.stock < item.quantity:
+        if ( item.seller_product.stock - item.seller_product.sell_count ) < item.quantity:
             return JsonResponse({
                 'success': False,
                 'error': f'موجودی کافی برای محصول {item.seller_product.product.title} وجود ندارد'
@@ -378,6 +429,13 @@ def checkout(request):
 
         # ایجاد آیتم‌های سفارش
         for cart_item in cart.items.all():
+            # کاهش موجودی اصلی (stock) و افزایش sell_count
+            seller_product = cart_item.seller_product
+            # seller_product.available_count -= cart_item.quantity
+            seller_product.sell_count += cart_item.quantity
+            seller_product.save()
+
+            # ایجاد آیتم سفارش
             OrderItem.objects.create(
                 order=order,
                 seller_product=cart_item.seller_product,
@@ -385,17 +443,12 @@ def checkout(request):
                 price=cart_item.seller_product.price
             )
 
-            # کاهش موجودی محصول
-            seller_product = cart_item.seller_product
-            seller_product.stock -= cart_item.quantity
-            seller_product.save()
 
-        # غیرفعال کردن سبد خرید فعلی
+        # غیرفعال کردن سبد خرید فعلی و ایجاد سبد جدید
         cart.is_active = False
         cart.save()
-
-        # ایجاد سبد خرید جدید برای کاربر
         Cart.objects.create(user=request.user)
+
 
         return JsonResponse({
             'success': True,
@@ -408,3 +461,6 @@ def checkout(request):
             'success': False,
             'error': f'خطا در ثبت سفارش: {str(e)}'
         })
+
+
+

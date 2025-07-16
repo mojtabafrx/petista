@@ -1,44 +1,110 @@
 {% extends 'base/base.html' %}
+{% load static %}
+{% block custom_css %}<link rel="stylesheet" href="{% static 'css/signup.css' %}" />{% endblock %}
 
 {% block content %}
-<h2>ثبت نام در فروشگاه</h2>
-<form method="post">
-  {% csrf_token %}
-  
-  <div class="form-group">
-    {{ form.phone_number.label_tag }}
-    {{ form.phone_number }}
-    {{ form.phone_number.errors }}
-  </div>
-  
-  <div class="form-group">
-    {{ form.password1.label_tag }}
-    {{ form.password1 }}
-    {{ form.password1.errors }}
-  </div>
-  
-  <div class="form-group">
-    {{ form.password2.label_tag }}
-    {{ form.password2 }}
-    {{ form.password2.errors }}
-  </div>
-  
-  <div class="form-group">
-    <label>نوع حساب کاربری:</label>
-    <div class="radio-group">
-      {% for choice in form.user_type %}
-        <div class="radio-item">
-          {{ choice.tag }}
-          <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
-        </div>
-      {% endfor %}
+{#<h2>ثبت نام در فروشگاه</h2>#}
+{#<form method="post">#}
+{#  {% csrf_token %}#}
+{#  #}
+{#  <div class="form-group">#}
+{#    {{ form.phone_number.label_tag }}#}
+{#    {{ form.phone_number }}#}
+{#    {{ form.phone_number.errors }}#}
+{#  </div>#}
+{#  #}
+{#  <div class="form-group">#}
+{#    {{ form.password1.label_tag }}#}
+{#    {{ form.password1 }}#}
+{#    {{ form.password1.errors }}#}
+{#  </div>#}
+{#  #}
+{#  <div class="form-group">#}
+{#    {{ form.password2.label_tag }}#}
+{#    {{ form.password2 }}#}
+{#    {{ form.password2.errors }}#}
+{#  </div>#}
+{#  #}
+{#  <div class="form-group">#}
+{#    <label>نوع حساب کاربری:</label>#}
+{#    <div class="radio-group">#}
+{#      {% for choice in form.user_type %}#}
+{#        <div class="radio-item">#}
+{#          {{ choice.tag }}#}
+{#          <label for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>#}
+{#        </div>#}
+{#      {% endfor %}#}
+{#    </div>#}
+{#  </div>#}
+{#  #}
+{#  <div class="form-group">#}
+{#    {{ form.captcha }}#}
+{#  </div>#}
+{#  #}
+{#  <button type="submit" class="btn btn-primary">ثبت نام و ارسال کد تأیید</button>#}
+{#</form>#}
+
+<div class="all-container">
+    <div class="container">
+        <form class="signup-form" method="post">
+        {% csrf_token %}
+          <input
+            type="text"
+            id="name"
+            name="phone_number"
+            placeholder="شماره تلفن"
+            pattern="09[0-9]{9}"
+            maxlength="11"
+            inputmode="numeric"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
+            required
+          />
+
+          <input
+            type="password"
+            id="password"
+            name="password1"
+            placeholder="رمز عبور"
+            required
+          />
+
+          <input
+            type="password"
+            id="confirm-password"
+            name="password2"
+            placeholder="تایید رمز عبور"
+            required
+          />
+          <div class="form-container">
+              <div class="radio-group">
+
+                {% for choice in form.user_type %}
+                    <label class="custom-radio">
+                      {{ choice.choice_label }}
+{#                      <input type="radio" name="{{ choice.tag }}" value="{{ choice.tag }}" />#}
+                      {{ choice.tag }}
+                    </label>
+
+                {% endfor %}
+              </div>
+              <!-- استفاده از کپچای فرم رمز عبور -->
+                <div>
+                  {{ form.captcha }}
+                </div>
+
+                <!-- نمایش خطاهای کپچای رمز عبور -->
+                {% if form.captcha.errors %}
+                  <div class="error-message" style="color: red; font-size: 0.8rem;">
+                    {{ form.captcha.errors.0 }}
+                  </div>
+                {% endif %}
+                <br/>
+              <button name="" type="submit">ثبت‌نام</button>
+
+          </div>
+
+          <p class="login-link">حساب دارید؟ <a href="#">وارد شوید</a></p>
+        </form>
     </div>
-  </div>
-  
-  <div class="form-group">
-    {{ form.captcha }}
-  </div>
-  
-  <button type="submit" class="btn btn-primary">ثبت نام و ارسال کد تأیید</button>
-</form>
+</div>
 {% endblock %}

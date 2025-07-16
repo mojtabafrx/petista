@@ -69,9 +69,13 @@
                                     {{ product.min_price|floatformat:"0" }} تومان
                                 </span>
                                 
-                                <span class="badge {% if product.status == 1 %}bg-success{% else %}bg-danger{% endif %}">
+                                <span class="badge {% if product.total_available > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if product.total_available > 0 %}
                                     {{ product.total_available  }}
-                                    {{ product.get_status_display }}
+                                    موجود
+                                {% else %}
+                                    ناموجود
+                                {% endif %}
                                 </span>
                             </div>
                         </div>
@@ -160,6 +164,16 @@
                 },
                 function(response) {
                     if (response.success) {
+                        let badge = $(".badge");
+                        if(parseInt(badge.text()) -1 == 0){
+                            badge.removeClass("bg-success")
+                            badge.addClass("bg-danger");
+                            badge.text("ناموجود" );
+                            $('button.add-to-cart').prop("disabled",true);
+                        }
+                        else{
+                            badge.text(parseInt(badge.text()) - 1 + "موجود");
+                            }
                         // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید
                         $('.cart-count').text(response.cart_items_count);
                         alert(response.message);

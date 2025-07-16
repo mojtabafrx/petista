@@ -22,8 +22,10 @@ class SellerProduct(models.Model):
     def __str__(self):
         return f"{self.product.title} توسط {self.seller.username}"
     def save(self, *args, **kwargs):
-        self.available_count = self.stock
-        return super(SellerProduct, self).save(*args, **kwargs)
+        # فقط زمانی که شیء جدید ایجاد می‌شود یا stock تغییر کرده است
+        if self.pk is None or SellerProduct.objects.get(pk=self.pk).stock != self.stock:
+            self.available_count = self.stock
+        super(SellerProduct, self).save(*args, **kwargs)
 
 
 class Cart(models.Model):

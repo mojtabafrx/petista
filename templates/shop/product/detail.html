@@ -66,12 +66,24 @@
                 
                 <div class="d-flex justify-content-between align-items-center my-3">
                     <div>
-                        <span class="h3 text-primary">{{ product.min_price|floatformat:"0" }} تومان</span>
+                        <span class="h3 text-primary">{{ product.min_price|floatformat:"0" }}
+                        {% if product.total_available > 0 %}
+
+                                    تومان
+                        {% else %}
+                                    محصول موجود نیست
+                        {% endif %}
+                        </span>
                     </div>
                     
                     <div>
-                        <span class="badge {% if product.status == 1 %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ product.get_status_display }}
+                        <span class="badge {% if product.total_available > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if product.total_available > 0 %}
+                                    {{ product.total_available  }}
+                                    موجود
+                                {% else %}
+                                    ناموجود
+                                {% endif %}
                         </span>
                         <span class="badge bg-info ms-2">
                             {{ product.get_product_type_display }}
@@ -86,7 +98,14 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between">
                             <span>موجودی:</span>
-                            <span>{{ product.total_available }} عدد</span>
+                            <span class="badge">
+                                {% if product.total_available > 0 %}
+                                    {{ product.total_available  }}
+                                    عدد
+                                {% else %}
+                                    ناموجود
+                                {% endif %}
+                            </span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between">
                             <span>حداقل سفارش:</span>
@@ -109,9 +128,16 @@
                 
                 <div class="d-grid gap-2 mb-4">
                     <!-- جایگزینی دکمه قدیمی -->
-                    <button class="btn btn-primary btn-lg add-to-cart" type="button" data-id="{{ product.id }}">
-                        <i class="fas fa-cart-plus me-2"></i>افزودن به سبد خرید
-                    </button>
+                    {% if product.total_available > 0 %}
+                        <button class="btn btn-primary btn-lg add-to-cart" type="button" data-id="{{ product.id }}">
+                            <i class="fas fa-cart-plus me-2"></i>افزودن به سبد خرید
+                        </button>
+                    {% else %}
+                        <button class="btn btn-primary btn-lg add-to-cart" type="button" data-id="{{ product.id }}" disabled>
+                            <i class="fas fa-cart-plus me-2"></i>افزودن به سبد خرید
+                        </button>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
@@ -185,14 +211,12 @@
     $(document).ready(function() {
         $('.add-to-cart').click(function() {
             const productId = $(this).data('id');
-
             // بررسی اینکه آیا کاربر لاگین کرده یا نه
             {% if not request.user.is_authenticated %}
                 alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
                 window.location.href = "{% url 'account:login' %}";
                 return;
             {% endif %}
-
             // درخواست AJAX برای افزودن به سبد خرید
             $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
                 {
@@ -200,6 +224,16 @@
                 },
                 function(response) {
                     if (response.success) {
+                        let badge = $(".badge");
+                        if(parseInt(badge.text()) -1 == 0){
+                            badge.removeClass("bg-success")
+                            badge.addClass("bg-danger");
+                            badge.text("ناموجود" );
+                            $('button.add-to-cart').prop("disabled",true);
+                        }
+                        else{
+                            badge.text(parseInt(badge.text()) - 1 + "موجود");
+                            }
                         // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید
                         $('.cart-count').text(response.cart_items_count);
                         alert(response.message);
