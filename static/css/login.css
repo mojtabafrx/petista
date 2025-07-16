@@ -1,0 +1,272 @@
+@import "webfont.css";
+
+:root {
+  --main-color: #8ae2d2;
+  --font-size-dw: Clamp(10vw, 14vw, 15vw);
+  --font-size-up: Clamp(6vw, 7vw, 10vw);
+  --main-color-two: rgb(255, 120, 24);
+}
+.all-login-box {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+  margin: 0;
+}
+
+.header-div {
+  width: 100%;
+  height: 60px;
+  background-color: var(--main-color);
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1001;
+}
+
+.menu-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: linear-gradient(to bottom, #ffffff, #dcdcdc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.menu-divv {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  height: calc(100vh - 60px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  border-radius: 20px 20px 0 0;
+  border-top: 2px solid gray;
+}
+
+.menu-divv.active {
+  transform: translateY(0);
+}
+
+.menu-grabber-div {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 8px;
+}
+
+.tach-div {
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+}
+
+.menu-grabber {
+  width: 60px;
+  height: 8px;
+  background: var(--main-color-two);
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+}
+
+.zirmenu,
+.submenu {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 40px 20px;
+  background-color: #f5f5f5;
+}
+
+.menu-box {
+  width: clamp(130px, 40vw, 220px);
+  height: 100px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: bold;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.menu-box:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-4px);
+}
+
+#backBtn {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 18px;
+  background-color: var(--main-color-two);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.ham-icon {
+  width: 25%;
+}
+
+.login-box {
+  margin: 2%;
+  background-color: white;
+  padding: 30px 20px;
+  border-radius: 12px;
+  /*box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);*/
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0px 2px 15px rgba(138, 226, 210, 1);
+}
+
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #eee;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  cursor: pointer;
+  font-weight: bold;
+  color: #555;
+  border-bottom: 3px solid transparent;
+  transition: 0.3s;
+}
+
+.tab.active {
+  color: #8ae2d2;
+  border-bottom: 3px solid #8ae2d2;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.input-container {
+  border: 2px solid #8ae2d2;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input,
+.captcha-input-group input {
+  width: 100%;
+  height: 45px;
+  border: 2px solid #8ae2d2;
+  border-radius: 15px;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 45px;
+  font-size: 16px;
+}
+
+.captcha-box {
+  width: 40%;
+  height: 50px;
+  margin-bottom: 10px;
+  border: 1px dashed #bbb;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  font-size: 14px;
+}
+
+.captcha-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.captcha-input-group button {
+  padding: 0 16px;
+  background-color: var(--main-color-two);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: white;
+}
+
+.captcha-input-group button:hover {
+  background-color: var(--main-color-two);
+  color: black;
+}
+
+.login-box button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #8ae2d2;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-box button[type="submit"]:hover {
+  background-color: #8ae2d2;
+}
+@media (min-width: 768px) {
+  .header-div {
+    height: 70px;
+    padding: 0 32px;
+  }
+
+  .menu-divv {
+    top: 70px;
+    height: calc(100vh - 70px);
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-box {
+    width: 100%;
+    height: auto;
+    font-size: 1rem;
+    padding: 12px;
+  }
+  .all-container{
+    padding: 7%;
+  }
+}

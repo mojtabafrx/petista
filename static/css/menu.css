@@ -1,0 +1,193 @@
+
+.glass {
+    margin: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 9998;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transform: translateY(100%);
+    overflow: hidden;
+    padding: 10px;
+}
+
+.glass.show {
+    transform: translateY(0);
+}
+
+.scroll-box {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+
+
+.scroll-box {
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.menu,
+.sub-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* مخفی پیش‌فرض زیرمنو */
+.sub-menu {
+  display: none;
+}
+
+/* وقتی active شدند نمایش */
+.menu.active,
+.sub-menu.active {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.sub-menu:has(.active) {
+  display: flex;
+}
+
+.menu:has(.active) > li,
+.sub-menu:has(.active) > li {
+  display: none;
+}
+
+.menu:has(.active) > li:has(.active),
+.sub-menu:has(.active) > li:has(.active) {
+  display: flex !important;
+}
+
+.menu:has(.active) > li:has(.active) > .item,
+.sub-menu:has(.active) > li:has(.active) > .item {
+  display: none;
+}
+
+/* li و item */
+.menu li,
+.sub-menu li {
+  display: flex;
+  justify-content: center;
+}
+
+/* آیتم مکعبی */
+.item {
+  background: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding: 10px;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s ease;
+  width: 7rem;
+  height: 8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.item:hover {
+  background: #ddd;
+  transform: scale(1.05);
+}
+
+/* آیکون */
+.icon {
+  width: 60px;
+  height: 60px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0 auto 8px auto;
+  border-radius: 4px;
+}
+
+/* متن */
+.item .text {
+  font-size: 14px;
+}
+
+.item {
+  background: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding: 0;
+  margin: 5px;
+  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background 0.3s, transform 0.2s ease;
+  width: 7rem;
+  height: 8rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.item:hover {
+  transform: scale(1.05);
+}
+
+.icon {
+  flex: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+}
+
+/* این بخش پایین */
+.text {
+  background: #f9f9f99a; /* پس‌زمینه روشن */
+  padding: 5px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+
+
+.menu-btn {
+    background-color: blue;
+    position: fixed;
+    top: 10px;
+    right: 0px;
+    width: 40px;
+    height: 40px;
+    z-index: 9999;
+    border: none;
+    font-size: 24px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius:  50% 0% 0% 50% ;
+
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+
+
+
+.show-menu {
+    top: 10px;
+
+}
+
+
+.back-menu {
+    top: 60px;
+
+}
