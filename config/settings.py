@@ -40,9 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages', 
     'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'api',
+
 
 
     # Crispy
@@ -58,10 +56,13 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'account.apps.AccountConfig',
     'captcha',
+    'user_panel.apps.UserPanelConfig',
 
     # local_kasra
     'administrator.apps.AdministratorConfig',
-
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'api',
 ]
 
 ALLOW_UNICODE_SLUGS = True

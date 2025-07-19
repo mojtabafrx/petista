@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from product.models import Product
-from .serializer import ProductSerializer, OTPSerializer, PhoneSerializer, AllProductSerializer
+from .serializer import ProductSerializer, OTPSerializer, PhoneSerializer, AllProductSerializer,CreateProductSerializer
 from account.models import VerificationCode, Profile
 from django.utils import timezone
 import random
@@ -140,3 +140,31 @@ class HealthCheckView(APIView) :
     permission_classes = []
     def head(self, request, *args, **kwargs):
         return Response(status=status.HTTP_200_OK)
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+
+
+
+
+class CreateProductView(APIView):
+    permission_classes = [IsAuthenticated]  # نیاز به احراز هویت
+
+    def post(self, request):
+        serializer = CreateProductSerializer(
+            data=request.data,
+            context={'request': request}
+        )
+
+        if serializer.is_valid():
+            product = serializer.save()
+            return Response({
+                'id': product.id,
+                'title': product.title,
+                'message': 'محصول با موفقیت ایجاد شد'
+            }, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

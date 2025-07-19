@@ -1,10 +1,16 @@
 from pyexpat import model
-
+from rest_framework import serializers
+from user_panel.models import SellerProduct
+from django.utils.text import slugify
+import uuid
 from product.models import Product
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from account.models import Profile , VerificationCode
+
+
+
 
 class ProductSerializer(serializers.ModelSerializer) :
     class Meta :
@@ -17,15 +23,56 @@ class AllProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ["title", "description", "base_price"]
 
-# class AllProductSerializer(serializers.ModelSerializer) :
-#     class Meta :
-#         model = Product
-#         fields = ['id','title','base_price','stock',]
-#     def GetPicture(self):
-#         pitureid = """(SELECT SUM(available_count) FROM user_panel_sellerproduct
-#                     WHERE product_id = product_product.id AND available_count > 0
-#                     AND price = (SELECT MIN(price) FROM user_panel_sellerproduct
-#                     WHERE product_id = product_product.id AND available_count > 0)"""
+
+
+
+class CreateProductSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=200)
+    description = serializers.CharField()
+    price = serializers.IntegerField(min_value=0)
+    stock = serializers.IntegerField(min_value=0)  # موجودی اولیه
+
+    # فیلدهای اختیاری
+    minimum_order = serializers.IntegerField(min_value=1, default=1, required=False)
+    product_type = serializers.IntegerField(default=1, required=False)
+    # category = serializers.PrimaryKeyRelatedField(
+    #     queryset=Category.objects.all(),
+    #     allow_null=True,
+    #     required=False
+    # )
+
+    def create(self, validated_data):
+        # تولید slug منحصر به فرد
+        slug = slugify(validated_data['title'], allow_unicode=True)
+        if not slug:
+            slug = "product"
+
+        unique_slug = slug
+        while Product.objects.filter(slug=unique_slug).exists():
+            unique_slug = f"{slug}-{uuid.uuid4().hex[:6]}"
+
+        # ایجاد محصول
+        product = Product.objects.create(
+            title=validated_data['title'],
+            description=validated_data['description'],
+            slug=unique_slug,
+            minimum_order=validated_data.get('minimum_order', 1),
+            product_type=validated_data.get('product_type', 1),
+            # category=validated_data.get('category', None),
+            status=1  # وضعیت پیش‌فرض: موجود
+        )
+
+        # ایجاد محصول فروشنده (SellerProduct)
+        seller = self.context['request'].user
+        SellerProduct.objects.create(
+            seller=seller,
+            product=product,
+            price=validated_data['price'],
+            stock=validated_data['stock'],
+            available_count=validated_data['stock']  # مقدار اولیه = stock
+        )
+
+        return product
 
 
 # serializers.py
@@ -64,35 +111,3 @@ class OTPSerializer(serializers.Serializer):
         attrs['ver_code'] = ver_code
         return attrs
 
-# User = get_user_model()
-#
-# class OTPSerializer(serializers.Serializer):
-#     username = serializers.CharField()
-#     otp = serializers.CharField(max_length=6)
-#
-#     def validate(self, attrs):
-#         username = attrs.get('username')
-#         otp = attrs.get('otp')
-#
-#         # 1. بررسی وجود کاربر
-#         try:
-#             user = User.objects.get(username=username)
-#         except User.DoesNotExist:
-#             raise serializers.ValidationError('User not found')
-#
-#         # 2. اعتبارسنجی OTP (پیاده‌سازی منطق تأیید کد)
-#         if not self.verify_otp(username, otp):  # تابع دلخواه شما
-#             raise serializers.ValidationError('Invalid OTP')
-#
-#         # 3. ایجاد توکن‌ها
-#         refresh = RefreshToken.for_user(user)
-#         return {
-#             'user': user.username,
-#             'access': str(refresh.access_token),
-#             'refresh': str(refresh)
-#         }
-#
-#     def verify_otp(self, phone, otp):
-#         # پیاده‌سازی منطق بررسی OTP
-#         # مثال: چک کردن با پایگاه داده یا سرویس خارجی
-#         return True  # جایگزین با منطق واقعی
