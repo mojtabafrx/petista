@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from product.models import Product
-from .serializer import ProductSerializer,OTPSerializer,PhoneSerializer
+from .serializer import ProductSerializer, OTPSerializer, PhoneSerializer, AllProductSerializer
 from account.models import VerificationCode, Profile
 from django.utils import timezone
 import random
@@ -47,7 +47,7 @@ def Product_detail(request, pk):
 
 class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
-    serializer_class = ProductSerializer
+    serializer_class = AllProductSerializer
 
 
 

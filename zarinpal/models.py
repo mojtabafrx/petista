@@ -15,7 +15,7 @@ class ZarinTransaction(models.Model):
     PENDING = 3
 
     STATUS_TYPES = (
-        (1 , 'پذریفته شد'),
+        (1 , 'پذیرفته شد'),
         (2, 'رد شد'),
         (3, 'درحال پردازش')
     )
