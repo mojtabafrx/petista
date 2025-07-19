@@ -6,8 +6,6 @@ from utils import imageuploader
 # from utils.imageuploader import upload_product_image, make_image_function
 
 # my managers :
-
-
 class CategoryManager(models.Manager):
     def active(self):
         return self.filter(status=True)
@@ -47,41 +45,6 @@ User = get_user_model()
 
 
 class Product(models.Model):
-    # اطلاعات پایه محصول
-    title = models.CharField(max_length=200, verbose_name="نام محصول")
-    slug = models.SlugField(max_length=100, allow_unicode=True,
-                            unique=True, null=True, blank=True, verbose_name="آدرس محصول")
-
-    # slug = models.SlugField(max_length=100, unique=True,
-    #                         verbose_name="آدرس محصول")
-    description = models.TextField(verbose_name="توضیحات محصول")
-    minimum_order = models.PositiveIntegerField(
-        verbose_name="حداقل میزان سفارس", default=1)
-    related_product = models.ForeignKey(
-        'self', verbose_name="محصول مرتبط", on_delete=models.SET_NULL, null=True, blank=True)
-
-    WHOLESALE = 1
-    RETAIL = 2
-    PRODUCT_TYPES = (
-        (1, 'عمده'),
-        (2, 'خرده'),
-    )
-    product_type = models.IntegerField(choices=PRODUCT_TYPES,
-                                       default=1,
-                                       verbose_name="نوع محصول")
-
-    # دسته‌بندی
-    category = models.ForeignKey(
-        'Category',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='products',
-        verbose_name="دسته‌بندی"
-    )
-
-    # قیمت پایه (قیمت عمده برای تولیدکننده)
-    base_price = models.PositiveIntegerField(verbose_name="قیمت  ")
 
     # وضعیت محصول
 
@@ -92,21 +55,38 @@ class Product(models.Model):
         (1, 'موجود'),
         (2, 'ناموجود'),
     )
+
+    WHOLESALE = 1
+    RETAIL = 2
+    PRODUCT_TYPES = (
+        (1, 'عمده'),
+        (2, 'خرده'),
+    )
+
+    # اطلاعات پایه محصول
+    title = models.CharField(max_length=200, verbose_name="نام محصول")
+    slug = models.SlugField(max_length=100, allow_unicode=True, unique=True, null=True, blank=True, verbose_name="آدرس محصول")
+    description = models.TextField(verbose_name="توضیحات محصول")
+    minimum_order = models.PositiveIntegerField(verbose_name="حداقل میزان سفارس", default=1)
+    related_product = models.ForeignKey('self', verbose_name="محصول مرتبط", on_delete=models.SET_NULL, null=True, blank=True)
+    product_type = models.IntegerField(choices=PRODUCT_TYPES, default=1, verbose_name="نوع محصول")
+    # دسته‌بندی
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='products',
+        verbose_name="دسته‌بندی"
+    )
     status = models.IntegerField(
         choices=STATUS_CHOICES,
         default=1,
         verbose_name="وضعیت محصول"
     )
-
-    # موجودی کل (برای تولیدکننده)
-    stock = models.PositiveIntegerField(
-        verbose_name="موجودی در انبار", default=0)
-
     # زمان‌های ایجاد و به‌روزرسانی
-    created_at = models.DateTimeField(
-        auto_now_add=True, verbose_name="تاریخ ایجاد")
-    updated_at = models.DateTimeField(
-        auto_now=True, verbose_name="آخرین به‌روزرسانی")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین به‌روزرسانی")
 
     class Meta:
         verbose_name = 'محصول'
@@ -126,10 +106,7 @@ class Product(models.Model):
             slug_str = f"{self.title}"
             self.slug = slugify(slug_str, allow_unicode=True)
         super(Product,self).save(*args, **kwargs)
-        # if not self.slug:
-        #     self.slug = slugify(self.title)
 
-        # super().save(*args, **kwargs)
 
 
 class ProductImage(models.Model):

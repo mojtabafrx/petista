@@ -40,7 +40,6 @@ class VerificationForm(forms.Form):
         max_length=6,
         widget=forms.TextInput(attrs={'placeholder': 'کد دریافتی'})
     )
-    captcha = CaptchaField(label='کپچا')
 
 
 class CaptchaFieldCustomInput(CaptchaTextInput):
