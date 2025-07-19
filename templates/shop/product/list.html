@@ -66,20 +66,29 @@
                             
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <span class="text-success fw-bold">
-                                    {{ product.base_price|floatformat:"0" }} تومان
+                                    {{ product.min_price|floatformat:"0" }} تومان
                                 </span>
                                 
-                                <span class="badge {% if product.status == 1 %}bg-success{% else %}bg-danger{% endif %}">
-                                    {{ product.get_status_display }}
+                                <span class="badge {% if product.total_available > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                                {% if product.total_available > 0 %}
+                                    {{ product.total_available  }}
+                                    موجود
+                                {% else %}
+                                    ناموجود
+                                {% endif %}
                                 </span>
                             </div>
                         </div>
                         
+                        <!-- در قسمت کارت محصول -->
                         <div class="card-footer bg-white">
-                            <div class="d-grid">
-                                <a href='{% url "product:product_detail" product.id product.slug %}' class="btn btn-outline-primary">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'product:product_detail' product.id product.slug %}" class="btn btn-outline-primary">
                                     مشاهده جزئیات
                                 </a>
+                                <button class="btn btn-outline-success add-to-cart" data-id="{{ product.id }}">
+                                    افزودن به سبد خرید
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -131,4 +140,51 @@
         {% endif %}
     </div>
 </div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart').click(function() {
+            const productId = $(this).data('id');
+
+            // بررسی اینکه آیا کاربر لاگین کرده یا نه
+            {% if not request.user.is_authenticated %}
+                alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
+                window.location.href = "{% url 'account:login' %}";
+                return;
+            {% endif %}
+
+            // درخواست AJAX برای افزودن به سبد خرید
+            $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
+                {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        let badge = $(".badge");
+                        if(parseInt(badge.text()) -1 == 0){
+                            badge.removeClass("bg-success")
+                            badge.addClass("bg-danger");
+                            badge.text("ناموجود" );
+                            $('button.add-to-cart').prop("disabled",true);
+                        }
+                        else{
+                            badge.text(parseInt(badge.text()) - 1 + "موجود");
+                            }
+                        // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید
+                        $('.cart-count').text(response.cart_items_count);
+                        alert(response.message);
+                    } else {
+                        alert('خطا در افزودن محصول به سبد خرید: ' + response.error);
+                    }
+                }
+            );
+        });
+    });
+</script>
+
 {% endblock %}
+

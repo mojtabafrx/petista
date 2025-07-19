@@ -6,10 +6,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}{% endblock %}</title>
-  {% load bootstrap5 %}
-  {% bootstrap_css %}
-  {% bootstrap_javascript %}
-  <link rel="stylesheet" href="{% static 'css/main.css'  %}" />
+  {% block custom_css %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'css/menu.css' %}" />
+{#  <link rel="stylesheet" href="{% static 'css/main.css'  %}" />#}
 </head>
 
 <body dir="rtl">
@@ -17,18 +16,272 @@
 
 
   <!-- محتوای اصلی -->
-  <main class="container my-5">
-    {% block content %}{% endblock %}
-  </main>
+{#  <main class="container my-5">#}
+{#  </main>#}
+{% block content %}{% endblock %}
 
   <!-- پاورقی -->
   <footer class="bg-light py-4">
-    <div class="container text-center">
+    <div class=" text-center">
         <p>کلیه حقوق محفوظ است © 2023</p>
     </div>
   </footer>
-  
 
+
+
+<script>
+      const menuDiv = document.getElementById("menuDiv");
+      const grabber = document.getElementById("grabber");
+      const tachDiv = document.getElementById("tachDiv");
+      const menuBtn = document.getElementById("menuBtn");
+
+      let startY = 0,
+        isDragging = false,
+        currentOffset = 0,
+        isAnimating = false;
+
+      function openMenu() {
+        menuDiv.classList.add("active");
+        document.body.classList.add("no-scroll");
+        menuDiv.style.transition = "transform 0.3s ease";
+        menuDiv.style.transform = "translateY(0)";
+        currentOffset = 0;
+      }
+
+      function closeMenu() {
+        isAnimating = true;
+        menuDiv.style.transition = "transform 0.3s ease";
+        menuDiv.style.transform = "translateY(100%)";
+        menuDiv.addEventListener("transitionend", function handler() {
+          menuDiv.classList.remove("active");
+          document.body.classList.remove("no-scroll");
+          currentOffset = 0;
+          isAnimating = false;
+          menuDiv.removeEventListener("transitionend", handler);
+        });
+      }
+
+      function handleMove(currentY) {
+        const diff = currentY - startY;
+        const total = currentOffset + diff;
+        if (diff < 0 && total <= 20) return;
+        const finalOffset = Math.max(0, total);
+        menuDiv.style.transition = "none";
+        menuDiv.style.transform = `translateY(${finalOffset}px)`;
+      }
+
+      function handleEnd(endY) {
+        const diff = endY - startY;
+        const total = currentOffset + diff;
+        const threshold = window.innerHeight / 2;
+
+        menuDiv.style.transition = "transform 0.3s ease";
+        if (diff < 0 && total <= 20) return;
+
+        if (total > threshold) {
+          closeMenu();
+        } else {
+          currentOffset = total;
+          menuDiv.style.transform = `translateY(${currentOffset}px)`;
+        }
+      }
+
+      function addDragHandlers(el) {
+        el.addEventListener("touchstart", (e) => {
+          startY = e.touches[0].clientY;
+          isDragging = true;
+        });
+
+        el.addEventListener(
+          "touchmove",
+          (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            handleMove(e.touches[0].clientY);
+          },
+          { passive: false }
+        );
+
+        el.addEventListener("touchend", (e) => {
+          isDragging = false;
+          handleEnd(e.changedTouches[0].clientY);
+        });
+
+        el.addEventListener("mousedown", (e) => {
+          startY = e.clientY;
+          isDragging = true;
+          const onMouseMove = (eMove) => {
+            if (!isDragging) return;
+            handleMove(eMove.clientY);
+          };
+          const onMouseUp = (eUp) => {
+            isDragging = false;
+            handleEnd(eUp.clientY);
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("mouseup", onMouseUp);
+          };
+          window.addEventListener("mousemove", onMouseMove);
+          window.addEventListener("mouseup", onMouseUp);
+        });
+      }
+
+      addDragHandlers(grabber);
+      addDragHandlers(tachDiv);
+
+      menuBtn.addEventListener("click", () => {
+        if (isAnimating) return;
+        menuDiv.classList.contains("active") ? closeMenu() : openMenu();
+      });
+
+      document.addEventListener("click", (e) => {
+        const isClickInsideMenu = menuDiv.contains(e.target);
+        const isClickOnButton = menuBtn.contains(e.target);
+        if (
+          menuDiv.classList.contains("active") &&
+          !isClickInsideMenu &&
+          !isClickOnButton
+        ) {
+          closeMenu();
+        }
+      });
+
+      // زیرمنوها
+      let historyStack = ["mainMenu"];
+      let submenuCounter = 1;
+
+      function createSubMenu(title, level) {
+        if (level > 7) return;
+
+        const newId = `submenu_${submenuCounter++}`;
+        const newMenu = document.createElement("div");
+        newMenu.classList.add("submenu");
+        newMenu.id = newId;
+        newMenu.style.display = "none";
+
+        for (let i = 1; i <= 4; i++) {
+          const box = document.createElement("div");
+          box.classList.add("menu-box");
+          box.innerText = `${title} - مرحله ${level}.${i}`;
+          box.onclick = () => {
+            if (level < 7)
+              createSubMenu(`${title} - مرحله ${level}.${i}`, level + 1);
+          };
+          newMenu.appendChild(box);
+        }
+
+        document.getElementById("menuDiv").appendChild(newMenu);
+        document
+          .querySelectorAll(".submenu, #mainMenu")
+          .forEach((el) => (el.style.display = "none"));
+        newMenu.style.display = "flex";
+        historyStack.push(newId);
+        updateBackButton();
+      }
+
+      function goBack() {
+        if (historyStack.length <= 1) return;
+        const lastId = historyStack.pop();
+        const lastMenu = document.getElementById(lastId);
+        if (lastMenu && lastId !== "mainMenu") lastMenu.remove();
+
+        const prevId = historyStack[historyStack.length - 1];
+        document
+          .querySelectorAll(".submenu, #mainMenu")
+          .forEach((el) => (el.style.display = "none"));
+        document.getElementById(prevId).style.display = "flex";
+        updateBackButton();
+      }
+
+      function updateBackButton() {
+        const btn = document.getElementById("backBtn");
+        btn.style.display = historyStack.length > 1 ? "block" : "none";
+      }
+
+      // ✅ سوئیچ تب‌ها
+      function switchTab(tabId) {
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        const selectedTab = document.getElementById(tabId);
+        if (selectedTab) selectedTab.classList.add("active");
+
+        const tabButtons = document.querySelectorAll(".tabs .tab");
+        tabButtons.forEach((btn, index) => {
+          const correspondingTabId = index === 0 ? "password-tab" : "otp-tab";
+          if (correspondingTabId === tabId) {
+            btn.classList.add("active");
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const glass = document.querySelector(".glass");
+        const btn = document.querySelector(".show-menu");
+
+        btn.addEventListener("click", () => {
+          glass.classList.toggle("show");
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const rootMenu = document.querySelector(".menu");
+
+        function showMenu(menu) {
+          document
+            .querySelectorAll(".menu, .sub-menu")
+            .forEach((ul) => ul.classList.remove("active"));
+          menu.classList.add("active");
+        }
+
+        function goToSubMenu(nextMenu) {
+          if (!nextMenu) return;
+          showMenu(nextMenu);
+          history.pushState({ menu: nextMenu.dataset.path }, "", "");
+        }
+
+        function findMenuByPath(path) {
+          if (!path) return rootMenu;
+          return document.querySelector(`[data-path="${path}"]`) || rootMenu;
+        }
+
+        // به هر منو یه شناسه بدیم
+        let id = 0;
+        document.querySelectorAll(".menu, .sub-menu").forEach((ul) => {
+          if (!ul.dataset.path) {
+            ul.dataset.path = "menu-" + id++;
+          }
+        });
+
+        // در شروع
+        showMenu(rootMenu);
+
+        document.querySelector(".glass").addEventListener("click", (e) => {
+          const item = e.target.closest(".item");
+          if (!item) return;
+
+          const li = item.closest("li");
+          if (!li) return;
+
+          const nextMenu = li.querySelector(":scope > .sub-menu");
+          if (!nextMenu) return;
+
+          goToSubMenu(nextMenu);
+        });
+
+        window.addEventListener("popstate", (e) => {
+          const path = e.state?.menu;
+          const menu = findMenuByPath(path);
+          showMenu(menu);
+        });
+      });
+</script>
+
+{% block extra_js %}{% endblock %}
 </body>
 
 </html>

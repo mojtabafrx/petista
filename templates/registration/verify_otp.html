@@ -1,158 +1,228 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% block custom_css %}<link rel="stylesheet" href="{% static 'css/verify.css' %}" />{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white">
-          <h3 class="text-center">ورود با کد یکبارمصرف</h3>
-        </div>
-        
-        <div class="card-body">
-          <div class="text-center mb-4">
-            <i class="bi bi-phone fs-1 text-primary"></i>
-            <h4 class="mt-3">کد تأیید به شماره {{ phone }} ارسال شد</h4>
-            <p class="text-muted">لطفاً کد ۶ رقمی ارسال شده را وارد کنید</p>
-          </div>
-          
-          {% if error %}
-            <div class="alert alert-danger text-center">
-              {{ error }}
-            </div>
-          {% endif %}
-          
-          <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="ver_id" value="{{ ver_id }}">
-            
-            <div class="mb-4">
-              <label for="code" class="form-label">کد تأیید</label>
-              <div class="d-flex justify-content-center">
-                <input 
-                  type="text" 
-                  class="form-control form-control-lg text-center" 
-                  id="code" 
-                  name="code"
-                  placeholder="------"
-                  maxlength="6"
-                  style="letter-spacing: 10px; width: 200px;"
-                  autocomplete="off"
-                  autofocus
-                >
-              </div>
-            </div>
-            
-            <div class="d-grid mb-4">
-              <button type="submit" class="btn btn-primary btn-lg">
-                تأیید و ورود
-              </button>
-            </div>
-            
-            <div class="text-center">
-              <p class="text-muted">
-                زمان باقیمانده: 
-                <span id="countdown" class="fw-bold text-danger">05:00</span>
-              </p>
-              <button 
-                type="button" 
-                class="btn btn-link text-decoration-none" 
-                id="resend-btn"
-                disabled
-              >
-                ارسال مجدد کد
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
+<div class="container">
+    <h2>ورود با کد یکبار مصرف</h2>
 
+    <p class="info-text">
+      کد تأیید به شماره <strong>{{ phone_number }}</strong> ارسال شد.
+    </p>
+
+    <p class="plain-hint">لطفاً کد ۶ رقمی ارسال شده را وارد کنید.</p>
+
+    <form id="otp-form" method="post">
+        {% csrf_token %}
+      <input
+        type="text"
+        maxlength="6"
+        id="id_verification_code"
+        name="code"
+        class="otp-single-input"
+        placeholder="- - - - - -"
+      />
+      <button type="submit" class="submit-button">تأیید و ورود</button>
+    </form>
+
+    <div class="countdown">
+      زمان باقیمانده تا ارسال مجدد کد: <span id="timer">2:00</span>
+    </div>
+
+    <div class="resend" id="resend">ارسال مجدد کد</div>
+</div>
+
+{% endblock %}
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // تنظیم تایمر شمارش معکوس
-  const countdownEl = document.getElementById('countdown');
-  const resendBtn = document.getElementById('resend-btn');
-  let timeLeft = 5 * 60; // 5 دقیقه به ثانیه
-  
-  function updateCountdown() {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    
-    countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      countdownEl.textContent = '00:00';
-      resendBtn.disabled = false;
-      resendBtn.classList.remove('text-muted');
-      resendBtn.classList.add('text-primary');
-    } else {
-      timeLeft--;
-    }
-  }
-  
-  const timer = setInterval(updateCountdown, 1000);
-  updateCountdown(); // شروع فوری
-  
-  // ارسال مجدد کد
-  resendBtn.addEventListener('click', function() {
-    // ارسال درخواست AJAX برای ارسال مجدد کد
-    fetch('{% url "resend_otp" %}', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: JSON.stringify({
-        ver_id: '{{ ver_id }}'
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // ریست تایمر
-        timeLeft = 5 * 60;
-        resendBtn.disabled = true;
-        resendBtn.classList.remove('text-primary');
-        resendBtn.classList.add('text-muted');
-        
-        // نمایش پیام موفقیت
-        alert('کد جدید با موفقیت ارسال شد');
-      } else {
-        alert('خطا در ارسال کد جدید: ' + data.error);
+  const timerEl = document.getElementById("timer");
+  const resendEl = document.getElementById("resend");
+  let time = 120;
+
+  function startCountdown() {
+    const interval = setInterval(() => {
+      time--;
+      const minutes = Math.floor(time / 60);
+      const seconds = time % 60;
+      timerEl.textContent = `${minutes}:${
+        seconds < 10 ? "0" : ""
+      }${seconds}`;
+
+      if (time <= 0) {
+        clearInterval(interval);
+        resendEl.classList.add("active");
+        resendEl.style.cursor = "pointer";
       }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('خطا در ارتباط با سرور');
-    });
+    }, 1000);
+  }
+
+  resendEl.addEventListener("click", () => {
+    if (resendEl.classList.contains("active")) {
+      alert("کد مجدد ارسال شد! (شبیه‌سازی)");
+      resendEl.classList.remove("active");
+      resendEl.style.cursor = "default";
+      time = 120;
+      timerEl.textContent = "2:00";
+      startCountdown();
+    }
   });
-  
-  // اعتبارسنجی کد هنگام تایپ
-  const codeInput = document.getElementById('code');
-  codeInput.addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g, ''); // فقط اعداد مجاز
-  });
-});
+
+  startCountdown();
 </script>
 
-<style>
-/* استایل مخصوص فیلد کد */
-#code {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-/* استایل دکمه ارسال مجدد در حالت غیرفعال */
-#resend-btn.text-muted {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-</style>
 {% endblock %}
+{#{% block content %}#}
+{#<div class="container mt-5">#}
+{#  <div class="row justify-content-center">#}
+{#    <div class="col-md-6">#}
+{#      <div class="card shadow-lg">#}
+{#        <div class="card-header bg-primary text-white">#}
+{#          <h3 class="text-center">ورود با کد یکبارمصرف</h3>#}
+{#        </div>#}
+{#        #}
+{#        <div class="card-body">#}
+{#          <div class="text-center mb-4">#}
+{#            <i class="bi bi-phone fs-1 text-primary"></i>#}
+{#            <h4 class="mt-3">کد تأیید به شماره {{ phone }} ارسال شد</h4>#}
+{#            <p class="text-muted">لطفاً کد ۶ رقمی ارسال شده را وارد کنید</p>#}
+{#          </div>#}
+{#          #}
+{#          {% if error %}#}
+{#            <div class="alert alert-danger text-center">#}
+{#              {{ error }}#}
+{#            </div>#}
+{#          {% endif %}#}
+{#          #}
+{#          <form method="post">#}
+{#            {% csrf_token %}#}
+{#            <input type="hidden" name="ver_id" value="{{ ver_id }}">#}
+{#            #}
+{#            <div class="mb-4">#}
+{#              <label for="code" class="form-label">کد تأیید</label>#}
+{#              <div class="d-flex justify-content-center">#}
+{#                <input #}
+{#                  type="text" #}
+{#                  class="form-control form-control-lg text-center" #}
+{#                  id="code" #}
+{#                  name="code"#}
+{#                  placeholder="------"#}
+{#                  maxlength="6"#}
+{#                  style="letter-spacing: 10px; width: 200px;"#}
+{#                  autocomplete="off"#}
+{#                  autofocus#}
+{#                >#}
+{#              </div>#}
+{#            </div>#}
+{#            #}
+{#            <div class="d-grid mb-4">#}
+{#              <button type="submit" class="btn btn-primary btn-lg">#}
+{#                تأیید و ورود#}
+{#              </button>#}
+{#            </div>#}
+{#            #}
+{#            <div class="text-center">#}
+{#              <p class="text-muted">#}
+{#                زمان باقیمانده: #}
+{#                <span id="countdown" class="fw-bold text-danger">05:00</span>#}
+{#              </p>#}
+{#              <button #}
+{#                type="button" #}
+{#                class="btn btn-link text-decoration-none" #}
+{#                id="resend-btn"#}
+{#                disabled#}
+{#              >#}
+{#                ارسال مجدد کد#}
+{#              </button>#}
+{#            </div>#}
+{#          </form>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#  </div>#}
+{#</div>#}
+{#{% endblock %}#}
+{##}
+{#{% block extra_js %}#}
+{#<script>#}
+{#document.addEventListener('DOMContentLoaded', function() {#}
+{#  // تنظیم تایمر شمارش معکوس#}
+{#  const countdownEl = document.getElementById('countdown');#}
+{#  const resendBtn = document.getElementById('resend-btn');#}
+{#  let timeLeft = 5 * 60; // 5 دقیقه به ثانیه#}
+{#  #}
+{#  function updateCountdown() {#}
+{#    const minutes = Math.floor(timeLeft / 60);#}
+{#    const seconds = timeLeft % 60;#}
+{#    #}
+{#    countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;#}
+{#    #}
+{#    if (timeLeft <= 0) {#}
+{#      clearInterval(timer);#}
+{#      countdownEl.textContent = '00:00';#}
+{#      resendBtn.disabled = false;#}
+{#      resendBtn.classList.remove('text-muted');#}
+{#      resendBtn.classList.add('text-primary');#}
+{#    } else {#}
+{#      timeLeft--;#}
+{#    }#}
+{#  }#}
+{#  #}
+{#  const timer = setInterval(updateCountdown, 1000);#}
+{#  updateCountdown(); // شروع فوری#}
+{#  #}
+{#  // ارسال مجدد کد#}
+{#  resendBtn.addEventListener('click', function() {#}
+{#    // ارسال درخواست AJAX برای ارسال مجدد کد#}
+{#    fetch('{% url "account:resend_otp" %}', {#}
+{#      method: 'POST',#}
+{#      headers: {#}
+{#        'Content-Type': 'application/json',#}
+{#        'X-CSRFToken': '{{ csrf_token }}'#}
+{#      },#}
+{#      body: JSON.stringify({#}
+{#        ver_id: '{{ ver_id }}'#}
+{#      })#}
+{#    })#}
+{#    .then(response => response.json())#}
+{#    .then(data => {#}
+{#      if (data.success) {#}
+{#        // ریست تایمر#}
+{#        timeLeft = 5 * 60;#}
+{#        resendBtn.disabled = true;#}
+{#        resendBtn.classList.remove('text-primary');#}
+{#        resendBtn.classList.add('text-muted');#}
+{#        #}
+{#        // نمایش پیام موفقیت#}
+{#        alert('کد جدید با موفقیت ارسال شد');#}
+{#      } else {#}
+{#        alert('خطا در ارسال کد جدید: ' + data.error);#}
+{#      }#}
+{#    })#}
+{#    .catch(error => {#}
+{#      console.error('Error:', error);#}
+{#      alert('خطا در ارتباط با سرور');#}
+{#    });#}
+{#  });#}
+{#  #}
+{#  // اعتبارسنجی کد هنگام تایپ#}
+{#  const codeInput = document.getElementById('code');#}
+{#  codeInput.addEventListener('input', function() {#}
+{#    this.value = this.value.replace(/\D/g, ''); // فقط اعداد مجاز#}
+{#  });#}
+{# });#}
+{#</script>#}
+{##}
+{#<style>#}
+{#/* استایل مخصوص فیلد کد */#}
+{##code {#}
+{#  font-size: 1.5rem;#}
+{#  font-weight: bold;#}
+{# } #}
+{##}
+{#/* استایل دکمه ارسال مجدد در حالت غیرفعال */#}
+{##resend-btn.text-muted {#}
+{#  cursor: not-allowed;#}
+{#  opacity: 0.6;#}
+{# } #}
+{#</style>#}
+{#{% endblock %}#}

@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login  as default_login, authenticate
+from django.shortcuts import render, redirect , reverse
+from django.contrib.auth import login  as default_login, authenticate , logout as auth_logout
 from django.contrib.auth.models import User
 from .forms import SignupForm, VerificationForm , PasswordLoginForm, OTPLoginForm
 from .models import Profile , VerificationCode
@@ -8,7 +8,8 @@ from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.contrib import messages
+from captcha.conf import settings as captcha_settings
 
 
 
@@ -19,7 +20,7 @@ def signup(request):
             # ساخت کاربر جدید
             user = form.save(commit=False)
             user.username = form.cleaned_data['phone_number'] # استفاده از شماره تلفن به عنوان نام کاربری
-            # user.password = form.cleaned_data['password1']
+            user.set_password = form.cleaned_data['password1']
             user.is_active=False 
             user.save()
             
@@ -33,7 +34,8 @@ def signup(request):
             ver = VerificationCode.objects.create(
                 code_type = VerificationCode.REGISTRATION_VERIFY,
                 code = str(random.randint(100000, 999999)) ,
-                profile = profile
+                profile = profile,
+                expires_at=timezone.now() + timedelta(minutes=5)
             )
             # اینجا باید کد تأیید را به شماره کاربر ارسال کنید (با استفاده از سرویس SMS)
             # send_sms(profile.phone_number, f'کد تأیید شما: {profile.verification_code}')
@@ -111,21 +113,16 @@ def login(request):
 
     else:
         print(password_form.errors)
-    
-    # پردازش فرم ورود با کد یکبار مصرف
+    # بخش ورود با کد یکبار مصرف - بهینه‌سازی شده
     if 'otp-login' in request.POST and otp_form.is_valid():
-        phone = otp_form.cleaned_data['phone']
-        user = User.objects.get(username=phone)
-        profile = Profile.objects.get(phone_number=phone)
-        active_tab = 'otp'
-
-
+        username = otp_form.cleaned_data['username']
         try:
-            profile = Profile.objects.get(phone_number=phone)
-            active_tab = 'otp'
-            
-            # بررسی فعال بودن حساب کاربری
-            if not profile.user.is_active:
+            # پیدا کردن کاربر بر اساس username
+            user = User.objects.get(username=username)
+            # دسترسی به پروفایل از طریق رابطه
+            profile = user.profile
+
+            if not user.is_active:
                 otp_form.add_error('phone', "حساب کاربری شما فعال نیست. لطفاً ابتدا حساب خود را تأیید کنید")
             else:
                 # تولید کد یکبار مصرف
@@ -144,16 +141,24 @@ def login(request):
                 request.session['otp_user_id'] = user.id
                 
                 return redirect('account:verify_otp', ver.id)
-        
-        except Profile.DoesNotExist:
+
+        except User.DoesNotExist:
             otp_form.add_error('phone', "کاربری با این شماره تلفن ثبت‌نام نکرده است")
     else:
         pass
-    
+
+    # دریافت URL تصویر کپچا
+    # captcha_image_url = password_form.fields['captcha'].widget.image_url()
+    # print(captcha_image_url)
+    # captcha_image_url = captcha_settings.CAPTCHA_IMAGE_URL
+    # if captcha_settings.CAPTCHA_IMAGE_TEMPLATE:
+    #     captcha_image_url = reverse(captcha_settings.CAPTCHA_IMAGE_URL)
+
     context = {
         'password_form': password_form,
         'otp_form': otp_form,
-        'active_tab': active_tab
+        'active_tab': active_tab,
+        # 'captcha_image_url': captcha_image_url,
     }
 
     # اگر در فرم OTP خطا وجود داشت، تب OTP را فعال نگه دار
@@ -165,8 +170,11 @@ def login(request):
 
 def verify_otp(request, ver_id):
     ver = VerificationCode.objects.get(id=ver_id)
+    print(ver.code)
     profile = ver.profile
-    
+    # استفاده از user.username به جای phone_number
+    phone_number = profile.user.username
+
     if request.method == 'POST':
         code = request.POST.get('code')
         now = timezone.now()
@@ -183,13 +191,13 @@ def verify_otp(request, ver_id):
             error = "کد وارد شده نامعتبر یا منقضی شده است"
             return render(request, 'registration/verify_otp.html', {
                 'error': error,
-                'phone': profile.phone_number,
+                'phone': phone_number,
                 'ver_id': ver_id,
                 'expires_at': ver.expires_at
             })
     
     return render(request, 'registration/verify_otp.html', {
-        'phone': profile.phone_number,
+        'phone': phone_number,
         'ver_id': ver_id,
         'expires_at': ver.expires_at
     })
@@ -220,3 +228,10 @@ def resend_otp(request):
             return JsonResponse({'success': False, 'error': 'کد تأیید یافت نشد'})
     
     return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+
+
+def logout(request):
+    """ویو ساده برای خروج کاربر"""
+    auth_logout(request)
+    messages.success(request, 'شما با موفقیت از سیستم خارج شدید.')
+    return redirect('home:home')

@@ -1,175 +1,313 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
+{% block custom_css %}<link rel="stylesheet" href="{% static 'css/login.css' %}" />{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white">
-          <h3 class="text-center">ورود به حساب کاربری</h3>
+{#<div class="container mt-5">#}
+{#  <div class="row justify-content-center">#}
+{#    <div class="col-md-6">#}
+{#      <div class="card shadow-lg">#}
+{#        <div class="card-header bg-primary text-white">#}
+{#          <h3 class="text-center">ورود به حساب کاربری</h3>#}
+{#        </div>#}
+{#        #}
+{#        <div class="card-body">#}
+{#          <!-- تب‌ها -->#}
+{#          <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">#}
+{#            <li class="nav-item" role="presentation">#}
+{#              <button class="nav-link {% if active_tab == 'password' %}active{% endif %}" #}
+{#                      id="password-tab" data-bs-toggle="tab" data-bs-target="#password" #}
+{#                      type="button" role="tab">#}
+{#                <i class="bi bi-key me-2"></i>ورود با رمز عبور#}
+{#              </button>#}
+{#            </li>#}
+{#            <li class="nav-item" role="presentation">#}
+{#              <button class="nav-link {% if active_tab == 'otp' %}active{% endif %}" #}
+{#                      id="otp-tab" data-bs-toggle="tab" data-bs-target="#otp" #}
+{#                      type="button" role="tab">#}
+{#                <i class="bi bi-phone me-2"></i>ورود با کد یکبارمصرف#}
+{#              </button>#}
+{#            </li>#}
+{#          </ul>#}
+{##}
+{#          <!-- پیام‌های خطا -->#}
+{#          {% if password_form.non_field_errors %}#}
+{#          <div class="alert alert-danger">#}
+{#            {% for error in password_form.non_field_errors %}#}
+{#              {{ error }}#}
+{#            {% endfor %}#}
+{#          </div>#}
+{#          {% endif %}#}
+{#          #}
+{#          {% if otp_form.non_field_errors %}#}
+{#          <div class="alert alert-danger">#}
+{#            {% for error in otp_form.non_field_errors %}#}
+{#              {{ error }}#}
+{#            {% endfor %}#}
+{#          </div>#}
+{#          {% endif %}#}
+{##}
+{#          <!-- محتوای تب‌ها -->#}
+{#          <div class="tab-content" id="loginTabsContent">#}
+{#            <!-- تب رمز عبور -->#}
+{#            <div class="tab-pane fade {% if active_tab == 'password' %}show active{% endif %}" #}
+{#                 id="password" role="tabpanel">#}
+{#              <form method="post">#}
+{#                {% csrf_token %}#}
+{#                <input type="hidden" name="form_type" value="password">#}
+{#                #}
+{#                <div class="mb-3">#}
+{#                  <label for="{{ password_form.username.id_for_label }}" class="form-label">#}
+{#                    {{ password_form.username.label }}#}
+{#                  </label>#}
+{#                  {{ password_form.username }}#}
+{#                  {% if password_form.username.errors %}#}
+{#                    <div class="invalid-feedback d-block">#}
+{#                      {{ password_form.username.errors.0 }}#}
+{#                    </div>#}
+{#                  {% endif %}#}
+{#                </div>#}
+{#                #}
+{#                <div class="mb-3">#}
+{#                  <label for="{{ password_form.password.id_for_label }}" class="form-label">#}
+{#                    {{ password_form.password.label }}#}
+{#                  </label>#}
+{#                  {{ password_form.password }}#}
+{#                  {% if password_form.password.errors %}#}
+{#                    <div class="invalid-feedback d-block">#}
+{#                      {{ password_form.password.errors.0 }}#}
+{#                    </div>#}
+{#                  {% endif %}#}
+{#                </div>#}
+{#                #}
+{#                <div class="mb-3">#}
+{#                  <label for="{{ password_form.captcha.id_for_label }}" class="form-label">#}
+{#                    {{ password_form.captcha.label }}#}
+{#                  </label>#}
+{#                  {{ password_form.captcha }}#}
+{#                  {% if password_form.captcha.errors %}#}
+{#                    <div class="invalid-feedback d-block">#}
+{#                      {{ password_form.captcha.errors.0 }}#}
+{#                    </div>#}
+{#                  {% endif %}#}
+{#                </div>#}
+{#                #}
+{#                <div class="d-grid mb-3">#}
+{#                  <button type="submit" name="password-login" class="btn btn-primary btn-lg">#}
+{#                    ورود به حساب#}
+{#                  </button>#}
+{#                </div>#}
+{#                #}
+{#                <div class="text-center">#}
+{#                  <a href="#">رمز عبور را فراموش کرده‌اید؟</a>#}
+{#                </div>#}
+{#              </form>#}
+{#            </div>#}
+{##}
+{#            <!-- تب کد یکبارمصرف -->#}
+{#            <div class="tab-pane fade {% if active_tab == 'otp' %}show active{% endif %}" #}
+{#                 id="otp" role="tabpanel">#}
+{#              <form method="post">#}
+{#                {% csrf_token %}#}
+{#                <input type="hidden" name="form_type" value="otp">#}
+{#                #}
+{#                <div class="mb-3">#}
+{#                  <label for="{{ otp_form.phone.id_for_label }}" class="form-label">#}
+{#                    {{ otp_form.phone.label }}#}
+{#                  </label>#}
+{#                  {{ otp_form.phone }}#}
+{#                  {% if otp_form.phone.errors %}#}
+{#                    <div class="invalid-feedback d-block">#}
+{#                      {{ otp_form.phone.errors.0 }}#}
+{#                    </div>#}
+{#                  {% endif %}#}
+{#                </div>#}
+{#                #}
+{#                <div class="mb-3">#}
+{#                  <label for="{{ otp_form.captcha.id_for_label }}" class="form-label">#}
+{#                    {{ otp_form.captcha.label }}#}
+{#                  </label>#}
+{#                  {{ otp_form.captcha }}#}
+{#                  {% if otp_form.captcha.errors %}#}
+{#                    <div class="invalid-feedback d-block">#}
+{#                      {{ otp_form.captcha.errors.0 }}#}
+{#                    </div>#}
+{#                  {% endif %}#}
+{#                </div>#}
+{#                #}
+{#                <div class="d-grid">#}
+{#                  <button type="submit" name="otp-login" class="btn btn-primary btn-lg">#}
+{#                    ارسال کد یکبارمصرف#}
+{#                  </button>#}
+{#                </div>#}
+{#              </form>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#  </div>#}
+{#</div>#}
+
+    <div class="all-login-box">
+      <div class="login-box">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('password-tab')">
+            ورود با رمز
+          </div>
+          <div class="tab" onclick="switchTab('otp-tab')">
+            ورود با کد یکبار مصرف
+          </div>
         </div>
-        
-        <div class="card-body">
-          <!-- تب‌ها -->
-          <ul class="nav nav-tabs nav-fill mb-4" id="loginTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-              <button class="nav-link {% if active_tab == 'password' %}active{% endif %}" 
-                      id="password-tab" data-bs-toggle="tab" data-bs-target="#password" 
-                      type="button" role="tab">
-                <i class="bi bi-key me-2"></i>ورود با رمز عبور
-              </button>
-            </li>
-            <li class="nav-item" role="presentation">
-              <button class="nav-link {% if active_tab == 'otp' %}active{% endif %}" 
-                      id="otp-tab" data-bs-toggle="tab" data-bs-target="#otp" 
-                      type="button" role="tab">
-                <i class="bi bi-phone me-2"></i>ورود با کد یکبارمصرف
-              </button>
-            </li>
-          </ul>
 
-          <!-- پیام‌های خطا -->
-          {% if password_form.non_field_errors %}
-          <div class="alert alert-danger">
-            {% for error in password_form.non_field_errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-          {% endif %}
-          
-          {% if otp_form.non_field_errors %}
-          <div class="alert alert-danger">
-            {% for error in otp_form.non_field_errors %}
-              {{ error }}
-            {% endfor %}
-          </div>
-          {% endif %}
+        <!-- تب ورود با رمز -->
 
-          <!-- محتوای تب‌ها -->
-          <div class="tab-content" id="loginTabsContent">
-            <!-- تب رمز عبور -->
-            <div class="tab-pane fade {% if active_tab == 'password' %}show active{% endif %}" 
-                 id="password" role="tabpanel">
-              <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="form_type" value="password">
-                
-                <div class="mb-3">
-                  <label for="{{ password_form.username.id_for_label }}" class="form-label">
-                    {{ password_form.username.label }}
-                  </label>
-                  {{ password_form.username }}
-                  {% if password_form.username.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ password_form.username.errors.0 }}
-                    </div>
-                  {% endif %}
-                </div>
-                
-                <div class="mb-3">
-                  <label for="{{ password_form.password.id_for_label }}" class="form-label">
-                    {{ password_form.password.label }}
-                  </label>
-                  {{ password_form.password }}
-                  {% if password_form.password.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ password_form.password.errors.0 }}
-                    </div>
-                  {% endif %}
-                </div>
-                
-                <div class="mb-3">
-                  <label for="{{ password_form.captcha.id_for_label }}" class="form-label">
-                    {{ password_form.captcha.label }}
-                  </label>
-                  {{ password_form.captcha }}
-                  {% if password_form.captcha.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ password_form.captcha.errors.0 }}
-                    </div>
-                  {% endif %}
-                </div>
-                
-                <div class="d-grid mb-3">
-                  <button type="submit" name="password-login" class="btn btn-primary btn-lg">
-                    ورود به حساب
-                  </button>
-                </div>
-                
-                <div class="text-center">
-                  <a href="#">رمز عبور را فراموش کرده‌اید؟</a>
-                </div>
-              </form>
+        <!-- تب ورود با رمز -->
+        <div id="password-tab" class="tab-content active">
+          <form method="post">
+            {% csrf_token %}
+            <div class="input-group">
+              <input
+                type="tel"
+                name="username"
+                placeholder="شماره تلفن"
+                pattern="09[0-9]{8}"
+                maxlength="11"
+                inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
+                required
+              />
+            </div>
+            <div class="input-group">
+              <input type="password" name="password" placeholder="رمز عبور" required />
             </div>
 
-            <!-- تب کد یکبارمصرف -->
-            <div class="tab-pane fade {% if active_tab == 'otp' %}show active{% endif %}" 
-                 id="otp" role="tabpanel">
-              <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="form_type" value="otp">
-                
-                <div class="mb-3">
-                  <label for="{{ otp_form.phone.id_for_label }}" class="form-label">
-                    {{ otp_form.phone.label }}
-                  </label>
-                  {{ otp_form.phone }}
-                  {% if otp_form.phone.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ otp_form.phone.errors.0 }}
-                    </div>
-                  {% endif %}
-                </div>
-                
-                <div class="mb-3">
-                  <label for="{{ otp_form.captcha.id_for_label }}" class="form-label">
-                    {{ otp_form.captcha.label }}
-                  </label>
-                  {{ otp_form.captcha }}
-                  {% if otp_form.captcha.errors %}
-                    <div class="invalid-feedback d-block">
-                      {{ otp_form.captcha.errors.0 }}
-                    </div>
-                  {% endif %}
-                </div>
-                
-                <div class="d-grid">
-                  <button type="submit" name="otp-login" class="btn btn-primary btn-lg">
-                    ارسال کد یکبارمصرف
-                  </button>
-                </div>
-              </form>
+            <!-- استفاده از کپچای فرم رمز عبور -->
+            <div>
+              {{ password_form.captcha }}
             </div>
-          </div>
+
+            <!-- نمایش خطاهای کپچای رمز عبور -->
+            {% if password_form.captcha.errors %}
+              <div class="error-message" style="color: red; font-size: 0.8rem;">
+                {{ password_form.captcha.errors.0 }}
+              </div>
+            {% endif %}
+
+            <button type="submit" name="password-login">ورود</button>
+          </form>
         </div>
+{#        <div id="password-tab" class="tab-content active">#}
+{#          <form method="post">#}
+{#            {% csrf_token %}#}
+{#            <div class="input-group">#}
+{#              <input#}
+{#                type="tel"#}
+{#                name = "username"#}
+{#                placeholder="شماره تلفن"#}
+{#                pattern="09[0-9]{8}"#}
+{#                maxlength="11"#}
+{#                inputmode="numeric"#}
+{#                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"#}
+{#                required#}
+{#              />#}
+{#            </div>#}
+{#            <div class="input-group">#}
+{#              <input type="password" name="password" placeholder="رمز عبور" required />#}
+{#            </div>#}
+{#            {{ password_form.captcha }}#}
+{#            <button type="submit"  name="password-login">ورود</button>#}
+{#          </form>#}
+{#        </div>#}
+
+
+        <!-- تب ورود با کد یکبار مصرف -->
+        <div id="otp-tab" class="tab-content">
+          <form method="post">
+            {% csrf_token %}
+            <div class="input-group">
+              <input
+                type="tel"
+                name="otp-username"
+                placeholder="شماره تلفن"
+                pattern="09[0-9]{8}"
+                maxlength="11"
+                inputmode="numeric"
+                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
+                required
+              />
+              <!-- نمایش خطاهای فیلد username -->
+              {% if otp_form.username.errors %}
+                <div class="error-message" style="color: red; font-size: 0.8rem;">
+                  {{ otp_form.username.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- استفاده از کپچای فرم OTP با پیشوند -->
+            <div class="">
+              {{ otp_form.captcha }}
+            </div>
+
+            <!-- نمایش خطاهای کپچای OTP -->
+            {% if otp_form.captcha.errors %}
+              <div class="error-message" style="color: red; font-size: 0.8rem;">
+                {{ otp_form.captcha.errors.0 }}
+              </div>
+            {% endif %}
+
+            <button type="submit" name="otp-login">ورود</button>
+          </form>
+        </div>
+
+{#        <div id="otp-tab" class="tab-content">#}
+{#          <form method="post">#}
+{#            {% csrf_token %}#}
+{#            <div class="input-group">#}
+{#              <input#}
+{#                type="tel"#}
+{#                name = "username"#}
+{#                placeholder="شماره تلفن"#}
+{#                pattern="09[0-9]{8}"#}
+{#                maxlength="11"#}
+{#                inputmode="numeric"#}
+{#                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"#}
+{#                required#}
+{#              />#}
+{#            </div>#}
+{#            {{ password_form.captcha }}#}
+{#            <button type="submit" name="otp-login">ورود</button>#}
+{#          </form>#}
+{#        </div>#}
       </div>
     </div>
-  </div>
-</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentDidLoad', function() {
-  // فعال کردن تب مناسب بر اساس خطاها
-  {% if active_tab == 'otp' %}
-    const otpTab = new bootstrap.Tab(document.getElementById('otp-tab'));
-    otpTab.show();
-  {% endif %}
-  
-  // افزودن کلاس form-control به فیلدهای کپچا
-  document.querySelectorAll('input[name="captcha_0"], input[name="captcha_1"]').forEach(input => {
-    input.classList.add('form-control');
-  });
-  
-  // تنظیم استایل برای تصویر کپچا
-  const captchaImage = document.querySelector('.captcha img');
-  if (captchaImage) {
-    captchaImage.classList.add('img-fluid', 'mt-2');
-    captchaImage.style.border = '1px solid #dee2e6';
-    captchaImage.style.borderRadius = '4px';
-  }
-});
+{#document.addEventListener('DOMContentDidLoad', function() {#}
+{#  // فعال کردن تب مناسب بر اساس خطاها#}
+{#  {% if active_tab == 'otp' %}#}
+{#    const otpTab = new bootstrap.Tab(document.getElementById('otp-tab'));#}
+{#    otpTab.show();#}
+{#  {% endif %}#}
+{#  #}
+{#  // افزودن کلاس form-control به فیلدهای کپچا#}
+{#  document.querySelectorAll('input[name="captcha_0"], input[name="captcha_1"]').forEach(input => {#}
+{#    input.classList.add('form-control');#}
+{#  });#}
+{#  #}
+{#  // تنظیم استایل برای تصویر کپچا#}
+{#  const captchaImage = document.querySelector('.captcha img');#}
+{#  if (captchaImage) {#}
+{#    captchaImage.classList.add('img-fluid', 'mt-2');#}
+{#    captchaImage.style.border = '1px solid #dee2e6';#}
+{#    captchaImage.style.borderRadius = '4px';#}
+{#  }#}
+{# }); #}
+
 </script>
+
 {% endblock %}
