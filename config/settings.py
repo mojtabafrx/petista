@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'api',
+    'zarinpal.apps.ZarinpalConfig',
 ]
 
 ALLOW_UNICODE_SLUGS = True
