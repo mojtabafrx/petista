@@ -12,7 +12,6 @@ urlpatterns = [
     path('get_product_details/', views.get_product_details, name='get_product_details'),
     path('edit_seller_product/', views.edit_seller_product, name='edit_seller_product'),
     path('change-password/', views.change_password, name='change_password'),
-    path('change-password-ajax/', views.change_password_ajax, name='change_password_ajax'),
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.view_cart, name='view_cart'),
     path('update-cart-item/<int:item_id>/', views.update_cart_item, name='update_cart_item'),

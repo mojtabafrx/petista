@@ -1,36 +1,178 @@
+@font-face {
+  font-family: "Iranian-Sans";
+  src: url("/static/fonts/A-Iranian-Sans/IranianSans.woff2") format("woff2"),
+    url("/static/fonts/A-Iranian-Sans/IranianSans.woff") format("woff"),
+    url("/static/fonts/A-Iranian-Sans/IranianSans.eot") format("eot"),
+    url("/static/fonts/A-Iranian-Sans/IranianSans.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+:root {
+  --main-color: #8ae2d2;
+  --font-size-dw: Clamp(10vw, 14vw, 15vw);
+  --font-size-up: Clamp(6vw, 7vw, 10vw);
+  --main-color-two: rgb(255, 120, 24);
+}
+html,
+body,
+.mycontainer {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Iranian-Sans;
+}
+/*شروع کد های header*/
+.header-div {
+  height: 60px;
+  background-color: var(--main-color);
+  display: flex;
+  justify-content: space-between;
 
+  align-items: center;
+  padding: 0 16px;
+  position: relative;
+}
+
+.menu-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background: linear-gradient(to bottom, #ffffff, #dcdcdc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1002;
+}
+
+.menu-divv {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  height: calc(100vh - 60px);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  border-radius: 20px 20px 0 0;
+  border-top: 2px solid gray;
+}
+
+.menu-divv.active {
+  transform: translateY(0);
+}
+
+.menu-grabber-div {
+  width: 100%;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 8px;
+}
+
+.tach-div {
+  width: 30%;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+}
+
+.menu-grabber {
+  width: 60px;
+  height: 8px;
+  background: var(--main-color-two);
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: grab;
+}
+
+.zirmenu,
+.submenu {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 40px 20px;
+  background-color: #f5f5f5;
+}
+
+.menu-box {
+  width: clamp(130px, 40vw, 220px);
+  height: 100px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: bold;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.menu-box:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-4px);
+}
+
+#backBtn {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 18px;
+  background-color: var(--main-color-two);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.htwo {
+  color: #000;
+  margin: 0;
+  font-size: 25px;
+}
+/*پایان کد هلی header*/
+/*شروع کد های مشترک منو های داخل دیو کشویی*/
 .glass {
-    margin: 10px;
-    background: rgba(255, 255, 255, 0.2);
-    z-index: 9998;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    transform: translateY(100%);
-    overflow: hidden;
-    padding: 10px;
+  margin: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 9998;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  transform: translateY(100%);
+  overflow: hidden;
+  padding: 10px;
 }
 
 .glass.show {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .scroll-box {
-    height: 100%;
-    overflow-y: auto;
-    padding: 20px;
-    box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-
-
 .scroll-box {
-    height: 100%;
-    overflow-y: auto;
-    padding: 20px;
-    box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .menu,
@@ -43,6 +185,10 @@
   justify-content: center;
   gap: 10px;
 }
+/*
+.header-div h2 {
+  font-size: 16px;
+} */
 
 /* مخفی پیش‌فرض زیرمنو */
 .sub-menu {
@@ -90,7 +236,7 @@
   margin: 5px;
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: background 0.3s, transform 0.2s ease;
   width: 7rem;
   height: 8rem;
@@ -128,7 +274,7 @@
   margin: 5px;
   cursor: pointer;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: background 0.3s, transform 0.2s ease;
   width: 7rem;
   height: 8rem;
@@ -158,36 +304,32 @@
   box-sizing: border-box;
 }
 
-
-
-
 .menu-btn {
-    background-color: blue;
-    position: fixed;
-    top: 10px;
-    right: 0px;
-    width: 40px;
-    height: 40px;
-    z-index: 9999;
-    border: none;
-    font-size: 24px;
-    padding: 8px 12px;
-    cursor: pointer;
-    border-radius:  50% 0% 0% 50% ;
+  background-color: blue;
+  position: fixed;
+  top: 10px;
+  right: 0px;
+  width: 40px;
+  height: 40px;
+  z-index: 9999;
+  border: none;
+  font-size: 24px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 50% 0% 0% 50%;
 
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
-
-
-
 
 .show-menu {
-    top: 10px;
-
+  top: 10px;
 }
 
-
 .back-menu {
-    top: 60px;
+  top: 60px;
+}
+/*پایان کد های مشترک منو های داخل دیو کشویی*/
 
+.menu-button-icon-ham{
+  width: 20px;
 }

@@ -1,18 +1,151 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% if messages %}
-  {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-      {{ message }}
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-    </div>
-  {% endfor %}
-{% endif %}
+{#{% if messages %}#}
+{#  {% for message in messages %}#}
+{#    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">#}
+{#      {{ message }}#}
+{#      <button type="button" class="close" data-dismiss="alert">&times;</button>#}
+{#    </div>#}
+{#  {% endfor %}#}
+{#{% endif %}#}
 
 
 {% block content %}
+<div class="div-picture">
+        <div class="divtodiv">
+          <img
+            class="big-imge marg-top"
+            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9pLqiYv6fnbTBokin
+            8V7OY9m5dH4vtCl35jao5FBzqT3-1w88SEmkPkFR4EIB6HiQaqQ&usqp=CAU"
+            alt="dog"
+          />
+          <div class="big-img-div marg-top"></div>
+          <div class="div-for-big-img marg-top"></div>
 
+          <div class="right-top top">
+            <div class="flip-box">
+              <div class="flip-box-inner">
+                <div class="flip-box-front">
+                  <div class="img">
+                    <i class="nf nf-fa-home"></i>
+                  </div>
+                </div>
+                <div class="flip-box-back">
+                  <h5>کلبه</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left-top top">
+            <div class="flip-box">
+              <div class="flip-box-inner">
+                <div class="flip-box-front">
+                  <div class="img">
+                    <i class="nf nf-fa-place_of_worship"></i>
+                  </div>
+                </div>
+                <div class="flip-box-back">
+                  <h5>کلبه</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="right center float-div">
+            <div class="flip-box">
+              <div class="flip-box-inner">
+                <div class="flip-box-front">
+                  <div class="img">
+                    <i class="nf nf-fae-chess_queen"></i>
+                  </div>
+                </div>
+                <div class="flip-box-back">
+                  <h5>فرشته</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left center float-div">
+            <div class="flip-box">
+              <div class="flip-box-inner">
+                <div class="flip-box-front">
+                  <div class="img">
+                    <i class="nf nf-fa-paw"></i>
+                  </div>
+                </div>
+                <div class="flip-box-back">
+                  <h5>پنجه</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+<div class="div-bottom">
+        <hr />
+        <div class="div-4img">
+          <div class="flip-box">
+            <div class="flip-box-inner">
+              <div class="flip-box-front">
+                <div class="img">
+                  <i class="nf nf-md-rice"></i>
+                </div>
+              </div>
+              <div class="flip-box-back">
+                <h2>ظرف غذا</h2>
+              </div>
+            </div>
+          </div>
+          <div class="flip-box">
+            <div class="flip-box-inner">
+              <div class="flip-box-front">
+                <div class="img">
+                  <i class="nf nf-fa-cookie_bite"></i>
+                </div>
+              </div>
+              <div class="flip-box-back">
+                <h2>خوراکی</h2>
+              </div>
+            </div>
+          </div>
+          <div class="flip-box">
+            <div class="flip-box-inner">
+              <div class="flip-box-front">
+                <div class="img">
+                  <i class="nf nf-fa-photo_film"></i>
+                </div>
+              </div>
+              <div class="flip-box-back">
+                <h2>فیلم</h2>
+              </div>
+            </div>
+          </div>
+          <div class="flip-box">
+            <div class="flip-box-inner">
+              <div class="flip-box-front">
+                <div class="img">
+                  <i class="nf nf-md-tractor"></i>
+                </div>
+              </div>
+              <div class="flip-box-back">
+                <h4>اسباب بازی</h4>
+              </div>
+            </div>
+          </div>
+          <div class="flip-box">
+            <div class="flip-box-inner">
+              <div class="flip-box-front">
+                <div class="img">
+                  <i class="nf nf-fa-cat"></i>
+                </div>
+              </div>
+              <div class="flip-box-back">
+                <h4>اسباب بازی</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 {% endblock %}
 
 

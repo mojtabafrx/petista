@@ -13,8 +13,11 @@ def product_list(request, category_slug=None):
     products = Product.objects.filter(status=1)
     
     category = None
+    menu_list = Category.objects.filter(parent__isnull=True)
     if category_slug:
         category = get_object_or_404(Category, slug=category_slug)
+        menu_list = Category.objects.filter(parent=category)
+
         products = products.filter(category=category)
     
     products = products.annotate(
@@ -50,6 +53,7 @@ def product_list(request, category_slug=None):
         'category': category,
         'categories': categories,
         'page_obj': page_obj,
+        'menu_list': menu_list,
     }
     # return JsonResponse({})
     return render(request, 'shop/product/list.html', context)

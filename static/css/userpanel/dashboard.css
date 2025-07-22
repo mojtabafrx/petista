@@ -1,0 +1,180 @@
+
+.main-container-header {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    gap: 20px;
+}
+
+.main-container-p {
+    font-size: 22px;
+    color: #575656;
+}
+
+/* three div orders and history and intrest*/
+.all-three-div {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    justify-content: space-evenly;
+    margin-top: 5%;
+
+}
+
+.col {
+    /*width: 20%;*/
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+    padding: 10px;
+
+}
+
+.col:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    transform: scale(1.05)
+}
+
+.all-three-div {
+    width: 100%;
+    margin-bottom: 5%;
+}
+
+.all-three-div a {
+    text-decoration: none;
+    color: inherit; /* برای اینکه رنگ متن تغییر نکنه */
+}
+
+.all-three-div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.col {
+    flex: 1 1 250px;
+    max-width: 300px;
+    min-width: 200px;
+}
+
+.all-div-container {
+    width: 90%;
+    /*margin-right: 22%;*/
+    margin: 0 auto;
+
+}
+
+.container {
+    width: 100%;
+    margin-right: 0;
+}
+
+@media (max-width: 990px) {
+    .panel {
+        width: 30%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .panel {
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 2%;
+        padding: 10px 0;
+
+    }
+
+
+    .panel-icon {
+        width: 30px;
+    }
+
+    .head-container {
+        border-radius: 0px;
+    }
+
+    .col {
+        margin: 10px;
+    }
+
+    .header-container,
+    .all-header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .top-welcome {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .header-container {
+        margin: 0 auto;
+    }
+
+    .head-container-name {
+        font-size: 16px;
+    }
+
+    .main-container-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .main-container-p {
+        font-size: 18px;
+    }
+
+    .tab-button {
+        font-size: 14px;
+    }
+
+    .hamburger {
+        top: 10px;
+        right: 10px;
+
+    }
+
+    .all-container {
+        display: flex;
+        flex-direction: column;
+        height: fit-content;
+    }
+
+
+    .open, .side-menu {
+        width: 50%;
+    }
+}
+
+/*tab 4 content changing password*/
+
+@media (max-width: 800px) {
+    .panel {
+        width: 100%;
+    }
+
+    .all-div-container {
+        margin-top: 5%;
+    }
+
+    .hamburger {
+        /*margin-top: 5%;*/
+    }
+    .header-container{
+        width: 100%;
+    }
+}
+.all-container{
+    height: fit-content;
+}

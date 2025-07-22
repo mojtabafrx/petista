@@ -1,0 +1,157 @@
+{% extends 'user_panel/dashboard.html' %}
+{% load static %}
+{% block custom_css %}<link rel="stylesheet" href="{% static '/css/userpanel/shopping-cart.css' %}"/>{% endblock %}
+{% block content %}
+<div class="all-div-container">
+        <div class="all-container">
+            <div class="header-container">
+                <h3 class="top-welcome">خوش آمدید</h3>
+            </div>
+            <div class="panel">
+                <img class="panel-icon" src="/assets/images/icons8-customer-64.png">
+                <span class="panel-name">خریدار معمولی</span>
+            </div>
+        </div>
+        <div class="container">
+            <div class="all-header-container"></div>
+
+            <div class="head-container">
+                <img class="head-container-icon" src="/assets/images/icons8-add-to-cart-30.png">
+                <span class="head-container-name">سبد خرید</span>
+            </div>
+            <div class="main-container">
+                <div class="cart-container" id="cart">
+                    <div class="cart-header">
+                        <div>محصول</div>
+                        <div>فروشنده</div>
+                        <div>قیمت واحد</div>
+                        <div>تعداد</div>
+                        <div>قیمت کل</div>
+                        <div>عملیات</div>
+                    </div>
+
+                    <!-- ردیف‌ها -->
+                    <div class="cart-row">
+                        <div data-label="محصول">کفش اسپرت مردانه</div>
+                        <div data-label="فروشنده">فروشگاه کفش خوب</div>
+                        <div data-label="قیمت واحد" class="unit-price">550000</div>
+                        <div data-label="تعداد">
+                            <div class="qty-controls">
+                                <button class="decrease">-</button>
+                                <span class="qty">2</span>
+                                <button class="increase">+</button>
+                            </div>
+                        </div>
+                        <div data-label="قیمت کل" class="total-price">1100000</div>
+                        <div data-label="عملیات">
+                            <button class="remove-btn">حذف</button>
+                        </div>
+                    </div>
+
+                    <div class="cart-row">
+                        <div data-label="محصول">شلوار جین زنانه</div>
+                        <div data-label="فروشنده">مدپوشان</div>
+                        <div data-label="قیمت واحد" class="unit-price">320000</div>
+                        <div data-label="تعداد">
+                            <div class="qty-controls">
+                                <button class="decrease">-</button>
+                                <span class="qty">1</span>
+                                <button class="increase">+</button>
+                            </div>
+                        </div>
+                        <div data-label="قیمت کل" class="total-price">320000</div>
+                        <div data-label="عملیات">
+                            <button class="remove-btn">حذف</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart-summary" id="cart-summary">
+                    جمع کل: ۱,۴۲۰,۰۰۰ تومان
+                </div>
+
+                <div class="cart-actions">
+                    <button class="continue-btn">ادامه خرید</button>
+                    <button class="checkout-btn">پرداخت نهایی</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_js %}
+
+//add to cart tab js
+const updateCart = () => {
+    let total = 0;
+    document.querySelectorAll('.cart-row').forEach(row => {
+        const unitPrice = parseInt(row.querySelector('.unit-price').textContent);
+        const qty = parseInt(row.querySelector('.qty').textContent);
+        const totalPrice = unitPrice * qty;
+        row.querySelector('.total-price').textContent = totalPrice.toLocaleString('fa-IR');
+        total += totalPrice;
+    });
+    document.getElementById('cart-summary').textContent = `جمع کل: ${total.toLocaleString('fa-IR')} تومان`;
+};
+
+document.querySelectorAll('.increase').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const qtyElem = btn.parentElement.querySelector('.qty');
+        let qty = parseInt(qtyElem.textContent);
+        qtyElem.textContent = ++qty;
+        updateCart();
+    });
+});
+
+document.querySelectorAll('.decrease').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const qtyElem = btn.parentElement.querySelector('.qty');
+        let qty = parseInt(qtyElem.textContent);
+        if (qty > 1) {
+            qtyElem.textContent = --qty;
+            updateCart();
+        }
+    });
+});
+
+document.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.closest('.cart-row').remove();
+        updateCart();
+    });
+});
+
+// اجرای اولیه
+updateCart();
+
+const hamburger = document.getElementById('hamburger');
+const closeBtn = document.getElementById('closeBtn');
+const sideMenu = document.getElementById('sideMenu');
+const allDivContainer = document.querySelector('.all-div-container');
+
+// حالت اولیه
+allDivContainer.style.width = '90%';
+allDivContainer.style.marginRight = '5%';
+
+hamburger.addEventListener('click', () => {
+    sideMenu.classList.add('open');
+    allDivContainer.style.width = '70%';
+    allDivContainer.style.marginRight = '20%';
+
+    // مخفی کردن همبرگر
+    hamburger.style.visibility = 'hidden';
+    // یا می‌تونی display رو هم امتحان کنی: hamburger.style.display = 'none';
+});
+
+closeBtn.addEventListener('click', () => {
+    sideMenu.classList.remove('open');
+    allDivContainer.style.width = '90%';
+    allDivContainer.style.marginRight = '5%';
+
+    // نمایش مجدد همبرگر
+    hamburger.style.visibility = 'visible';
+    // یا hamburger.style.display = 'block';
+});
+
+{% endblock %}

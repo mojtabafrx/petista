@@ -10,6 +10,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.db import transaction
 from django.views.decorators.http import require_POST
+from django.db.models import Count
 
 @user_panel_access
 def dashboard(request):
@@ -60,8 +61,14 @@ def add_seller_product(request):
             return JsonResponse({'success': True, 'message': 'محصول با موفقیت ثبت شد'})
         except Product.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'محصول معتبر نیست'})
-    
-    return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+    else:
+        categories = Category.objects.active().annotate(product_count=Count('products')).filter(product_count__gt=0)
+        context = {
+            'user_type': request.user.profile.user_type,
+            'categories': categories,
+            'section': 'dashboard'  # بخش پیش‌فرض
+        }
+        return render(request, 'user_panel/add_seller_product.html' , context)
 
 
 
@@ -88,7 +95,7 @@ def my_products(request):
         'products_page': products_page,
         'section': 'my_products'  # برای شناسایی بخش در تمپلیت
     }
-    return render(request, 'user_panel/dashboard.html', context)
+    return render(request, 'user_panel/seller_products.html', context)
 
 
 @user_panel_access
@@ -153,30 +160,27 @@ def edit_seller_product(request):
 
 @user_panel_access
 def change_password(request):
-    """ویو تغییر رمز عبور"""
-    context = {
-        'user_type': request.user.profile.user_type,
-        'section': 'change_password'
-    }
-    return render(request, 'user_panel/dashboard.html', context)
-
-@user_panel_access
-def change_password_ajax(request):
-    """تغییر رمز عبور با AJAX"""
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             # بروزرسانی session برای جلوگیری از خروج کاربر
             update_session_auth_hash(request, user)
-            return JsonResponse({'success': True, 'message': 'رمز عبور شما با موفقیت تغییر یافت'})
+            return render(request, 'user_panel/dashboard.html', context={'message': 'رمز عبور شما با موفقیت تغییر یافت'})
         else:
             errors = []
             for field, field_errors in form.errors.items():
                 for error in field_errors:
                     errors.append(error)
             return JsonResponse({'success': False, 'errors': errors})
-    return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+    else:
+        """ویو تغییر رمز عبور"""
+        context = {
+            'user_type': request.user.profile.user_type,
+            'section': 'change_password'
+        }
+        return render(request, 'user_panel/change_password.html', context)
+
 
 
 @user_panel_access
@@ -184,13 +188,15 @@ def view_cart(request):
     """نمایش سبد خرید"""
     # یافتن سبد خرید فعال کاربر
     # cart = Cart.objects.get_or_create(user=request.user, is_active=True)
-    cart = get_object_or_404(Cart, user=request.user, is_active=True)
+    cart = Cart.objects.filter(user=request.user, is_active=True)
     context = {
         'cart': cart,
         'user_type': request.user.profile.user_type,
         'section': 'cart'
     }
-    return render(request, 'user_panel/dashboard.html', context)
+    if cart :
+        return render(request, 'user_panel/shopping-cart.html', context)
+    return render(request, 'user_panel/no_product.html', context)
 
 @user_panel_access
 def add_to_cart(request, product_id):

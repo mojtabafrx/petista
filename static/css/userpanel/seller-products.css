@@ -1,0 +1,133 @@
+.orders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-x: auto;
+}
+
+/* ردیف‌ها و هدر در دسکتاپ */
+.order-header, .order-row {
+    display: flex;
+    flex-wrap: nowrap;
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    align-items: center;
+    text-align: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-direction: row;
+}
+
+.order-header > div,
+.order-row > div {
+    flex: 1;
+    min-width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ستون دکمه‌ها */
+.order-header > div:last-child,
+.order-row > div:last-child {
+    min-width: 140px;
+}
+
+/* استایل هدر */
+.order-header {
+    background-color: var(--main-color);
+    color: white;
+    font-weight: bold;
+    margin-top: 1%;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.paid { background-color: #d9fdf6; color: #06796b; }
+.pending { background-color: #fff8e1; color: #a67700; }
+.canceled { background-color: #ffe2e5; color: #c62828; }
+
+.details-btn {
+    padding: 8px 12px;
+    background-color: #ed4949;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin: 4px;
+    white-space: nowrap;
+}
+
+.details-btn:hover {
+    background-color: var(--main-color-two);
+    transform: scale(1.05);
+}
+
+.edit-button {
+    background-color: var(--main-color);
+}
+
+.edit-button-link {
+    text-decoration: none;
+}
+.head-container-order-icon{
+    width: 25px;
+    margin-left: 5px;
+}
+
+/* حالت موبایل */
+@media (max-width: 995px) {
+    .order-header {
+        display: none;
+    }
+
+    .order-row {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: right;
+    }
+
+    .order-row > div {
+        width: 100%;
+        display: block;
+        margin-bottom: 10px;
+        font-size: 15px;
+        padding-right: 10px;
+        position: relative;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-row > div:last-child {
+        border-bottom: none;
+    }
+
+    .order-row > div::before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: #444;
+        display: inline;
+    }
+
+    .two-buttom {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .details-btn {
+        width: 100%;
+        font-size: 15px;
+    }
+}

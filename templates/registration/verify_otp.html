@@ -4,7 +4,8 @@
 
 {% block content %}
 <div class="container">
-    <h2>ورود با کد یکبار مصرف</h2>
+    <div class="container-content">
+        <h2>ورود با کد یکبار مصرف</h2>
 
     <p class="info-text">
       کد تأیید به شماره <strong>{{ phone_number }}</strong> ارسال شد.
@@ -30,6 +31,8 @@
     </div>
 
     <div class="resend" id="resend">ارسال مجدد کد</div>
+    </div>
+
 </div>
 
 {% endblock %}
