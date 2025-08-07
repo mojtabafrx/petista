@@ -1,26 +1,29 @@
 from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import redirect
 import requests
 import json
 
 # ? sandbox merchant
-if settings.SANDBOX:
-    sandbox = 'sandbox'
-else:
-    sandbox = 'www'
-
-ZP_API_REQUEST = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentRequest.json"
-ZP_API_VERIFY = f"https://{sandbox}.zarinpal.com/pg/rest/WebGate/PaymentVerification.json"
-ZP_API_STARTPAY = f"https://{sandbox}.zarinpal.com/pg/StartPay/"
+# if settings.SANDBOX:
+#     sandbox = 'sandbox'
+# else:
+#     sandbox = 'www'
+MERCHANT=""
+ZP_API_REQUEST = "https://sandbox.zarinpal.com/pg/v4/payment/request.json"
+ZP_API_VERIFY = "https://sandbox.zarinpal.com/pg/v4/payment/verify.json"
+ZP_API_STARTPAY = "https://sandbox.zarinpal.com/pg/StartPay/{authority}"
 
 amount = ""  # Rial / Required
 description = "توضیحات مربوط به تراکنش را در این قسمت وارد کنید"  # Required
+email = "" #Optional
 phone = 'YOUR_PHONE_NUMBER'  # Optional
 # Important: need to edit for realy server.
 CallbackURL = 'http://127.0.0.1:8080/verify/'
 
 
 def send_request(request):
-    data = {
+    req_data = {
         "MerchantID": settings.MERCHANT,
         "Amount": amount,
         "Description": description,

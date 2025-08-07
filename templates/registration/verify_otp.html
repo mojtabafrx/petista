@@ -1,77 +1,84 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% block custom_css %}<link rel="stylesheet" href="{% static 'css/verify.css' %}" />{% endblock %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static 'css/verify.css' %}"/>{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="container-content">
-        <h2>ورود با کد یکبار مصرف</h2>
+	<div class="container">
+		<div class="container-content">
+			<h2>ورود با کد یکبار مصرف</h2>
 
-    <p class="info-text">
-      کد تأیید به شماره <strong>{{ phone_number }}</strong> ارسال شد.
-    </p>
+			<p class="info-text">
+				کد تأیید به شماره <strong>{{ phone_number }}</strong> ارسال شد.
+			</p>
 
-    <p class="plain-hint">لطفاً کد ۶ رقمی ارسال شده را وارد کنید.</p>
+			<p class="plain-hint">لطفاً کد ۶ رقمی ارسال شده را وارد کنید.</p>
 
-    <form id="otp-form" method="post">
-        {% csrf_token %}
-      <input
-        type="text"
-        maxlength="6"
-        id="id_verification_code"
-        name="code"
-        class="otp-single-input"
-        placeholder="- - - - - -"
-      />
-      <button type="submit" class="submit-button">تأیید و ورود</button>
-    </form>
+			<form id="otp-form" method="post">
+				{% csrf_token %}
+				<input
+						type="text"
+						maxlength="6"
+						id="id_verification_code"
+						name="code"
+						class="otp-single-input"
+						placeholder="- - - - - -"
+				/>
+				<button type="submit" class="submit-button">تأیید و ورود</button>
+			</form>
 
-    <div class="countdown">
-      زمان باقیمانده تا ارسال مجدد کد: <span id="timer">2:00</span>
-    </div>
+			<div class="countdown">
+				زمان باقیمانده تا ارسال مجدد کد: <span id="timer">2:00</span>
+			</div>
+			{% if messages %}
+				<div class="messages" style="color: red; font-size: 0.8rem;">
+					{% for message in messages %}
+						<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+					{% endfor %}
+				</div>
+			{% endif %}
+			<div class="resend" id="resend">ارسال مجدد کد</div>
+		</div>
 
-    <div class="resend" id="resend">ارسال مجدد کد</div>
-    </div>
-
-</div>
+	</div>
 
 {% endblock %}
 {% block extra_js %}
-<script>
-  const timerEl = document.getElementById("timer");
-  const resendEl = document.getElementById("resend");
-  let time = 120;
+	<script>
+        const timerEl = document.getElementById("timer");
+        const resendEl = document.getElementById("resend");
+        let time = 120;
 
-  function startCountdown() {
-    const interval = setInterval(() => {
-      time--;
-      const minutes = Math.floor(time / 60);
-      const seconds = time % 60;
-      timerEl.textContent = `${minutes}:${
-        seconds < 10 ? "0" : ""
-      }${seconds}`;
+        function startCountdown() {
+            const interval = setInterval(() => {
+                time--;
+                const minutes = Math.floor(time / 60);
+                const seconds = time % 60;
+                timerEl.textContent = `${minutes}:${
+                    seconds < 10 ? "0" : ""
+                }${seconds}`;
 
-      if (time <= 0) {
-        clearInterval(interval);
-        resendEl.classList.add("active");
-        resendEl.style.cursor = "pointer";
-      }
-    }, 1000);
-  }
+                if (time <= 0) {
+                    clearInterval(interval);
+                    resendEl.classList.add("active");
+                    resendEl.style.cursor = "pointer";
+                }
+            }, 1000);
+        }
 
-  resendEl.addEventListener("click", () => {
-    if (resendEl.classList.contains("active")) {
-      alert("کد مجدد ارسال شد! (شبیه‌سازی)");
-      resendEl.classList.remove("active");
-      resendEl.style.cursor = "default";
-      time = 120;
-      timerEl.textContent = "2:00";
-      startCountdown();
-    }
-  });
+        resendEl.addEventListener("click", () => {
+            if (resendEl.classList.contains("active")) {
+                alert("کد مجدد ارسال شد! (شبیه‌سازی)");
+                resendEl.classList.remove("active");
+                resendEl.style.cursor = "default";
+                time = 120;
+                timerEl.textContent = "2:00";
+                startCountdown();
+            }
+        });
 
-  startCountdown();
-</script>
+        startCountdown();
+	</script>
 
 {% endblock %}
 {#{% block content %}#}

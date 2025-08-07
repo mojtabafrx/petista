@@ -23,167 +23,164 @@
                          aria-labelledby="v-pills-home-tab">
                         <div class="all-slider-one">
                             <div class="slider-one-div shop">
-
-                            <a href="#" class="sliders-link">
-                                    <div class="slider-one content">
+                            {% for product in page_obj %}
+                            <a href="{{ product.get_absolute_url }}" class="sliders-link">
+                                    <div class="slider-one content {% if product.total_available == 0 %} no-product-content {% endif %}">
                                         <div class="slider-container">
                                             <!--                              slider slider -->
                                             <div class="slider">
 
                                                 <button class="arrow prev">&#10094;</button>
+                                                {% if product.additional_images %}
                                                 <div class="slides">
-                                                    <img class="slide-img" src="assets/images/images%20(2).jpeg"
-                                                         alt="عکس ۲"/>
-                                                    <img class="slide-img" src="assets/images/images%20(1).jpeg"
+                                                    <img class="slide-img" src="{{ product.additional_images.all.0.image.url }}"
+                                                         alt="{{ product.title }}"/>
+                                                    <img class="slide-img" src="{% static 'images/images%20(1).jpeg' %}"
                                                          alt="عکس ۳"/>
-                                                    <img class="slide-img" src="assets/images/images.jpeg"
+                                                    <img class="slide-img" src="{% static 'images/images.jpeg' %}"
                                                          alt="عکس ۱"/>
                                                 </div>
+                                                {% else %}
+                                                    <div class="bg-light d-flex align-items-center justify-content-center"
+                                                         style="height: 200px;">
+                                                        <span class="text-muted">بدون تصویر</span>
+                                                    </div>
+                                                {% endif %}
+
                                                 <button class="arrow next">&#10095;</button>
                                             </div>
                                         </div>
-                                        <h3>نام محصول</h3>
-                                        <span>موجود</span><br>
-                                        <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"
-                                                                                      src="shopping-cart.png"></button>
-                                        <span>100,000تومان</span>
-                                    </div>
-                            </a>
+                                        <h3>{{ product.title }}</h3>
 
+                                        {% if product.total_available > 0 %}
+                                        <div class="div-available">
 
-
-                            <a href="#" class="sliders-link">
-                                <div class="slider-one content">
-                                    <!--                              slider start-->
-                                    <div class="slider">
-
-                                        <button class="arrow prev">&#10094;</button>
-                                        <div class="slides">
-                                            <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>
-                                            <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>
-                                            <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>
+                                            <div class="available">
+                                                موجودی
+                                            </div>
+                                            <div class="available-count">
+                                                {{ product.total_available  }}
+                                         عدد
+                                            </div>
                                         </div>
-                                        <button class="arrow next">&#10095;</button>
-                                    </div>
-                                    <!--                              slider end-->
-                                    <h3>نام محصول</h3>
-                                    <span>موجود</span><br>
-                                    <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"
-                                                                                  src="shopping-cart.png"></button>
-
-                                    <span>100,000تومان</span>
 
 
-                                </div>
-                            </a>
-
-                            <a href="#" class="sliders-link">
-                                <div class="slider-one content">
-                                    <!--                              slider start-->
-                                    <div class="slider">
-
-                                        <button class="arrow prev">&#10094;</button>
-                                        <div class="slides">
-                                            <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>
-                                            <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>
-                                            <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>
+                                            <div class="flex-col-button-price">
+                                            <span>قیمت : {{ product.min_price|floatformat:"0" }}  تومان</span>
+                                            <button class="button add-to-cart" data-id="{{ product.id }}">
+                                                <img class="add-to-cart-img" src="{% static '/images/icons8-add-to-cart-96.png' %}" />
+                                            </button>
                                         </div>
-                                        <button class="arrow next">&#10095;</button>
+
+
+
+                                        {% else %}
+                                        <div class="div-unavailable">
+                                            <span class="unavailable">
+                                                ناموجود
+                                            </span>
+                                        </div>
+
+                                        {% endif %}
+
+
+
                                     </div>
-                                    <!--                              slider end-->
-                                    <h3>نام محصول</h3>
-                                    <span>موجود</span><br>
-                                    <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"
-                                                                                  src="shopping-cart.png"></button>
-
-                                    <span>100,000تومان</span>
-
-
-                                </div>
                             </a>
+
+                            {% endfor %}
+
+
+
+
+
+
 
                         </div>
                     </div>
 
 
-                    <div class="slider-two-div shop">
-                        <a href="#" class="sliders-link">
-                            <div class="slider-one content">
-                                <div class="slider-container">
-                                    <!--                              slider start-->
-                                    <div class="slider">
-
-                                        <button class="arrow prev">&#10094;</button>
-                                        <div class="slides">
-                                            <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>
-                                            <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>
-                                            <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>
-                                        </div>
-                                        <button class="arrow next">&#10095;</button>
-                                    </div>
-                                    <!--                              slider end-->
-                                </div>
-                                <h3>نام محصول</h3>
-                                <span>موجود</span><br>
-                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"
-                                                                              src="shopping-cart.png"></button>
-
-                                <span>100,000تومان</span>
-
-                            </div>
-                        </a>
-
-                        <a href="#" class="sliders-link">
-                            <div class="slider-one content">
-                                <!--                              slider start-->
-                                <div class="slider">
-
-                                    <button class="arrow prev">&#10094;</button>
-                                    <div class="slides">
-                                        <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>
-                                        <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>
-                                        <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>
-                                    </div>
-                                    <button class="arrow next">&#10095;</button>
-                                </div>
-                                <!--                              slider end-->
-                                <h3>نام محصول</h3>
-                                <span>موجود</span><br>
-                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"
-                                                                              src="shopping-cart.png"></button>
-
-                                <span>100,000تومان</span>
 
 
-                            </div>
-                        </a>
-
-                        <a href="#" class="sliders-link">
-                            <div class="slider-one content">
-                                <!--                              slider start-->
-                                <div class="slider">
-
-                                    <button class="arrow prev">&#10094;</button>
-                                    <div class="slides">
-                                        <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>
-                                        <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>
-                                        <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>
-                                    </div>
-                                    <button class="arrow next">&#10095;</button>
-                                </div>
-                                <!--                              slider end-->
-                                <h3>نام محصول</h3>
-                                <span>موجود</span><br>
-                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"
-                                                                              src="shopping-cart.png"></button>
-
-                                <span>100,000تومان</span>
-
-
-                            </div>
-                        </a>
-
-                    </div>
+{##}
+{#                    <div class="slider-two-div shop">#}
+{#                        <a href="#" class="sliders-link">#}
+{#                            <div class="slider-one content">#}
+{#                                <div class="slider-container">#}
+{#                                    <!--                              slider start-->#}
+{#                                    <div class="slider">#}
+{##}
+{#                                        <button class="arrow prev">&#10094;</button>#}
+{#                                        <div class="slides">#}
+{#                                            <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>#}
+{#                                            <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>#}
+{#                                            <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>#}
+{#                                        </div>#}
+{#                                        <button class="arrow next">&#10095;</button>#}
+{#                                    </div>#}
+{#                                    <!--                              slider end-->#}
+{#                                </div>#}
+{#                                <h3>نام محصول</h3>#}
+{#                                <span>موجود</span><br>#}
+{#                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"#}
+{#                                                                              src="shopping-cart.png"></button>#}
+{##}
+{#                                <span>100,000تومان</span>#}
+{##}
+{#                            </div>#}
+{#                        </a>#}
+{##}
+{#                        <a href="#" class="sliders-link">#}
+{#                            <div class="slider-one content">#}
+{#                                <!--                              slider start-->#}
+{#                                <div class="slider">#}
+{##}
+{#                                    <button class="arrow prev">&#10094;</button>#}
+{#                                    <div class="slides">#}
+{#                                        <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>#}
+{#                                        <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>#}
+{#                                        <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>#}
+{#                                    </div>#}
+{#                                    <button class="arrow next">&#10095;</button>#}
+{#                                </div>#}
+{#                                <!--                              slider end-->#}
+{#                                <h3>نام محصول</h3>#}
+{#                                <span>موجود</span><br>#}
+{#                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"#}
+{#                                                                              src="shopping-cart.png"></button>#}
+{##}
+{#                                <span>100,000تومان</span>#}
+{##}
+{##}
+{#                            </div>#}
+{#                        </a>#}
+{##}
+{#                        <a href="#" class="sliders-link">#}
+{#                            <div class="slider-one content">#}
+{#                                <!--                              slider start-->#}
+{#                                <div class="slider">#}
+{##}
+{#                                    <button class="arrow prev">&#10094;</button>#}
+{#                                    <div class="slides">#}
+{#                                        <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>#}
+{#                                        <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>#}
+{#                                        <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>#}
+{#                                    </div>#}
+{#                                    <button class="arrow next">&#10095;</button>#}
+{#                                </div>#}
+{#                                <!--                              slider end-->#}
+{#                                <h3>نام محصول</h3>#}
+{#                                <span>موجود</span><br>#}
+{#                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"#}
+{#                                                                              src="shopping-cart.png"></button>#}
+{##}
+{#                                <span>100,000تومان</span>#}
+{##}
+{##}
+{#                            </div>#}
+{#                        </a>#}
+{##}
+{#                    </div>#}
 
 
                 </div>
@@ -197,44 +194,109 @@
 
 {% block extra_js %}
 <script>
-    function initializeSlider(slider) {
-        const slides = slider.querySelector('.slides');
-        const images = slider.querySelectorAll('.slides img');
-        const prevBtn = slider.querySelector('.prev');
-        const nextBtn = slider.querySelector('.next');
-        let index = 0;
 
-        // تابعی برای جابجایی اسلایدها
-        function showSlide(i) {
-            if (i < 0) index = images.length - 1;
-            else if (i >= images.length) index = 0;
-            else index = i;
+function initializeSlider(slider) {
+    const slides = slider.querySelector('.slides');
+    const images = slider.querySelectorAll('.slides img');
+    const prevBtn = slider.querySelector('.prev');
+    const nextBtn = slider.querySelector('.next');
+    let index = 0;
 
-            // انیمیشن جابجایی عکس‌ها
-            slides.style.transform = `translateX(${index * 100}%)`;
-        }
+    // تابعی برای جابجایی اسلایدها
+    function showSlide(i) {
+        if (i < 0) index = images.length - 1;
+        else if (i >= images.length) index = 0;
+        else index = i;
 
-        // تنظیمات دکمه‌های قبلی و بعدی
-    prevBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
-            showSlide(index - 1);
-    });
-
-        nextBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
-            showSlide(index + 1);
-        });
-
-        // نمایش اسلاید اول در ابتدا
-        showSlide(-1);
+        // انیمیشن جابجایی عکس‌ها
+        slides.style.transform = `translateX(${index * 100}%)`;
     }
 
-    // راه‌اندازی اسلایدرها
-    const sliders = document.querySelectorAll('.slider');
-    sliders.forEach(initializeSlider);
+    // تنظیمات دکمه‌های قبلی و بعدی
+    prevBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+        showSlide(index - 1);
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+        e.preventDefault(); // جلوگیری از رفتار پیش‌فرض
+        showSlide(index + 1);
+    });
+
+    // نمایش اسلاید اول در ابتدا
+    showSlide(-1);
+}
+
+// راه‌اندازی اسلایدرها
+const sliders = document.querySelectorAll('.slider');
+sliders.forEach(initializeSlider);
+
+
+$(document).ready(function() {
+    $('.add-to-cart').click(function(e) {
+        e.preventDefault();
+        const button = $(this);
+
+        // پیدا کردن المان‌های مربوطه در همان کارت محصول
+        const productCard = button.closest('.content');
+        const availableDiv = productCard.find('.div-available');
+        const countBadge = availableDiv.find('.available-count');
+
+        // بررسی متن موجودی
+        if (countBadge.text().trim() === "ناموجود") return;
+
+        const productId = button.data('id');
+
+        // بررسی لاگین بودن کاربر
+        {% if not request.user.is_authenticated %}
+        alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
+        window.location.href = "{% url 'account:login' %}";
+        return;
+        {% endif %}
+
+        // درخواست AJAX برای افزودن به سبد خرید
+        $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
+            {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            function(response) {
+                if (response.success) {
+                    // دریافت مقدار فعلی و تبدیل به عدد
+                    const currentText = countBadge.text().trim();
+                    const currentCount = parseInt(currentText);
+                    const newCount = currentCount - 1;
+
+                    if (newCount === 0) {
+                        // ایجاد ساختار جدید برای حالت ناموجود
+                        const newUnavailableDiv = $('<div class="div-unavailable"></div>');
+                        const newUnavailableSpan = $('<span class="unavailable">ناموجود</span>');
+
+                        newUnavailableDiv.append(newUnavailableSpan);
+
+                        // جایگزینی المان قدیمی با ساختار جدید
+                        availableDiv.replaceWith(newUnavailableDiv);
+
+                        button.prop('disabled', true);
+                    } else {
+                        // به‌روزرسانی مقدار با واحد "عدد"
+                        countBadge.text(newCount + ' عدد');
+                    }
+
+                    // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید
+                    $('.cart-count').text(response.cart_items_count);
+                    alert(response.message);
+                } else {
+                    alert('خطا در افزودن محصول به سبد خرید: ' + response.error);
+                }
+            }
+        );
+    });
+});
 
 </script>
+
 {% endblock %}
+
 
 {#<div class="row">#}
 {#    <!-- سایدبار دسته‌بندی‌ها -->#}

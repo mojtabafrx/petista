@@ -74,11 +74,11 @@
                         <div class="order-row-col" data-label="شماره سفارش">{{ product.product.title }}</div>
                         <div class="order-row-col" data-label="تاریخ">{{ product.product.category.title }}</div>
                         <div class="order-row-col" data-label="مبلغ">{{ product.price|floatformat:0 }}</div>
-                        <div class="order-row-col" data-label="مبلغ">{{ product.stock }}</div>
+                        <div class="order-row-col" data-label="مبلغ">{{ product.available_count  }}</div>
                         <div class="order-row-col" data-label="وضعیت"><span class="status paid">{% if product.stock > 0 %}موجود{% else %}ناموجود{% endif %}</span></div>
                         <div class="order-row-col" data-label="کد رهگیری">{{ product.created_at|date:"Y/m/d" }}</div>
                         <div  data-label="جزییات" class="two-buttom order-row-col">
-                            <a class="edit-button-link" href="seller-edit-product.html">
+                            <a class="edit-button-link" href="{% url 'user_panel:edit_seller_product' product.id %}">
                                 <button class="details-btn edit-button edit-product" data-id="{{ product.id }}" data-bs-toggle="tooltip" title="ویرایش">ویرایش</button>
                             </a>
                             <button class="details-btn delete-product" data-id="{{ product.id }}" data-bs-toggle="tooltip" title="حذف">حذف</button>
@@ -149,4 +149,48 @@
     </div>
 
 
+{% endblock %}
+
+{% block custom_js %}
+<script>
+    $(document).on('click', '.delete-product', function() {
+        const productId = $(this).data('id');
+        const productRow = $(this).closest('.order-row');
+
+        if (confirm('آیا مطمئن هستید که می‌خواهید این محصول را حذف کنید؟')) {
+            $.ajax({
+                url: '{% url "user_panel:delete_product" %}',
+                method: 'POST',
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'product_id': productId
+                },
+                beforeSend: function() {
+                    productRow.css('opacity', '0.5');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // افکت حذف ردیف
+                        productRow.fadeOut(400, function() {
+                            $(this).remove();
+                            // اگر جدول خالی شد، پیام نمایش داده شود
+                            if ($('tbody tr').length === 0) {
+                                location.reload();
+                            }
+                        });
+                        showMessage('محصول با موفقیت حذف شد', true);
+                    } else {
+                        productRow.css('opacity', '1');
+                        showMessage(response.error, false);
+                    }
+                },
+                error: function() {
+                    productRow.css('opacity', '1');
+                    showMessage('خطا در ارتباط با سرور', false);
+                }
+            });
+        }
+    });
+
+</script>
 {% endblock %}

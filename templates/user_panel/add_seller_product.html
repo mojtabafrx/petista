@@ -58,6 +58,7 @@
 {% endblock %}
 
 {% block custom_js %}
+<script>
 // تغییر دسته‌بندی (AJAX)
 $('#category-select').change(function() {
     const categoryId = $(this).val();
@@ -88,5 +89,5 @@ $('#category-select').change(function() {
 });
 
 
-
+</script>
 {% endblock %}

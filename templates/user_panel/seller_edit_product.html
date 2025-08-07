@@ -1,0 +1,77 @@
+{% extends 'user_panel/dashboard.html' %}
+{% load static %}
+{% block custom_css %}<link rel="stylesheet" href="{% static '/css/userpanel/seller-edit-product.css' %}"/>{% endblock %}
+{% block content %}
+
+    <div class="all-div-container">
+        <div class="all-container">
+            <div class="header-container">
+                <h3 class="top-welcome">خوش آمدید</h3>
+                {% if form.errors %}
+                    {{ form.errors }}
+                {% endif %}
+            </div>
+            <div class="panel">
+                <img class="panel-icon" src="assets/images/icons8-seller-96.png">
+                <span class="panel-name">فروشنده</span>
+            </div>
+        </div>
+        <div class="container">
+            <div class="all-header-container"></div>
+
+            <div class="head-container">
+                <img class="head-container-icon" src="assets/images/icons8-add-to-cart-30.png">
+                <span class="head-container-name">ویرایش محصول</span>
+            </div>
+            <div class="main-container">
+                <div class="form-container">
+                    <form id="productForm" method="post">
+                        {% csrf_token %}
+                        <div class="all-div-select">
+                            <div class="div-category select">
+                                <label for="categorySelect" class="category-label label">دسته‌بندی را انتخاب
+                                    کنید</label>
+                                {{ form.category }}
+{#                                <select id="categorySelect" disabled required>#}
+{#                                    <option value="" selected disabled>دسته‌بندی را انتخاب کنید</option>#}
+{#                                    <option value="electronics">الکترونیک</option>#}
+{#                                    <option value="clothing">لباس</option>#}
+{#                                    <option value="books">کتاب</option>#}
+{#                                </select>#}
+                            </div>
+
+                            <div class="div-product-select select">
+                                <label for="productSelect" class="product-label label">محصول را انتخاب کنید</label>
+                                {{ form.product }}
+{#                                <select id="productSelect" disabled required>#}
+{#                                    <option value="" selected disabled>ابتدا دسته‌بندی را انتخاب کنید</option>#}
+{#                                </select>#}
+                            </div>
+                        </div>
+
+                        <div class="all-div-inputs">
+
+                            <div class="count-input-div input-div">
+                                <label for="quantityInput">تعداد</label>
+                                {{ form.stock }}
+{#                                <input class="count-input main-input" type="number" id="quantityInput" min="1" value=""#}
+{#                                       placeholder="تعداد را وارد کنید" required/>#}
+
+                            </div>
+                            <div class="price-input-div input-div">
+                                <label for="priceInput">قیمت (تومان)</label>
+                                {{ form.price }}
+{#                                <input class="price-input main-input" type="number" id="priceInput" min="0"#}
+{#                                       placeholder="قیمت را وارد کنید" required/>#}
+
+                            </div>
+
+                        </div>
+                        <button type="submit">ویرایش محصول</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}

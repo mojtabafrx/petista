@@ -1,164 +1,152 @@
 {% load static %}
+{% load make_menu %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}{% endblock %}</title>
-    {% block custom_css %}{% endblock %}
-    <link rel="stylesheet" href="{% static 'css/menu.css' %}" />
-    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
-    {% block header_js %}{% endblock %}
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>{% block title %}{% endblock %}</title>
+	{% block custom_css %}{% endblock %}
+	<link rel="stylesheet" href="{% static 'css/menu.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/index.css' %}"/>
+	{% block header_js %}{% endblock %}
 </head>
 <body>
 
 {#    {% include 'category/category_list.html' %}#}
 
 
-
 <div class="menu-divv glass" id="menuDiv">
-    <div class="menu-grabber-div">
-      <div class="tach-div" id="tachDiv">
-        <div class="menu-grabber" id="grabber"></div>
-      </div>
-    </div>
-    <div class="scroll-box">
-      <ul class="menu">
-        <li>
-          <div
-            class="item"
-            style="background-image: url('https://picsum.photos/300/300')"
-          >
-            <div class="text">دسته 📁 ۱</div>
-          </div>
-          <ul class="sub-menu">
-            <li>
-              <div
-                class="item"
-                style="
-                  background-image: url('https://picsum.photos/300/300');
-                "
-              >
-                <div class="text">آیتم 📄 1.1</div>
-              </div>
-            </li>
-            <li>
-              <div
-                class="item"
-                style="
-                  background-image: url('https://picsum.photos/300/300');
-                "
-              >
-                <div class="text">آیتم 📄 1.2</div>
-              </div>
-            </li>
-            <li>
-              <div
-                class="item"
-                style="
-                  background-image: url('https://picsum.photos/300/300');
-                "
-              >
-                <div class="text">آیتم 📄 1.3</div>
-              </div>
-            </li>
-            <li>
-              <div
-                class="item"
-                style="
-                  background-image: url('https://picsum.photos/300/300');
-                "
-              >
-                <div class="text">دسته 📁 1.4</div>
-              </div>
-              <ul class="sub-menu">
-                <li>
-                  <div
-                    class="item"
-                    style="
-                      background-image: url('https://picsum.photos/300/300');
-                    "
-                  >
-                    <div class="text">آیتم 📄 4.1</div>
-                  </div>
-                </li>
-                <li>
-                  <div
-                    class="item"
-                    style="
-                      background-image: url('https://picsum.photos/300/300');
-                    "
-                  >
-                    <div class="text">آیتم 📄 4.1</div>
-                  </div>
-                </li>
-                <li>
-                  <div
-                    class="item"
-                    style="
-                      background-image: url('https://picsum.photos/300/300');
-                    "
-                  >
-                    <div class="text">آیتم 📄 4.3</div>
-                  </div>
-                </li>
-                <li>
-                  <div
-                    class="item"
-                    style="
-                      background-image: url('https://picsum.photos/300/300');
-                    "
-                  >
-                    <div class="text">آیتم 📄 4.4</div>
-                  </div>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <div
-            class="item"
-            style="background-image: url('https://picsum.photos/300/300')"
-          >
-            <div class="text">آیتم 📄 ۲</div>
-          </div>
-        </li>
-        <li>
-          <div
-            class="item"
-            style="background-image: url('https://picsum.photos/300/300')"
-          >
-            <div class="text">آیتم 📄 ۳</div>
-          </div>
-        </li>
-        <li>
-          <div
-            class="item"
-            style="background-image: url('https://picsum.photos/300/300')"
-          >
-            <div class="text">آیتم 📄 ۴</div>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div style="display: flex; justify-content: start; padding: 0 20px">
-      <button id="backBtn" onclick="goBack()">بازگشت</button>
-    </div>
-  </div>
-<div class="mycontainer">
-  <div class="header-div">
-      <button class="menu-button" id="menuBtn">
-          <img alt="hamburger-menu-icon" class="menu-button-icon-ham" src="{% static 'images/icons8-hamburger-menu-50.png' %}">
-      </button>
-      <h2 class="htwo">PET SHOP</h2>
-  </div>
+	<div class="menu-grabber-div">
+		<div class="tach-div" id="tachDiv">
+			<div class="menu-grabber" id="grabber"></div>
+		</div>
+	</div>
 
-{% block content %}{% endblock %}
+
+	{#    <ul class="menu active" data-path="menu-0">#}
+	{#        <li>#}
+	{#            <div class="item" style="background-image: url('/media/images/dog.jpg')">#}
+	{#                        <div class="text">سگ</div>#}
+	{#            </div>#}
+	{#            <ul class="sub-menu" data-path="menu-1">#}
+	{#                <li>#}
+	{#                    <div class="item" style="background-image: url('/media/images/washing-dog.jpg')">#}
+	{#                        <div class="text">شوینده</div>#}
+	{#                    </div>#}
+	{#                    <ul class="sub-menu" data-path="menu-2"><a href="/products/category/shampo-dog/">#}
+	{#                    </a><li><a href="/products/category/shampo-dog/">#}
+	{#                    <div class="item" style="background-image: url('https://picsum.photos/300/300')">#}
+	{#                    <div class="text">شامپو سگ</div>#}
+	{#        </div>#}
+	{#        </a></li></ul></li></ul></li>#}
+	{#        <li>#}
+	{#        <div class="item" style="background-image: url('/media/images/cat.jpg')">#}
+	{#                    <div class="text">گربه</div>#}
+	{#        </div>#}
+	{#        <ul class="sub-menu" data-path="menu-3">#}
+	{#        <li>#}
+	{#        <div class="item" style="background-image: url('/media/images/washing-cat.jpg')">#}
+	{#                    <div class="text">شوینده i</div>#}
+	{#        </div>#}
+	{#        <ul class="sub-menu" data-path="menu-4"><a href="/products/category/cat-shampo/">#}
+	{#        </a><li><a href="/products/category/cat-shampo/">#}
+	{#        <div class="item" style="background-image: url('https://picsum.photos/300/300')">#}
+	{#                    <div class="text">شامپو گربه</div>#}
+	{#        </div>#}
+	{#        </a></li></ul></li></ul></li>#}
+	{#    </ul>#}
+	<div class="scroll-box">
+		<ul class="menu" data-path="menu-0">
+			{% if request.user.is_authenticated %}
+
+				<li>
+					<div class="item" style="background-image: url('{% static 'images/account.svg' %} ')">
+						<a href="{% url 'user_panel:dashboard' %}">
+							<div class="text">اکانت کاربری</div>
+						</a>
+					</div>
+				</li>
+
+			{% else %}
+
+				<li>
+					<div class="item" style="background-image: url('{% static 'images/account.svg' %} ')">
+						<a href="{% url 'account:login' %}">
+
+							<div class="text">ورود / ثبت نام</div>
+						</a>
+					</div>
+				</li>
+
+			{% endif %}
+
+			<li>
+				<div class="item" style="background-image: url('{% static 'images/products.jpg' %} ')">
+					<div class="text">محصولات</div>
+				</div>
+				<ul class="sub-menu" data-path="menu-1">
+					{% make_category %}
+
+				</ul>
+			</li>
+
+
+		</ul>
+
+	</div>
+	<div style="display: flex; justify-content: start; padding: 0 20px">
+		<button id="backBtn" onclick="goBack()">بازگشت</button>
+	</div>
+</div>
+<div class="mycontainer">
+	<div class="header-div">
+		<div class="header-right-content">
+			<button class="menu-button" id="menuBtn">
+				<img alt="hamburger-menu-icon" class="menu-button-icon-ham"
+				     src="{% static 'images/icons8-hamburger-menu-50.png' %}">
+
+			</button>
+			<img class="logo-img" src="{% static '/images/logo.jpg' %}">
+			<h2 class="htwo">پتیستا</h2>
+		</div>
+		<div class="header-left-content-col">
+			{% if not request.user.is_authenticated %}
+				<a href="{% url 'account:login' %}">
+					<div class="login-button-div">
+						<button class="login-button">
+							<img class="login-img" src="{% static 'images/login-img.png' %}">
+							<span>ورود | ثبت نام</span>
+						</button>
+					</div>
+				</a>
+				<span class="right-line"></span>
+			{% else %}
+				<a href="{% url 'user_panel:dashboard' %}">
+					<div class="login-button-div">
+						<button class="login-button">
+							<img class="login-img" src="{% static 'images/icons8-account.gif' %}">
+							<span>اکانت کاربری</span>
+						</button>
+					</div>
+				</a>
+				<span class="right-line"></span>
+			{% endif %}
+
+
+			<a href="{% url 'user_panel:view_cart' %}">
+				<img class="add-to-cart-img" src="{% static 'images/icons8-add-to-cart-96.png' %}">
+
+			</a>
+		</div>
+
+	</div>
+
+	{% block content %}{% endblock %}
 </div>
 
 
-{#<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
+<script src=" https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script type="text/javascript">
 
@@ -169,219 +157,191 @@
 
 
     let startY = 0,
-    isDragging = false,
-    currentOffset = 0,
-    isAnimating = false;
+        isDragging = false,
+        currentOffset = 0,
+        isAnimating = false;
 
     function openMenu() {
-    menuDiv.classList.add("active");
-    document.body.classList.add("no-scroll");
-    menuDiv.style.transition = "transform 0.3s ease";
-    menuDiv.style.transform = "translateY(0)";
-    currentOffset = 0;
+        menuDiv.classList.add("active");
+        document.body.classList.add("no-scroll");
+        menuDiv.style.transition = "transform 0.3s ease";
+        menuDiv.style.transform = "translateY(0)";
+        currentOffset = 0;
     }
 
     function closeMenu() {
-    isAnimating = true;
-    menuDiv.style.transition = "transform 0.3s ease";
-    menuDiv.style.transform = "translateY(100%)";
-    menuDiv.addEventListener("transitionend", function handler() {
-        menuDiv.classList.remove("active");
-        document.body.classList.remove("no-scroll");
-        currentOffset = 0;
-        isAnimating = false;
-        menuDiv.removeEventListener("transitionend", handler);
-    });
+        isAnimating = true;
+        menuDiv.style.transition = "transform 0.3s ease";
+        menuDiv.style.transform = "translateY(100%)";
+        menuDiv.addEventListener("transitionend", function handler() {
+            menuDiv.classList.remove("active");
+            document.body.classList.remove("no-scroll");
+            currentOffset = 0;
+            isAnimating = false;
+            menuDiv.removeEventListener("transitionend", handler);
+        });
     }
 
     function handleMove(currentY) {
-    const diff = currentY - startY;
-    const total = currentOffset + diff;
-    if (diff < 0 && total <= 20) return;
-    const finalOffset = Math.max(0, total);
-    menuDiv.style.transition = "none";
-    menuDiv.style.transform = `translateY(${finalOffset}px)`;
+        const diff = currentY - startY;
+        const total = currentOffset + diff;
+        if (diff < 0 && total <= 20) return;
+        const finalOffset = Math.max(0, total);
+        menuDiv.style.transition = "none";
+        menuDiv.style.transform = `translateY(${finalOffset}px)`;
     }
 
     function handleEnd(endY) {
-    const diff = endY - startY;
-    const total = currentOffset + diff;
-    const threshold = window.innerHeight / 2;
+        const diff = endY - startY;
+        const total = currentOffset + diff;
+        const threshold = window.innerHeight / 2;
 
-    menuDiv.style.transition = "transform 0.3s ease";
-    if (diff < 0 && total <= 20) return;
+        menuDiv.style.transition = "transform 0.3s ease";
+        if (diff < 0 && total <= 20) return;
 
-    if (total > threshold) {
-      closeMenu();
-    } else {
-      currentOffset = total;
-      menuDiv.style.transform = `translateY(${currentOffset}px)`;
-    }
+        if (total > threshold) {
+            closeMenu();
+        } else {
+            currentOffset = total;
+            menuDiv.style.transform = `translateY(${currentOffset}px)`;
+        }
     }
 
     function addDragHandlers(el) {
-    el.addEventListener("touchstart", (e) => {
-      startY = e.touches[0].clientY;
-      isDragging = true;
-    });
+        el.addEventListener("touchstart", (e) => {
+            startY = e.touches[0].clientY;
+            isDragging = true;
+        });
 
-    el.addEventListener(
-      "touchmove",
-      (e) => {
-        if (!isDragging) return;
-        e.preventDefault();
-        handleMove(e.touches[0].clientY);
-      },
-      { passive: false }
-    );
+        el.addEventListener(
+            "touchmove",
+            (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                handleMove(e.touches[0].clientY);
+            },
+            {passive: false}
+        );
 
-    el.addEventListener("touchend", (e) => {
-      isDragging = false;
-      handleEnd(e.changedTouches[0].clientY);
-    });
+        el.addEventListener("touchend", (e) => {
+            isDragging = false;
+            handleEnd(e.changedTouches[0].clientY);
+        });
 
-    el.addEventListener("mousedown", (e) => {
-      startY = e.clientY;
-      isDragging = true;
-      const onMouseMove = (eMove) => {
-        if (!isDragging) return;
-        handleMove(eMove.clientY);
-      };
-      const onMouseUp = (eUp) => {
-        isDragging = false;
-        handleEnd(eUp.clientY);
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
-      };
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
-    });
+        el.addEventListener("mousedown", (e) => {
+            startY = e.clientY;
+            isDragging = true;
+            const onMouseMove = (eMove) => {
+                if (!isDragging) return;
+                handleMove(eMove.clientY);
+            };
+            const onMouseUp = (eUp) => {
+                isDragging = false;
+                handleEnd(eUp.clientY);
+                window.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("mouseup", onMouseUp);
+            };
+            window.addEventListener("mousemove", onMouseMove);
+            window.addEventListener("mouseup", onMouseUp);
+        });
     }
 
     addDragHandlers(grabber);
     addDragHandlers(tachDiv);
 
     menuBtn.addEventListener("click", () => {
-    if (isAnimating) return;
-    menuDiv.classList.contains("active") ? closeMenu() : openMenu();
+        if (isAnimating) return;
+        menuDiv.classList.contains("active") ? closeMenu() : openMenu();
     });
 
     document.addEventListener("click", (e) => {
-    const isClickInsideMenu = menuDiv.contains(e.target);
-    const isClickOnButton = menuBtn.contains(e.target);
-    if (
-      menuDiv.classList.contains("active") &&
-      !isClickInsideMenu &&
-      !isClickOnButton
-    ) {
-      closeMenu();
-    }
+        const isClickInsideMenu = menuDiv.contains(e.target);
+        const isClickOnButton = menuBtn.contains(e.target);
+        if (
+            menuDiv.classList.contains("active") &&
+            !isClickInsideMenu &&
+            !isClickOnButton
+        ) {
+            closeMenu();
+        }
     });
 
     // زیرمنوها
     let historyStack = ["mainMenu"];
-    let submenuCounter = 1;
+    let submenuCounter = 2;
 
-    function createSubMenu(title, level) {
-    if (level > 7) return;
-
-    const newId = `submenu_${submenuCounter++}`;
-    const newMenu = document.createElement("div");
-    newMenu.classList.add("submenu");
-    newMenu.id = newId;
-    newMenu.style.display = "none";
-
-    for (let i = 1; i <= 4; i++) {
-      const box = document.createElement("div");
-      box.classList.add("menu-box");
-      box.innerText = `${title} - مرحله ${level}.${i}`;
-      box.onclick = () => {
-        if (level < 7)
-          createSubMenu(`${title} - مرحله ${level}.${i}`, level + 1);
-      };
-      newMenu.appendChild(box);
-    }
-
-    document.getElementById("menuDiv").appendChild(newMenu);
-    document
-      .querySelectorAll(".submenu, #mainMenu")
-      .forEach((el) => (el.style.display = "none"));
-    newMenu.style.display = "flex";
-    historyStack.push(newId);
-    updateBackButton();
-    }
 
     function goBack() {
-    if (historyStack.length <= 1) return;
-    const lastId = historyStack.pop();
-    const lastMenu = document.getElementById(lastId);
-    if (lastMenu && lastId !== "mainMenu") lastMenu.remove();
+        if (historyStack.length <= 1) return;
+        const lastId = historyStack.pop();
+        const lastMenu = document.getElementById(lastId);
+        if (lastMenu && lastId !== "mainMenu") lastMenu.remove();
 
-    const prevId = historyStack[historyStack.length - 1];
-    document
-      .querySelectorAll(".submenu, #mainMenu")
-      .forEach((el) => (el.style.display = "none"));
-    document.getElementById(prevId).style.display = "flex";
-    updateBackButton();
+        const prevId = historyStack[historyStack.length - 1];
+        document
+            .querySelectorAll(".submenu, #mainMenu")
+            .forEach((el) => (el.style.display = "none"));
+        document.getElementById(prevId).style.display = "flex";
+        updateBackButton();
     }
 
     function updateBackButton() {
-    const btn = document.getElementById("backBtn");
-    btn.style.display = historyStack.length > 1 ? "block" : "none";
+        const btn = document.getElementById("backBtn");
+        btn.style.display = historyStack.length > 1 ? "block" : "none";
     }
 
 
+    document.addEventListener("DOMContentLoaded", () => {
+        const rootMenu = document.querySelector(".menu");
 
-document.addEventListener("DOMContentLoaded", () => {
-    const rootMenu = document.querySelector(".menu");
-
-    function showMenu(menu) {
-        document.querySelectorAll(".menu, .sub-menu").forEach((ul) => ul.classList.remove("active"));
-        menu.classList.add("active");
-    }
-
-    function goToSubMenu(nextMenu) {
-        if (!nextMenu) return;
-        showMenu(nextMenu);
-        history.pushState({ menu: nextMenu.dataset.path }, "", "");
-    }
-
-    function findMenuByPath(path) {
-        if (!path) return rootMenu;
-        return document.querySelector(`[data-path="${path}"]`) || rootMenu;
-    }
-
-    // به هر منو یه شناسه بدیم
-    let id = 0;
-    document.querySelectorAll(".menu, .sub-menu").forEach((ul) => {
-        if (!ul.dataset.path) {
-        ul.dataset.path = "menu-" + id++;
+        function showMenu(menu) {
+            document.querySelectorAll(".menu, .sub-menu").forEach((ul) => ul.classList.remove("active"));
+            menu.classList.add("active");
         }
-    });
 
-    // در شروع
-    showMenu(rootMenu);
+        function goToSubMenu(nextMenu) {
+            if (!nextMenu) return;
+            showMenu(nextMenu);
+            console.log({menu: nextMenu.dataset.path})
+            history.pushState({menu: nextMenu.dataset.path}, "", "");
+        }
 
-    document.querySelector(".glass").addEventListener("click", (e) => {
-        const item = e.target.closest(".item");
-        if (!item) return;
+        function findMenuByPath(path) {
+            if (!path) return rootMenu;
+            return document.querySelector(`[data-path="${path}"]`) || rootMenu;
+        }
 
-        const li = item.closest("li");
-        if (!li) return;
+        // به هر منو یه شناسه بدیم
+        let id = 2;
+        document.querySelectorAll(".menu, .sub-menu").forEach((ul) => {
+            if (!ul.dataset.path) {
+                ul.dataset.path = "menu-" + id++;
+            }
+        });
 
-        const nextMenu = li.querySelector(":scope > .sub-menu");
-        if (!nextMenu) return;
+        // در شروع
+        showMenu(rootMenu);
 
-        goToSubMenu(nextMenu);
+        document.querySelector(".glass").addEventListener("click", (e) => {
+            const item = e.target.closest(".item");
+            if (!item) return;
+
+            const li = item.closest("li");
+            if (!li) return;
+
+            const nextMenu = li.querySelector(":scope > .sub-menu");
+            if (!nextMenu) return;
+
+            goToSubMenu(nextMenu);
         });
 
         window.addEventListener("popstate", (e) => {
-        const path = e.state?.menu;
-        const menu = findMenuByPath(path);
-        showMenu(menu);
-    });
+            const path = e.state?.menu;
+            const menu = findMenuByPath(path);
+            showMenu(menu);
+        });
 
-});
+    });
 </script>
 
 {% block extra_js %}{% endblock %}

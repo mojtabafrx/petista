@@ -1,0 +1,147 @@
+{% extends 'user_panel/dashboard.html' %}
+{% load static %}
+{% block custom_css %}<link rel="stylesheet" href="{% static '/css/userpanel/seller-orders.css' %}"/>{% endblock %}
+{% block content %}
+<div class="all-div-container">
+
+    <div class="container">
+        <!--            <div class="all-header-container"></div>-->
+
+        <div class="head-container-order head-container">
+            <img class="head-container-order-icon head-container-icon" src="{% static 'images/icons8-list-64.png' %}">
+            <span class="head-container-order-name">
+                محصولات من
+            </span>
+        </div>
+        <div class="all-tables-div">
+            <div class="orders-container">
+                <!-- هدر دسکتاپ -->
+                <div class="order-header">
+                    <div></div>
+                    <div>نام محصول</div>
+                    <div>تاریخ</div>
+                    <div>مبلغ کل</div>
+                    <div>وضعیت</div>
+                    <div>کد رهگیری</div>
+                    <div>جزییات</div>
+                </div>
+
+                <!-- ردیف نمونه -->
+                <div class="order-row">
+                    <div class="collapse-toggle">
+                        <img class="arrow-icon" src="{% static 'images/icons8-down-button-64.png' %}">
+                    </div>
+                    <div class="order-row-col" data-label="شماره سفارش">#1001</div>
+                    <div class="order-row-col" data-label="تاریخ">1403/05/01</div>
+                    <div class="order-row-col" data-label="مبلغ">۱,۲۰۰,۰۰۰ تومان</div>
+                    <div class="order-row-col" data-label="وضعیت"><span class="status paid">پرداخت شده</span></div>
+                    <div class="order-row-col" data-label="کد رهگیری">TRK123456</div>
+                    <div data-label="جزییات" class="two-buttom order-row-col">
+                        <a class="edit-button-link" href="seller-edit-product.html">
+                            <button class="details-btn edit-button">ویرایش</button>
+                        </a>
+                        <button class="details-btn">حذف</button>
+                    </div>
+
+                </div>
+                <div class="order-collapse">
+                    <div class="all-collapse-content">
+                        <div class="address-collapse-content">
+                            <label>آدرس :</label>
+                            <span></span>
+                        </div>
+                        <div class="number-collapse-content">
+                            <label>شماره :</label>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="order-row">
+                    <div class="collapse-toggle">
+                        <img class="arrow-icon" src="{% static 'images/icons8-down-button-64.png' %}">
+                    </div>
+
+                    <div data-label="شماره سفارش">#1002</div>
+                    <div data-label="تاریخ">1403/05/03</div>
+                    <div data-label="مبلغ">۷۵۰,۰۰۰ تومان</div>
+                    <div data-label="وضعیت"><span class="status pending">در انتظار پرداخت</span></div>
+                    <div data-label="کد رهگیری">TRK789012</div>
+                    <div data-label="جزییات" class="two-buttom">
+                        <a class="edit-button-link" href="seller-edit-product.html">
+                            <button class="details-btn edit-button">ویرایش</button>
+                        </a>
+
+                        <button class="details-btn">حذف</button>
+                    </div>
+                </div>
+                <div class="order-collapse">
+                    <div class="all-collapse-content">
+                        <div class="address-collapse-content">
+                            <label>آدرس :</label>
+                            <span></span>
+                        </div>
+                        <div class="number-collapse-content">
+                            <label>شماره :</label>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-row">
+                    <div class="collapse-toggle">
+                        <img class="arrow-icon" src="icons8-down-button-64.png">
+                    </div>
+                    <div data-label="شماره سفارش">#1003</div>
+                    <div data-label="تاریخ">1403/05/05</div>
+                    <div data-label="مبلغ">۳۵۰,۰۰۰ تومان</div>
+                    <div data-label="وضعیت"><span class="status canceled">لغو شده</span></div>
+                    <div data-label="کد رهگیری">TRK456789</div>
+                    <div data-label="جزییات" class="two-buttom">
+                        <a class="edit-button-link" href="seller-edit-product.html">
+                            <button class="details-btn edit-button">ویرایش</button>
+                        </a>
+
+                        <button class="details-btn">حذف</button>
+                    </div>
+                </div>
+                <div class="order-collapse">
+                    <div class="all-collapse-content">
+                        <div class="address-collapse-content">
+                            <label>آدرس :</label>
+                            <span></span>
+                        </div>
+                        <div class="number-collapse-content">
+                            <label>شماره :</label>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block custom_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toggles = document.querySelectorAll(".collapse-toggle");
+
+    toggles.forEach((toggle, index) => {
+        toggle.addEventListener("click", function () {
+            const collapse = toggle.parentElement.nextElementSibling;
+            const arrow = toggle.querySelector(".arrow-icon");
+
+            collapse.classList.toggle("open");
+            arrow.classList.toggle("rotate");
+        });
+    });
+});
+
+
+</script>
+{% endblock %}

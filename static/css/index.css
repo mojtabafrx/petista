@@ -1,338 +1,461 @@
 @import "webfont.css";
 
 @font-face {
-  font-family: "Iranian-Sans";
-  src: url("/static/fonts/A-Iranian-Sans/IranianSans.woff2") format("woff2"),
+    font-family: "Iranian-Sans";
+    src: url("/static/fonts/A-Iranian-Sans/IranianSans.woff2") format("woff2"),
     url("/static/fonts/A-Iranian-Sans/IranianSans.woff") format("woff"),
     url("/static/fonts/A-Iranian-Sans/IranianSans.eot") format("eot"),
     url("/static/fonts/A-Iranian-Sans/IranianSans.ttf") format("truetype");
-  font-weight: normal;
-  font-style: normal;
+    font-weight: normal;
+    font-style: normal;
 }
 
 :root {
-  --main-color: #8ae2d2;
-  --font-size-dw: Clamp(10vw, 14vw, 15vw);
-  --font-size-up: Clamp(6vw, 7vw, 10vw);
-  --main-color-two: rgb(255, 120, 24);
+    --main-color: #8ae2d2;
+    --font-size-dw: Clamp(10vw, 14vw, 15vw);
+    --font-size-up: Clamp(6vw, 7vw, 10vw);
+    --main-color-two: rgb(255, 120, 24);
 }
 
-html , body, .mycontainer {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: "Iranian-Sans";
+html, body, .mycontainer {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: "Iranian-Sans";
 }
 
 .div-picture {
-  position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding-top: 4%;
-  min-height: 76vw;
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 4%;
+    min-height: 70vw !important;
+    border-bottom: 1px solid gray;
 }
+
 .main-img {
-  margin: auto;
-  position: absolute;
+    margin: auto;
+    position: absolute;
 }
+
 .big-imge {
-  position: absolute;
-  width: 90%;
-  border-radius: 50%;
-  aspect-ratio: 1;
-  margin: 0% 5%;
+    position: absolute;
+    width: 90%;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    margin: 0% 5%;
 }
+
 .big-img-div {
-  position: absolute;
-  width: 90%;
-  border-radius: 50%;
-  aspect-ratio: 1;
-  box-shadow: inset 10px 15px 25px rgba(0, 0, 0, 0.3);
-  /*margin-left: 6.5%;*/
-  margin: 0% 5.5%;
-  border: 2px solid #f6e0b9;
+    position: absolute;
+    width: 90%;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    box-shadow: inset 10px 15px 25px rgba(0, 0, 0, 0.3);
+    /*margin-left: 6.5%;*/
+    margin: 0% 5.5%;
+    border: 2px solid #f6e0b9;
 }
+
 .div-for-big-img {
-  position: absolute;
-  width: 88%;
-  border-radius: 50%;
-  aspect-ratio: 1;
-  margin-left: 6.5%;
-  outline: 10px solid rgb(240, 238, 238);
-  box-shadow: 12px 12px 18px -7px rgba(0, 0, 0, 0.9);
-  margin: 0% 6.5%;
+    position: absolute;
+    width: 88%;
+    border-radius: 50%;
+    aspect-ratio: 1;
+    margin-left: 6.5%;
+    outline: 10px solid rgb(240, 238, 238);
+    box-shadow: 12px 12px 18px -7px rgba(0, 0, 0, 0.9);
+    margin: 0% 6.5%;
 }
+
 .marg-top {
-  margin-top: -10%;
+    margin-top: -10%;
 }
 
 .divtodiv {
-  width: 75%;
-  position: relative;
-  z-index: 2;
+    width: 75%;
+    position: relative;
+    z-index: 2;
 }
+
 .div-4img {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  align-content: space-around;
-  flex-wrap: wrap;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: space-around;
+    flex-wrap: wrap;
+
 }
+
 .img {
-  width: 100%;
-  border-radius: 50%;
-  margin: 2%;
-  aspect-ratio: 1;
-  background-color: var(--main-color);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 0;
-  padding: 0;
+    width: 100%;
+    border-radius: 50%;
+    margin: 2%;
+    aspect-ratio: 1;
+    background-color: var(--main-color);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
 }
 
 .img i {
-  color: white;
-  font-size: clamp(10vw, 7vw, 10vw);
+    color: white;
+    font-size: clamp(10vw, 7vw, 10vw);
 }
+
 /* h2 {
   font-size: 8vw;
 } */
 
 .center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 .top {
-  width: 30%;
-  aspect-ratio: 1;
-  position: absolute;
-  background: transparent;
-  top: 0%;
-  border-radius: 50%;
-  font-size: var(--font-size-up);
-  /* box-shadow: 12px 20px 62px 0px rgba(0, 0, 0, 0.9);
-  text-shadow: 5px 3px 20px rgba(0, 0, 0, 0.5); */
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    width: 30%;
+    aspect-ratio: 1;
+    position: absolute;
+    background: transparent;
+    top: 0%;
+    border-radius: 50%;
+    font-size: var(--font-size-up);
+    /* box-shadow: 12px 20px 62px 0px rgba(0, 0, 0, 0.9);
+    text-shadow: 5px 3px 20px rgba(0, 0, 0, 0.5); */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .top > .flip-box {
-  width: 100%;
-  height: 100%;
-  margin: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
+
 .top > .flip-box i {
-  font-size: clamp(6vw, 7vw, 10vw);
+    font-size: clamp(6vw, 7vw, 10vw);
 }
+
 .right-top {
-  right: -14%;
+    right: -14%;
 }
+
 .left-top {
-  left: -14%;
+    left: -14%;
 }
+
 .float-div {
-  width: 30%;
-  aspect-ratio: 1;
-  position: absolute;
-  background: transparent;
-  bottom: 12%;
-  border-radius: 50%;
-  font-size: clamp(6vw, 7vw, 10vw);
-  color: white;
+    width: 30%;
+    aspect-ratio: 1;
+    position: absolute;
+    background: transparent;
+    bottom: 12%;
+    border-radius: 50%;
+    font-size: clamp(6vw, 7vw, 10vw);
+    color: white;
 }
+
 .float-div > .flip-box {
-  width: 100%;
-  height: 100%;
-  margin: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
+
 .nav:focus-visible {
-  border: none;
-  outline: none;
+    border: none;
+    outline: none;
 }
+
 .float-div > .flip-box i {
-  font-size: clamp(6vw, 6vw, 10vw);
+    font-size: clamp(6vw, 6vw, 10vw);
 }
+
 .right {
-  right: -15%;
+    right: -15%;
 }
+
 .left {
-  left: -15%;
+    left: -15%;
 }
 
 .home-icon {
-  position: absolute;
+    position: absolute;
 }
 
 /* ********************************************** */
 
 .flip-box {
-  background-color: transparent;
-  width: 27%;
-  aspect-ratio: 1;
-  border: none;
-  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+    background-color: transparent;
+    width: 27%;
+    aspect-ratio: 1;
+    border: none;
+    perspective: 1000px; /* Remove this if you don't want the 3D effect */
 }
 
 /* This container is needed to position the front and back side */
 .flip-box-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
 }
 
 /* Do an horizontal flip when you move the mouse over the flip box container */
 .flip-box:hover .flip-box-inner {
-  transform: rotateY(180deg);
+    transform: rotateY(180deg);
 }
 
 /* Position the front and back side */
 
 .flip-box-front,
 .flip-box-back {
-  position: absolute;
-  width: 100%;
-  backface-visibility: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  margin: 2%;
+    position: absolute;
+    width: 100%;
+    backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    margin: 2%;
 }
 
 /* Style the front side (fallback if image is missing) */
 
 .flip-box-front {
-  background-color: #bbb;
-  color: black;
+    background-color: #bbb;
+    color: black;
 }
 
 /* Style the back side */
 
 .flip-box-back {
-  background-color: var(--main-color-two);
-  color: white;
-  transform: rotateY(180deg);
-  aspect-ratio: 1;
-  width: 100%;
-  text-align: center;
-  font-size: x-small;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    background-color: var(--main-color-two);
+    color: white;
+    transform: rotateY(180deg);
+    aspect-ratio: 1;
+    width: 100%;
+    text-align: center;
+    font-size: x-small;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #gamish {
-  padding: 10px;
-  margin: 10px;
-  border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 10px;
 }
 
 @media (max-width: 480px) {
-  .menu-box {
-    width: 100%;
-    height: auto;
-    font-size: 1rem;
-    padding: 12px;
-  }
+    .menu-box {
+        width: 100%;
+        height: auto;
+        font-size: 1rem;
+        padding: 12px;
+    }
 }
 
 @media screen and (min-width: 768px) {
-  .header-div {
-    height: 70px;
-    padding: 0 32px;
-  }
+    .header-div {
+        height: 70px;
+        padding: 0 32px;
+    }
 
-  .menu-divv {
-    top: 70px;
-    height: calc(100vh - 70px);
-  }
+    .menu-divv {
+        top: 70px;
+        height: calc(100vh - 70px);
+    }
 }
 
 @media screen and (min-width: 768px) {
-  .img {
-    width: 100%;
-  }
-  .divtodiv {
-    width: 50%;
-  }
-  .div-picture {
-    min-height: 51vw;
-  }
-  .top {
-    width: 36%;
-  }
-  .float-div {
-    width: 36%;
-  }
-  .div-4img {
-    flex: row;
-  }
-  .flip-box {
-    width: 17%;
-  }
-  .img i {
-    font-size: clamp(7vw, 8vw, 10vw);
-  }
-  .top > .flip-box i {
-    font-size: clamp(3vw, 5vw, 7vw);
-  }
-  .top > .flip-box {
-    width: 72%;
-  }
-  .float-div > .flip-box {
-    width: 72%;
-  }
+    .img {
+        width: 100%;
+    }
+
+    .divtodiv {
+        width: 50%;
+    }
+
+    .div-picture {
+        min-height: 51vw;
+    }
+
+    .top {
+        width: 36%;
+    }
+
+    .float-div {
+        width: 36%;
+    }
+
+    .div-4img {
+        flex: row;
+    }
+
+    .flip-box {
+        width: 17%;
+    }
+
+    .img i {
+        font-size: clamp(7vw, 8vw, 10vw);
+    }
+
+    .top > .flip-box i {
+        font-size: clamp(3vw, 5vw, 7vw);
+    }
+
+    .top > .flip-box {
+        width: 72%;
+    }
+
+    .float-div > .flip-box {
+        width: 72%;
+    }
 }
+
 @media screen and (min-width: 992px) {
-  .img {
-    width: 100%;
-  }
-  .divtodiv {
-    width: 32%;
-  }
-  .div-picture {
-    min-height: 33vw;
-  }
-  .right-top {
-    right: -92%;
-  }
-  .left-top {
-    left: -92%;
-  }
-  .top > .flip-box {
-    width: 80%;
-  }
-  .float-div > .flip-box {
-    width: 80%;
-  }
-  .div-4img {
-    flex: row;
-  }
-  .flip-box {
-    width: 12%;
-  }
-  .img i {
-    font-size: clamp(5vw, 6vw, 8vw);
-  }
-  .div-4img {
-    margin-top: 0;
-  }
-  .bg-menu {
-    height: 80%;
-  }
-  .marg-top {
-    margin-top: -20%;
-  }
+    .img {
+        width: 100%;
+    }
+
+    .divtodiv {
+        width: 32%;
+    }
+
+    .div-picture {
+        min-height: 25vw !important;
+    }
+
+    .right-top {
+        right: -92%;
+    }
+
+    .left-top {
+        left: -92%;
+    }
+
+    .top > .flip-box {
+        width: 70%;
+    }
+
+    .float-div > .flip-box {
+        width: 70%;
+    }
+
+    .flip-box {
+        width: 10%;
+    }
+
+    .img i {
+        font-size: clamp(5vw, 6vw, 8vw);
+    }
+
+    .div-4img {
+        margin-top: 2%;
+    }
+
+    .bg-menu {
+        height: 80%;
+    }
+
+    .marg-top {
+        margin-top: -20%;
+    }
+
+}
+
+.img img {
+    width: 60%;
+}
+
+.flip-box-back h3 {
+    font-size: 26px;
+}
+
+.flip-box-back h2 {
+    font-size: 30px;
+}
+
+.header-right-content {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    width: 60%;
+}
+
+.logo-img {
+    width: 50px;
+    border-radius: 50px;
+}
+
+.add-to-cart-img {
+    width: 50px;
+    margin-right: 10px;
+}
+
+.header-left-content-col {
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.right-line {
+    width: 1px;
+    height: 25px;
+    background-color: gray;
+
+}
+
+.add {
+    background-color: gray;
+}
+
+.login-img {
+    width: 35px;
+    margin-left: 4px;
+}
+
+.header-left-content-col a {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid lightgray;
+    border-radius: 8px;
+    padding: 4px 14px;
+    margin-left: 1vw;
+    cursor: pointer;
+}
+
+@media (max-width: 992px) {
+    .login-button-div {
+        display: none;
+    }
+
+    .right-line {
+        display: none;
+    }
+
+    .htwo {
+        display: none;
+    }
 }

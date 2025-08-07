@@ -4,9 +4,12 @@
     --font-size-up: Clamp(6vw, 7vw, 10vw);
     --main-color-two: rgb(255, 120, 24);
 }
-body , html {
+
+body, html {
     direction: rtl !important;
+    box-sizing: border-box !important;
 }
+
 .all-login-box {
     font-family: sans-serif;
     display: flex;
@@ -22,7 +25,7 @@ body , html {
 
 .nav {
     width: 18%;
-    margin-right: 3%;
+    margin-right: 2%;
 }
 
 /*header start*/
@@ -32,7 +35,6 @@ body , html {
     font-family: Iranian-Sans;
     margin-bottom: 5%;
 }
-
 
 
 /*header end*/
@@ -78,9 +80,16 @@ body , html {
     0 20px 40px rgba(138, 226, 210, 0.3);
 }
 
-.tabs-divs, .tab-content {
+.tabs-divs {
     width: 100%;
 }
+
+.tab-content {
+    width: 77%;
+    /*margin-right: 3%;*/
+    margin: 0 auto;
+}
+
 
 .shop {
     width: 100%;
@@ -88,11 +97,13 @@ body , html {
     justify-content: center;
     gap: 4%;
     height: fit-content;
+
 }
 
 .slide-img {
     width: 100%;
     border-radius: 5px;
+    height: 35vh;
 }
 
 .all-slider-one h3 {
@@ -107,14 +118,24 @@ body , html {
 
 .button {
     margin-top: 10%;
-    width: 100%;
     background-color: var(--main-color);
-    color: black;
     border-radius: 5px;
-    padding: 5px 16px;
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: 1px solid #d2d2d2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 25%;
+    margin-left: 5%;
+    font-size: 12px;
+    border: none;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 8px 15px rgba(58, 65, 150, 0.3),
+    inset 0 -3px 0 rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    margin-bottom: 5%;
 }
 
 .button:active {
@@ -150,7 +171,7 @@ body , html {
 dropdown {
     position: relative;
     display: inline-block;
-
+    width: 100%;
     /*margin-right: 20%;*/
 }
 
@@ -190,7 +211,8 @@ dropdown {
     margin-top: 2%;
     border: 1px solid #e3e2e2;
     padding-bottom: 8%;
-    width: 136%;
+    width: 100%;
+    box-sizing: border-box;
 
 }
 
@@ -300,6 +322,7 @@ dropdown {
 .sliders-link {
     text-decoration: none;
     color: black;
+    margin-bottom: 4%;
 }
 
 .sliders-link span, .sliders-link h3 {
@@ -310,22 +333,6 @@ dropdown {
     color: black;
 }
 
-.button {
-    width: 60%;
-    margin-left: 5%;
-    font-size: 12px;
-    border: none;
-    color: white;
-    padding: 15px 25px;
-    font-weight: bold;
-    border-radius: 12px;
-    box-shadow: 0 8px 15px rgba(58, 65, 150, 0.3),
-    inset 0 -3px 0 rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    user-select: none;
-    margin-bottom: 5%;
-}
 
 .button:hover {
     box-shadow: 0 12px 20px rgba(58, 65, 150, 0.5),
@@ -340,13 +347,14 @@ dropdown {
 }
 
 .dropdown {
-    width: 70%;
+    width: 98%;
 }
 
 .d-flex {
     display: flex;
 }
-.all-two-flex{
+
+.all-two-flex {
     display: flex;
     margin-top: 5%;
 }
@@ -359,22 +367,20 @@ dropdown {
 
 @media (max-width: 942px) {
     .shop {
-        flex-direction: column;
+        /*flex-direction: column;*/
     }
 
-    .content {
-        width: 70%;
-        margin: 3% auto;
-    }
-
+    /*.content {*/
+    /*    width: 70%;*/
+    /*    margin: 3% auto;*/
+    /*}*/
     h3 {
         font-size: 15px;
     }
 
-    .shop a {
-        width: 100%;
-    }
-
+    /*.shop a {*/
+    /*    width: 100%;*/
+    /*}*/
     #myDropdown {
         display: none;
     }
@@ -387,6 +393,10 @@ dropdown {
         display: none;
     }
 
+    .all-slider-one {
+        margin-right: 5%;
+    }
+
 }
 
 @media (max-width: 430px) {
@@ -397,6 +407,7 @@ dropdown {
     #myDropdown {
         display: none;
     }
+
 }
 
 .content {
@@ -405,13 +416,17 @@ dropdown {
 
 /*slider-end*/
 .add-to-cart-img {
-    width: 10%;
-    margin-right: 5%;
+    width: 70%;
+    /*margin-right: 5%;*/
 }
 
 @media screen and (min-width: 992px) {
     .header-div {
         height: 10vh;
+    }
+
+    .slider-one-div {
+        width: 100%;
     }
 }
 
@@ -421,7 +436,106 @@ dropdown {
         padding: 2px 10px;
     }
 
+
 }
-.menu-button-icon-ham{
+
+.menu-button-icon-ham {
     width: 20px;
+}
+
+.slider-one-div {
+    flex-wrap: wrap !important;
+    justify-content: flex-start;
+    width: 92%;
+}
+
+.all-slider-one {
+    /*margin-right: 14%;*/
+    width: 100%;
+}
+
+.shop a {
+    width: 30%;
+}
+
+.dropdown-content {
+    width: 100%;
+    margin-right: 0;
+}
+
+
+@media (max-width: 1200px) {
+    .shop a {
+        width: 48%;
+    }
+}
+
+@media (max-width: 800px) {
+    .shop a, .shop {
+        width: 100%;
+    }
+
+    .content {
+        width: 100%;
+    }
+
+}
+
+.no-product-content {
+    box-shadow: 0 4px 8px rgba(239, 101, 89, 0.4),
+    0 8px 16px rgba(225, 143, 118, 0.3),
+    0 12px 24px rgba(234, 142, 134, 0.2),
+    0 16px 32px rgba(230, 139, 132, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/*.no-product-content button{*/
+/*    pointer-events: none;*/
+/*}*/
+.no-product-content:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(228, 78, 65, 0.6),
+    0 12px 24px rgba(223, 134, 122, 0.5),
+    0 16px 32px rgba(226, 145, 138, 0.4),
+    0 20px 40px rgba(226, 138, 138, 0.3);
+}
+
+.div-unavailable {
+    width: 65px;
+    height: 25px;
+    border-radius: 5px;
+    background-color: rgba(211, 16, 16, 0.8);
+    padding: 5px 10px;
+}
+
+.unavailable {
+    color: white;
+    text-align: center;
+}
+
+
+.div-available {
+    width: 90%;
+    height: 25px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.available {
+    color: white;
+    text-align: center;
+    background-color: var(--main-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+
+}
+
+.flex-col-button-price {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }

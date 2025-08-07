@@ -74,6 +74,15 @@
     margin-right: 0;
 }
 
+body {
+    height: 100%;
+}
+
+.all-header-div-main-site {
+    height: fit-content;
+    min-height: 95%;
+}
+
 @media (max-width: 990px) {
     .panel {
         width: 30%;
@@ -171,10 +180,12 @@
     .hamburger {
         /*margin-top: 5%;*/
     }
-    .header-container{
+
+    .header-container {
         width: 100%;
     }
 }
-.all-container{
+
+.all-container {
     height: fit-content;
 }

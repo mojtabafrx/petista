@@ -1,166 +1,189 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
-{% block custom_css %}<link rel="stylesheet" href="{% static 'css/login.css' %}" />{% endblock %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static 'css/login.css' %}"/>{% endblock %}
 {% block header_js %}
+	<script src="{% static 'js/jquery.js' %}"></script>
 	<script>
-            function switchTab(tabId) {
-        document.querySelectorAll(".tab").forEach((tab) => {
-          tab.classList.remove("active");
+        $(document).ready(function () {
+            // Code to be executed after the DOM is ready
+            console.log("DOM is ready!");
+            switchTab('{{ tabId }}')
         });
 
-        document.querySelectorAll(".tab-content").forEach((content) => {
-          content.classList.remove("active");
-        });
+        function switchTab(tabId) {
+            document.querySelectorAll(".tab").forEach((tab) => {
+                tab.classList.remove("active");
+            });
 
-        const selectedTab = document.getElementById(tabId);
-        if (selectedTab) selectedTab.classList.add("active");
+            document.querySelectorAll(".tab-content").forEach((content) => {
+                content.classList.remove("active");
+            });
 
-        const tabButtons = document.querySelectorAll(".tabs .tab");
-        tabButtons.forEach((btn, index) => {
-          const correspondingTabId = index === 0 ? "password-tab" : "otp-tab";
-          if (correspondingTabId === tabId) {
-            btn.classList.add("active");
-          }
-        });
-      }
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) selectedTab.classList.add("active");
 
-    </script>
+            const tabButtons = document.querySelectorAll(".tabs .tab");
+            tabButtons.forEach((btn, index) => {
+                const correspondingTabId = index === 0 ? "password-tab" : "otp-tab";
+                if (correspondingTabId === tabId) {
+                    btn.classList.add("active");
+                }
+            });
+        }
+
+        switchTab('{{ tabId }}')
+	</script>
 {% endblock %}
 {% block content %}
+	
+	<div class="all-login-box">
+		<div class="login-box">
+			<div class="tabs">
+				<div class="tab active" onclick="switchTab('password-tab')">
+					ورود با رمز
+				</div>
+				<div class="tab" onclick="switchTab('otp-tab')">
+					ورود با کد یکبار مصرف
+				</div>
+			</div>
+			
+			<!-- تب ورود با رمز -->
+			
+			<!-- تب ورود با رمز -->
+			<div id="password-tab" class="tab-content active">
+				<form method="post">
+					{% csrf_token %}
+					<div class="input-group">
+						<input
+								type="tel"
+								name="username"
+								placeholder="شماره تلفن"
+								pattern="09[0-9]{9}"
+								maxlength="11"
+								inputmode="numeric"
+								oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
+								required
+						/>
+					</div>
+					<div class="input-group">
+						<input type="password" name="password" placeholder="رمز عبور" required/>
+					</div>
+					
+					<!-- استفاده از کپچای فرم رمز عبور -->
+					<div>
+						{{ password_form.captcha }}
+					</div>
+					
+					<!-- نمایش خطاهای کپچای رمز عبور -->
+					{% if password_form.captcha.errors %}
+						<div class="error-message" style="color: red; font-size: 0.8rem;">
+							{{ password_form.captcha.errors.0 }}
+						</div>
+					{% endif %}
+					{% if messages %}
+						<ul class="messages" style="color: red; font-size: 0.8rem;">
+							{% for message in messages %}
+								<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+					
+					<button type="submit" name="password-login">ورود</button>
+				</form>
+			</div>
+			{#        <div id="password-tab" class="tab-content active">#}
+			{#          <form method="post">#}
+			{#            {% csrf_token %}#}
+			{#            <div class="input-group">#}
+			{#              <input#}
+			{#                type="tel"#}
+			{#                name = "username"#}
+			{#                placeholder="شماره تلفن"#}
+			{#                pattern="09[0-9]{8}"#}
+			{#                maxlength="11"#}
+			{#                inputmode="numeric"#}
+			{#                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"#}
+			{#                required#}
+			{#              />#}
+			{#            </div>#}
+			{#            <div class="input-group">#}
+			{#              <input type="password" name="password" placeholder="رمز عبور" required />#}
+			{#            </div>#}
+			{#            {{ password_form.captcha }}#}
+			{#            <button type="submit"  name="password-login">ورود</button>#}
+			{#          </form>#}
+			{#        </div>#}
+			
+			
+			<!-- تب ورود با کد یکبار مصرف -->
+			<div id="otp-tab" class="tab-content">
+				<form method="post">
+					{% csrf_token %}
+					<div class="input-group">
+						<input
+								type="tel"
+								name="otp-username"
+								placeholder="شماره تلفن"
+								pattern="09[0-9]{9}"
+								maxlength="11"
+								inputmode="numeric"
+								oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
+								required
+						/>
+						<!-- نمایش خطاهای فیلد username -->
+						{#						{% if otp_form.username.errors %}#}
+						{#							<div class="error-message" style="color: red; font-size: 0.8rem;">#}
+						{#								{{ otp_form.username.errors.0 }}#}
+						{#							</div>#}
+						{#						{% endif %}#}
+					</div>
+					
+					<!-- استفاده از کپچای فرم OTP با پیشوند -->
+					<div class="">
+						{{ otp_form.captcha }}
+					</div>
+					
+					<!-- نمایش خطاهای کپچای OTP -->
+					{% if otp_form.captcha.errors %}
+						<div class="error-message" style="color: red; font-size: 0.8rem;">
+							{{ otp_form.captcha.errors.0 }}
+						</div>
+					{% endif %}
 
-    <div class="all-login-box">
-      <div class="login-box">
-        <div class="tabs">
-          <div class="tab active" onclick="switchTab('password-tab')">
-            ورود با رمز
-          </div>
-          <div class="tab" onclick="switchTab('otp-tab')">
-            ورود با کد یکبار مصرف
-          </div>
-        </div>
-
-        <!-- تب ورود با رمز -->
-
-        <!-- تب ورود با رمز -->
-        <div id="password-tab" class="tab-content active">
-          <form method="post">
-            {% csrf_token %}
-            <div class="input-group">
-              <input
-                type="tel"
-                name="username"
-                placeholder="شماره تلفن"
-                pattern="09[0-9]{9}"
-                maxlength="11"
-                inputmode="numeric"
-                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
-                required
-              />
-            </div>
-            <div class="input-group">
-              <input type="password" name="password" placeholder="رمز عبور" required />
-            </div>
-
-            <!-- استفاده از کپچای فرم رمز عبور -->
-            <div>
-              {{ password_form.captcha }}
-            </div>
-
-            <!-- نمایش خطاهای کپچای رمز عبور -->
-            {% if password_form.captcha.errors %}
-              <div class="error-message" style="color: red; font-size: 0.8rem;">
-                {{ password_form.captcha.errors.0 }}
-              </div>
-            {% endif %}
-
-            <button type="submit" name="password-login">ورود</button>
-          </form>
-        </div>
-{#        <div id="password-tab" class="tab-content active">#}
-{#          <form method="post">#}
-{#            {% csrf_token %}#}
-{#            <div class="input-group">#}
-{#              <input#}
-{#                type="tel"#}
-{#                name = "username"#}
-{#                placeholder="شماره تلفن"#}
-{#                pattern="09[0-9]{8}"#}
-{#                maxlength="11"#}
-{#                inputmode="numeric"#}
-{#                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"#}
-{#                required#}
-{#              />#}
-{#            </div>#}
-{#            <div class="input-group">#}
-{#              <input type="password" name="password" placeholder="رمز عبور" required />#}
-{#            </div>#}
-{#            {{ password_form.captcha }}#}
-{#            <button type="submit"  name="password-login">ورود</button>#}
-{#          </form>#}
-{#        </div>#}
-
-
-        <!-- تب ورود با کد یکبار مصرف -->
-        <div id="otp-tab" class="tab-content">
-          <form method="post">
-            {% csrf_token %}
-            <div class="input-group">
-              <input
-                type="tel"
-                name="otp-username"
-                placeholder="شماره تلفن"
-                pattern="09[0-9]{9}"
-                maxlength="11"
-                inputmode="numeric"
-                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
-                required
-              />
-              <!-- نمایش خطاهای فیلد username -->
-              {% if otp_form.username.errors %}
-                <div class="error-message" style="color: red; font-size: 0.8rem;">
-                  {{ otp_form.username.errors.0 }}
-                </div>
-              {% endif %}
-            </div>
-
-            <!-- استفاده از کپچای فرم OTP با پیشوند -->
-            <div class="">
-              {{ otp_form.captcha }}
-            </div>
-
-            <!-- نمایش خطاهای کپچای OTP -->
-            {% if otp_form.captcha.errors %}
-              <div class="error-message" style="color: red; font-size: 0.8rem;">
-                {{ otp_form.captcha.errors.0 }}
-              </div>
-            {% endif %}
-
-            <button type="submit" name="otp-login">ورود</button>
-
-          </form>
-        </div>
-
-{#        <div id="otp-tab" class="tab-content">#}
-{#          <form method="post">#}
-{#            {% csrf_token %}#}
-{#            <div class="input-group">#}
-{#              <input#}
-{#                type="tel"#}
-{#                name = "username"#}
-{#                placeholder="شماره تلفن"#}
-{#                pattern="09[0-9]{8}"#}
-{#                maxlength="11"#}
-{#                inputmode="numeric"#}
-{#                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"#}
-{#                required#}
-{#              />#}
-{#            </div>#}
-{#            {{ password_form.captcha }}#}
-{#            <button type="submit" name="otp-login">ورود</button>#}
-{#          </form>#}
-{#        </div>#}
-      </div>
-    </div>
+					
+					<button type="submit" name="otp-login">ورود</button>
+					{% if messages %}
+						<ul class="messages" style="color: red; font-size: 0.8rem;">
+							{% for message in messages %}
+								<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</form>
+			</div>
+			
+			{#        <div id="otp-tab" class="tab-content">#}
+			{#          <form method="post">#}
+			{#            {% csrf_token %}#}
+			{#            <div class="input-group">#}
+			{#              <input#}
+			{#                type="tel"#}
+			{#                name = "username"#}
+			{#                placeholder="شماره تلفن"#}
+			{#                pattern="09[0-9]{8}"#}
+			{#                maxlength="11"#}
+			{#                inputmode="numeric"#}
+			{#                oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"#}
+			{#                required#}
+			{#              />#}
+			{#            </div>#}
+			{#            {{ password_form.captcha }}#}
+			{#            <button type="submit" name="otp-login">ورود</button>#}
+			{#          </form>#}
+			{#        </div>#}
+		</div>
+	</div>
 
 {% endblock %}

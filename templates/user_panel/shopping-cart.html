@@ -3,76 +3,67 @@
 {% block custom_css %}<link rel="stylesheet" href="{% static '/css/userpanel/shopping-cart.css' %}"/>{% endblock %}
 {% block content %}
 <div class="all-div-container">
-        <div class="all-container">
-            <div class="header-container">
-                <h3 class="top-welcome">خوش آمدید</h3>
-            </div>
-            <div class="panel">
-                <img class="panel-icon" src="/assets/images/icons8-customer-64.png">
-                <span class="panel-name">خریدار معمولی</span>
-            </div>
-        </div>
+
         <div class="container">
             <div class="all-header-container"></div>
 
             <div class="head-container">
-                <img class="head-container-icon" src="/assets/images/icons8-add-to-cart-30.png">
+                <img class="head-container-icon" src="{% static 'images/icons8-add-to-cart-30.png' %}">
                 <span class="head-container-name">سبد خرید</span>
             </div>
+
             <div class="main-container">
                 <div class="cart-container" id="cart">
+                    {% if cart %}
                     <div class="cart-header">
                         <div>محصول</div>
                         <div>فروشنده</div>
-                        <div>قیمت واحد</div>
+                        <div>قیمت </div>
                         <div>تعداد</div>
                         <div>قیمت کل</div>
                         <div>عملیات</div>
                     </div>
-
+                    {% for item in cart.items.all %}
                     <!-- ردیف‌ها -->
                     <div class="cart-row">
-                        <div data-label="محصول">کفش اسپرت مردانه</div>
-                        <div data-label="فروشنده">فروشگاه کفش خوب</div>
-                        <div data-label="قیمت واحد" class="unit-price">550000</div>
+                        <div data-label="محصول">{{ item.seller_product.product.title }}</div>
+                        <div data-label="فروشنده">{{ item.seller_product.seller.get_username }}</div>
+                        <div data-label="قیمت واحد" class="unit-price">{{ item.unit_price|floatformat:0 }} تومان </div>
                         <div data-label="تعداد">
                             <div class="qty-controls">
-                                <button class="decrease">-</button>
-                                <span class="qty">2</span>
-                                <button class="increase">+</button>
+                                <button class="decrease decrement" data-id="{{ item.id }}">-</button>
+                                <span class="qty item-quantity">{{ item.quantity }}</span>
+                                <button class="increase increment" data-id="{{ item.id }}">+</button>
                             </div>
                         </div>
-                        <div data-label="قیمت کل" class="total-price">1100000</div>
+                        <div data-label="قیمت کل" class="total-price item-total">{{ item.total_price|floatformat:0 }}  تومان </div>
                         <div data-label="عملیات">
-                            <button class="remove-btn">حذف</button>
+                            <button class="remove-btn remove-item" data-id="{{ item.id }}">حذف</button>
                         </div>
                     </div>
-
-                    <div class="cart-row">
-                        <div data-label="محصول">شلوار جین زنانه</div>
-                        <div data-label="فروشنده">مدپوشان</div>
-                        <div data-label="قیمت واحد" class="unit-price">320000</div>
-                        <div data-label="تعداد">
-                            <div class="qty-controls">
-                                <button class="decrease">-</button>
-                                <span class="qty">1</span>
-                                <button class="increase">+</button>
-                            </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            <i class="fas fa-shopping-cart fa-4x text-muted"></i>
                         </div>
-                        <div data-label="قیمت کل" class="total-price">320000</div>
-                        <div data-label="عملیات">
-                            <button class="remove-btn">حذف</button>
-                        </div>
+                        <h5 class="text-muted">سبد خرید شما خالی است</h5>
+                        <p class="text-muted">برای افزودن محصول به سبد خرید از فروشگاه دیدن کنید</p>
+                        <a href="{% url 'product:product_list' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-store me-2"></i> بازگشت به فروشگاه
+                        </a>
                     </div>
+                    {% endif %}
                 </div>
 
                 <div class="cart-summary" id="cart-summary">
-                    جمع کل: ۱,۴۲۰,۰۰۰ تومان
+                   {{ cart.total_price|floatformat:0 }} تومان
                 </div>
 
                 <div class="cart-actions">
-                    <button class="continue-btn">ادامه خرید</button>
-                    <button class="checkout-btn">پرداخت نهایی</button>
+                    <a href="{% url 'product:product_list' %}"><button class="continue-btn">ادامه خرید</button></a>
+
+                    <a href="{% url 'user_panel:checkout' cart.id %}"><button class="checkout-btn" data-id="{{ cart.id }}" > پرداخت نهایی </button></a>
                 </div>
 
             </div>
@@ -81,77 +72,109 @@
 
 {% endblock %}
 {% block custom_js %}
+<script>
 
-//add to cart tab js
-const updateCart = () => {
-    let total = 0;
-    document.querySelectorAll('.cart-row').forEach(row => {
-        const unitPrice = parseInt(row.querySelector('.unit-price').textContent);
-        const qty = parseInt(row.querySelector('.qty').textContent);
-        const totalPrice = unitPrice * qty;
-        row.querySelector('.total-price').textContent = totalPrice.toLocaleString('fa-IR');
-        total += totalPrice;
-    });
-    document.getElementById('cart-summary').textContent = `جمع کل: ${total.toLocaleString('fa-IR')} تومان`;
-};
+$(document).ready(function() {
+    console.log("sa");
+        // افزایش تعداد
+        $('.increment').click(function() {
+            const itemId = $(this).data('id');
+            updateCartItem(itemId, 'increment');
 
-document.querySelectorAll('.increase').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const qtyElem = btn.parentElement.querySelector('.qty');
-        let qty = parseInt(qtyElem.textContent);
-        qtyElem.textContent = ++qty;
-        updateCart();
-    });
-});
+        });
 
-document.querySelectorAll('.decrease').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const qtyElem = btn.parentElement.querySelector('.qty');
-        let qty = parseInt(qtyElem.textContent);
-        if (qty > 1) {
-            qtyElem.textContent = --qty;
-            updateCart();
+        // کاهش تعداد
+        $('.decrement').click(function() {
+            const itemId = $(this).data('id');
+            updateCartItem(itemId, 'decrement');
+        });
+
+        // حذف آیتم
+        $('.remove-item').click(function() {
+            const itemId = $(this).data('id');
+            removeCartItem(itemId);
+        });
+
+        function updateCartItem(itemId, action) {
+            $.post('{% url "user_panel:update_cart_item" 0 %}'.replace('0', itemId),
+                {
+                    action: action,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        // به‌روزرسانی تعداد و قیمت در ردیف
+                        const row = $(`button[data-id="${itemId}"]`).closest('.cart-row');
+                        row.find('.item-quantity').text(response.new_quantity);
+                        row.find('.item-total').text(response.item_total + ' تومان');
+
+                        // به‌روزرسانی جمع کل سبد خرید
+                        $('.cart-summary').text(response.cart_total + ' تومان');
+                    }
+                }
+            );
         }
-    });
+
+        function removeCartItem(itemId) {
+            if (!confirm('آیا مطمئن هستید که می‌خواهید این محصول را از سبد خرید حذف کنید؟')) return;
+
+            $.post('{% url "user_panel:remove_cart_item" 0 %}'.replace('0', itemId),
+                {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        // حذف ردیف از جدول
+                        const row = $(`button[data-id="${itemId}"]`).closest('.cart-row');
+                        row.fadeOut(400, function() { $(this).remove(); });
+
+                        // به‌روزرسانی جمع کل سبد خرید
+                        $('.cart-summary').text(response.cart_total + ' تومان');
+
+                        // به‌روزرسانی تعداد آیتم‌ها در هدر
+                        $('.cart-count').text(response.cart_items_count);
+
+                        // اگر سبد خرید خالی شد، نمایش پیام
+                        if (response.cart_items_count == 0) {
+                            location.reload();
+                        }
+                    }
+                }
+            );
+        }
+        // افزودن به سبد خرید (در صفحات محصولات)
+        $('.add-to-cart').click(function() {
+            const productId = $(this).data('id');
+            // اگر کاربر وارد نشده باشد
+            {% if not request.user.is_authenticated %}
+                alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
+                window.location.href = "{% url 'account:login' %}";
+                return;
+            {% endif %}
+            // درخواست AJAX برای افزودن به سبد خرید
+            $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
+                {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                function(response) {
+                    if (response.success) {
+                        // به‌روزرسانی تعداد آیتم‌ها در هدر
+                        $('.cart-count').text(response.cart_items_count);
+
+                        // نمایش پیام موفقیت
+                        alert(response.message);
+                    } else {
+                        // نمایش خطای خاص برگشتی از سرور
+                        alert(response.error || 'خطا در افزودن محصول به سبد خرید');
+                    }
+                }
+            ).fail(function(xhr) {
+                // مدیریت خطاهای شبکه/سرور
+                alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید');
+                console.error('Error:', xhr.responseText);
+            });
+        });
 });
 
-document.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        btn.closest('.cart-row').remove();
-        updateCart();
-    });
-});
-
-// اجرای اولیه
-updateCart();
-
-const hamburger = document.getElementById('hamburger');
-const closeBtn = document.getElementById('closeBtn');
-const sideMenu = document.getElementById('sideMenu');
-const allDivContainer = document.querySelector('.all-div-container');
-
-// حالت اولیه
-allDivContainer.style.width = '90%';
-allDivContainer.style.marginRight = '5%';
-
-hamburger.addEventListener('click', () => {
-    sideMenu.classList.add('open');
-    allDivContainer.style.width = '70%';
-    allDivContainer.style.marginRight = '20%';
-
-    // مخفی کردن همبرگر
-    hamburger.style.visibility = 'hidden';
-    // یا می‌تونی display رو هم امتحان کنی: hamburger.style.display = 'none';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.classList.remove('open');
-    allDivContainer.style.width = '90%';
-    allDivContainer.style.marginRight = '5%';
-
-    // نمایش مجدد همبرگر
-    hamburger.style.visibility = 'visible';
-    // یا hamburger.style.display = 'block';
-});
-
+</script>
 {% endblock %}

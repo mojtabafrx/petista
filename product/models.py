@@ -1,3 +1,5 @@
+import string
+
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.text import slugify
@@ -16,7 +18,7 @@ class CategoryManager(models.Manager):
 
 class Category(models.Model):
     parent = models.ForeignKey('self', default=None, null=True, blank=True,
-                               on_delete=models.SET_NULL, related_name="children", verbose_name="زیر دسته")
+                               on_delete=models.SET_NULL, related_name="children", verbose_name="دسته والد")
     title = models.CharField(max_length=200, verbose_name="عنوان دسته بندی")
     slug = models.SlugField(max_length=100, unique=True,
                             verbose_name="آدرس دسته بندی")
@@ -24,6 +26,7 @@ class Category(models.Model):
     position = models.IntegerField(verbose_name="پوزیشن")
     image = models.ImageField(
         upload_to="images", null=True, blank=True, verbose_name="تصویر دسته بندی")
+    path = models.CharField(max_length=100, verbose_name="یونیکد زیرشاخه", blank=True)
 
     class Meta:
         db_table = ''
@@ -40,6 +43,51 @@ class Category(models.Model):
 
     objects = CategoryManager()
 
+    def to_base64(self,num, length=2):
+        parent = self.parent
+        parent_path = ""
+        if parent:
+            parent_path = parent.path
+        chars = string.ascii_lowercase + string.ascii_uppercase + '0123456789-_'
+
+        # اگر عدد کمتر از 64 است، یک رقم بیشتر نگیرد
+        if num < 64 ** (length - 1):
+            num = num % (64 ** length)  # اطمینان از محدوده
+
+            # تبدیل و پر کردن با صفر (a)
+            result = []
+            for _ in range(length):
+                num, remainder = divmod(num, 64)
+                result.append(chars[remainder])
+
+            return parent_path + ''.join(result[::-1])
+        else:
+            # برای اعداد بزرگتر
+            result = []
+            while num:
+                num, remainder = divmod(num, 64)
+                result.append(chars[remainder])
+            res = ''.join(result[::-1])
+            # پر کردن با a اگر طول کمتر از حد مورد نیاز باشد
+            return parent_path+ res.zfill(length).replace('0', 'a')
+
+    def get_all_child(self):
+        return Category.objects.filter(path__startswith=self.path)
+    def save(
+        self,
+        force_insert = False,
+        force_update = False,
+        using = None,
+        update_fields = None,
+    ):
+        create_flag = False
+        if not self.id:
+            create_flag = True
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        if create_flag:
+            self.path = self.to_base64(self.id)
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
 
 User = get_user_model()
 
@@ -52,15 +100,15 @@ class Product(models.Model):
     UNAVAILABLE = 2
 
     STATUS_CHOICES = (
-        (1, 'موجود'),
-        (2, 'ناموجود'),
+        (AVAILABLE, 'موجود'),
+        (UNAVAILABLE, 'ناموجود'),
     )
 
     WHOLESALE = 1
     RETAIL = 2
     PRODUCT_TYPES = (
-        (1, 'عمده'),
-        (2, 'خرده'),
+        (WHOLESALE, 'عمده'),
+        (RETAIL, 'خرده'),
     )
 
     # اطلاعات پایه محصول
@@ -69,7 +117,7 @@ class Product(models.Model):
     description = models.TextField(verbose_name="توضیحات محصول")
     minimum_order = models.PositiveIntegerField(verbose_name="حداقل میزان سفارس", default=1)
     related_product = models.ForeignKey('self', verbose_name="محصول مرتبط", on_delete=models.SET_NULL, null=True, blank=True)
-    product_type = models.IntegerField(choices=PRODUCT_TYPES, default=1, verbose_name="نوع محصول")
+    product_type = models.IntegerField(choices=PRODUCT_TYPES, default=RETAIL, verbose_name="نوع محصول")
     # دسته‌بندی
     category = models.ForeignKey(
         'Category',

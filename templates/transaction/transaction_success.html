@@ -1,0 +1,57 @@
+{% extends 'user_panel/dashboard.html' %}
+{% load static %}
+{% block custom_css %}<link rel="stylesheet" href="{% static '/css/transaction/transaction-success.css' %}"/>{% endblock %}
+{% block content %}
+
+<!-- محتوای تب‌ها -->
+<div class="tab-content active" id="tab1">
+    <div class="all-div-container">
+        <div class="all-container">
+            <div class="header-container">
+                <h3 class="top-welcome">خوش آمدید</h3>
+            </div>
+            <div class="panel">
+                <img class="panel-icon" src="{% static 'images/icons8-seller-96.png'%}">
+                <span class="panel-name">فروشنده</span>
+            </div>
+        </div>
+        <div class="container">
+            <div class="all-header-container"></div>
+
+            <div class="head-container">
+                <img class="head-container-icon" src="{% static 'images/icons8-bag-24.png'%}">
+                <span class="head-container-name">پنل خریدار</span>
+            </div>
+            <div class="main-container">
+                <div class="all-success-container">
+                    <div class="success-icon-div">
+                        <img src="{% static 'images/icons8-success-160.png' %}" class="success-icon">
+                    </div>
+                    <h3>پرداخت شما با موفقیت ثبت شد!</h3>
+                    <div class="all-tracking-code-div">
+                        <div class="tracking-code-div">
+                            <p>کد رهگیری سفارش شما: </p>
+                            <p>{{ ref_id }}</p>
+                        </div>
+                    </div>
+                    <div class="button-div">
+                        <a href="{% url 'user_panel:my_orders' %}" class="back-button-link">
+                            <button class="back-button">مشاهده ی سفارشات</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
+{% block custom_js %}
+<script>
+</script>
+{% endblock %}

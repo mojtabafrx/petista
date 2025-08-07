@@ -1,8 +1,10 @@
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
+
 from product.models import Product
 
 User = get_user_model()
+
 
 class SellerProduct(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='seller_products')
@@ -21,6 +23,7 @@ class SellerProduct(models.Model):
 
     def __str__(self):
         return f"{self.product.title} توسط {self.seller.username}"
+
     def save(self, *args, **kwargs):
         # فقط زمانی که شیء جدید ایجاد می‌شود یا stock تغییر کرده است
         if self.pk is None or SellerProduct.objects.get(pk=self.pk).stock != self.stock:
@@ -29,10 +32,22 @@ class SellerProduct(models.Model):
 
 
 class Cart(models.Model):
+    PENDING = 0
+    PAID = 1
+    CANCELLED = 2
+    PROCESSING = 3
+    STATUS_CHOICES = (
+        (PENDING, 'در انتظار پرداخت'),
+        (PAID, 'پرداخت شده'),
+        (CANCELLED, 'لغو شده'),
+        (PROCESSING, 'در حال آماده سازی')
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True, verbose_name="فعال")
+    status = models.IntegerField(choices=STATUS_CHOICES, default=PENDING)
+    tracking_code = models.CharField(max_length=50, null=True, blank=True, verbose_name="کد رهگیری")
 
     class Meta:
         verbose_name = 'سبد خرید'
@@ -53,6 +68,9 @@ class CartItem(models.Model):
     seller_product = models.ForeignKey(SellerProduct, on_delete=models.CASCADE, verbose_name="محصول فروشنده")
     quantity = models.PositiveIntegerField(default=1, verbose_name="تعداد")
     added_at = models.DateTimeField(auto_now_add=True)
+    price = models.PositiveIntegerField(verbose_name="قیمت خریداری شده")
+
+    # price
 
     class Meta:
         verbose_name = 'آیتم سبد خرید'
@@ -68,45 +86,44 @@ class CartItem(models.Model):
     def unit_price(self):
         return self.seller_product.price
 
-
 # Orders Section
-
-class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    total_price = models.PositiveIntegerField(verbose_name="جمع کل")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    STATUS_CHOICES = (
-        ('pending', 'در انتظار پرداخت'),
-        ('processing', 'در حال پردازش'),
-        ('shipped', 'ارسال شده'),
-        ('delivered', 'تحویل داده شده'),
-        ('cancelled', 'لغو شده'),
-    )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="وضعیت")
-    tracking_code = models.CharField(max_length=50, null=True, blank=True, verbose_name="کد رهگیری")
-
-    class Meta:
-        verbose_name = 'سفارش'
-        verbose_name_plural = 'سفارشات'
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"سفارش #{self.id} - {self.user.username}"
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    seller_product = models.ForeignKey(SellerProduct, on_delete=models.CASCADE, verbose_name="محصول فروشنده")
-    quantity = models.PositiveIntegerField(verbose_name="تعداد")
-    price = models.PositiveIntegerField(verbose_name="قیمت واحد")
-
-    class Meta:
-        verbose_name = 'آیتم سفارش'
-        verbose_name_plural = 'آیتم‌های سفارش'
-
-    def __str__(self):
-        return f"{self.quantity} عدد {self.seller_product.product.title}"
-
-    def total_price(self):
-        return self.quantity * self.price
+#
+# class Order(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
+#     total_price = models.PositiveIntegerField(verbose_name="جمع کل")
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True)
+#     STATUS_CHOICES = (
+#         ('pending', 'در انتظار پرداخت'),
+#         ('paid', 'پرداخت شده'),
+#         ('shipped', 'ارسال شده'),
+#         ('delivered', 'تحویل داده شده'),
+#         ('cancelled', 'لغو شده'),
+#     )
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', verbose_name="وضعیت")
+#     tracking_code = models.CharField(max_length=50, null=True, blank=True, verbose_name="کد رهگیری")
+#
+#     class Meta:
+#         verbose_name = 'سفارش'
+#         verbose_name_plural = 'سفارشات'
+#         ordering = ['-created_at']
+#
+#     def __str__(self):
+#         return f"سفارش #{self.id} - {self.user.username}"
+#
+#
+# class OrderItem(models.Model):
+#     order = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+#     seller_product = models.ForeignKey(SellerProduct, on_delete=models.CASCADE, verbose_name="محصول فروشنده")
+#     quantity = models.PositiveIntegerField(verbose_name="تعداد")
+#     price = models.PositiveIntegerField(verbose_name="قیمت واحد")
+#
+#     class Meta:
+#         verbose_name = 'آیتم سفارش'
+#         verbose_name_plural = 'آیتم‌های سفارش'
+#
+#     def __str__(self):
+#         return f"{self.quantity} عدد {self.seller_product.product.title}"
+#
+#     def total_price(self):
+#         return self.quantity * self.price

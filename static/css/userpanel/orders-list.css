@@ -1,0 +1,120 @@
+
+.orders-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.order-header, .order-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    align-items: center;
+    text-align: center;
+}
+
+.order-header {
+    background-color: var(--main-color);
+    color: white;
+    font-weight: bold;
+    margin-top: 1%;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.paid {
+    background-color: #d9fdf6;
+    color: #06796b;
+}
+
+
+.pending {
+    background-color: #fff8e1;
+    color: #a67700;
+}
+
+.canceled {
+    background-color: #ffe2e5;
+    color: #c62828;
+}
+
+.details-btn {
+    padding: 8px 14px;
+    background-color: #8ae2d2;
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.details-btn:hover {
+    background-color: var(--main-color-two);
+    transform: scale(1.05);
+}
+
+.head-container-icon {
+    width: 30px;
+    height: 30px;
+    margin-left: 1%;
+}
+
+
+/* موبایل */
+@media (max-width: 768px) {
+    .order-header {
+        display: none;
+    }
+
+    .order-row {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .order-row > div {
+        font-size: 15px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #eaeaea;
+        position: relative;
+        padding-right: 10px;
+    }
+
+    .order-row > div:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .order-row > div::before {
+        content: attr(data-label) ": ";
+        font-weight: bold;
+        color: #444;
+        display: inline-block;
+        margin-left: 4px;
+    }
+
+    .details-btn {
+        margin-top: 10px;
+        width: 100%;
+        background-color: #8ae2d2;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+}

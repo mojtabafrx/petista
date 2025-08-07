@@ -1,235 +1,280 @@
 {% load static %}
 <!DOCTYPE html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}{% endblock %}</title>
-  <link rel="stylesheet" href="{% static '/css/userpanel/dashboard.css' %}"/>
-  <link rel="stylesheet" href="{% static 'css/userpanel/common.css' %}">
-  {% block custom_css %}{% endblock %}
-  <link rel="stylesheet" href="{% static 'css/menu.css' %}" />
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>{% block title %}{% endblock %}</title>
+	<link rel="stylesheet" href="{% static '/css/userpanel/dashboard.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/userpanel/common.css' %}">
+	{% block custom_css %}{% endblock %}
+	<link rel="stylesheet" href="{% static 'css/menu.css' %}"/>
 </head>
 
 <body>
 
 <div class="all-header-div-main-site">
-    <div class="header-div">
-        <h2 class="htwo">PET SHOP</h2>
-        <!-- آیکن همبرگر -->
-        <div class="hamburger" id="hamburger">
-            <img src="{% static 'images/icons8-hamburger-menu-64.png' %}" width="50px" height="50px"/>
-        </div>
-    </div>
+	<div class="all-header">
+		<div class="header-div">
+			<!-- آیکن همبرگر -->
+			<div class="hamburger" id="hamburger">
+				<img src="{% static 'images/icons8-hamburger-menu-64.png' %}" width="50px" height="50px"/>
+				<h2 class="htwo">PET SHOP</h2>
+			</div>
+			<div class="header-left-content">
+				<div class="main-home-col">
+					<a href="{% url 'home:home' %}">
+						<img src="{% static 'images/icons8-home-100.png' %}" width="50px" height="50px"/>
 
-    <!-- منوی کناری -->
-    <div class="side-menu" id="sideMenu">
-        <div class="close-btn" id="closeBtn">&times;</div>
-        <div class="tabs">
-            <a href="{% url 'user_panel:dashboard' %}">
-                <button class="tab-button active">
-                    <img src="{% static 'images/icons8-dashboard-48.png' %}" class="side-menu-icons">
-                    داشبورد
-                </button>
-            </a>
-
-            <!-- منو برای کاربران عادی -->
-            {% if user.profile.user_type == 1 %}
-            <a href="{% url 'user_panel:view_cart' %}">
-                <button class="tab-button">
-                    <img src="{% static 'images/icons8-add-to-cart-30.png' %}" class="side-menu-icons">
-                    سبد خرید
-                </button>
-            </a>
-            <a href="orders.html">
-                <button class="tab-button">
-                    <img src="{% static 'images/icons8-list-64.png' %}" class="side-menu-icons">
-                    سفارشات من
-                </button>
-            </a>
-            {% endif %}
-
-            <!-- منو برای تولیدکنندگان -->
-            {% if user.profile.user_type == 2 %}
-            {% endif %}
-
-            <!-- منو برای فروشندگان -->
-            {% if user_type == 3 %}
-            <a href="{% url 'user_panel:add_seller_product' %}">
-                <button class="tab-button">
-                    <img src="{% static 'images/icons8-add-to-cart-30.png' %}" class="side-menu-icons">
-                    ثبت محصول جدید
-                </button>
-            </a>
-            <a href="{% url 'user_panel:my_products' %}">
-                <button class="tab-button">
-                    <img src="{% static 'images/icons8-list-64.png' %}" class="side-menu-icons">
-                    محصولات من
-                </button>
-            </a>
-            {% endif %}
-
-            <a href="{% url 'user_panel:change_password' %}">
-                <button class="tab-button">
-                    <img src="{% static 'images/icons8-password-48.png' %}" class="side-menu-icons">
-                    تغییر رمز عبور
-                </button>
-            </a>
-            <a href="{% url 'account:logout' %}" id="exit-link">
-                <button class="tab-button" id="exit-button">
-                    <img src="{% static 'images/icons8-exit-30.png' %}" class="side-menu-icons">
-                    خروج
-                </button>
-            </a>
-        </div>
-    </div>
+					</a>
+					<span class="right-line"></span>
+					<a href="{% url 'user_panel:view_cart' %}">
+						<img class="add-to-cart-img" src="{% static 'images/icons8-add-to-cart-96.png' %}">
+					</a>
+				</div>
 
 
-    <!-- محتوای تب‌ها -->
-    <div class="tab-content active" id="tab1">
-        <div class="all-div-container">
-            <div class="all-container">
-                <div class="header-container">
-                    <h3 class="top-welcome">خوش آمدید</h3>
-                </div>
-                <div class="panel">
-                    <img class="panel-icon" src="{% static 'images/icons8-customer-64.png' %}">
-                    <span class="panel-name">{%  if user_type == 1 %}خریدار {% elif user_type == 2 %}فروشنده عمده{% else %}فروشنده {% endif %}</span>
-                </div>
-            </div>
+			</div>
 
-{% block content %}
-            <div class="container">
-                <div class="all-header-container"></div>
+		</div>
 
-                <div class="head-container">
-                    <img class="head-container-icon" src="{% static 'images/icons8-bag-24.png' %}">
-                    <span class="head-container-name">پنل {%  if user_type == 1 %}خریدار {% elif user_type == 2 %}فروشنده عمده{% else %}فروشنده {% endif %}</span>
-                </div>
-                <div class="main-container">
-                    <div class="main-container-header">
-                        <img src="{% static 'images/icons8-customer-72.png' %}" width="90px">
-                        <p class="main-container-p">شما به عنوان <span class="panel-name-change">{%  if user_type == 1 %}خریدار {% elif user_type == 2 %}فروشنده عمده{% else %}فروشنده {% endif %}</span><br>
-                            از امکانات ویژه ی <span class="panel-name2-change">{%  if user_type == 1 %}خریدار {% elif user_type == 2 %} عمده فروشنده{% else %}فروشنده {% endif %} </span>استفاده کنید</p>
-                    </div>
-
-                    {% if user_type == 1 and section == 'dashboard' %}
-                    <div class="all-three-div">
-                        <a href="{% url 'user_panel:view_cart' %}">
-                            <div class="orders-div col">
-                                <img src="{% static 'images/icons8-add-to-cart-96.png' %}">
-                                <h3>سفارشات من</h3>
-                                <p>پیگیری سفارشات اخیر شما</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="intrests-div col">
-                                <img src="{% static 'images/icons8-heart-96.png' %}">
-                                <h3>علاقه مندی ها</h3>
-                                <p>محصولات مورد علاقه ی شما</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="history-div col">
-                                <img src="{% static 'images/icons8-activity-history-100.png' %}">
-                                <h3>تاریخچه ی خرید</h3>
-                                <p>تاریخچه ی تمام خرید های شما</p>
-                            </div>
-                        </a>
-                    </div>
-                    {% elif user_type == 2 %}
-                    <div class="all-three-div">
-                        <a href="{% url 'user_panel:view_cart' %}">
-                            <div class="orders-div col">
-                                <img src="{% static 'images/icons8-add-to-cart-96.png' %}">
-                                <h3>سفارشات من</h3>
-                                <p>پیگیری سفارشات اخیر شما</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="intrests-div col">
-                                <img src="{% static 'images/icons8-heart-96.png' %}">
-                                <h3>علاقه مندی ها</h3>
-                                <p>محصولات مورد علاقه ی شما</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="history-div col">
-                                <img src="{% static 'images/icons8-activity-history-100.png' %}">
-                                <h3>تاریخچه ی خرید</h3>
-                                <p>تاریخچه ی تمام خرید های شما</p>
-                            </div>
-                        </a>
-                    </div>
-                    {% else %}
-                    <div class="all-three-div">
-                        <a href="{% url 'user_panel:view_cart' %}">
-                            <div class="orders-div col">
-                                <img src="{% static 'images/icons8-add-to-cart-96.png' %}">
-                                <h3>سفارشات من</h3>
-                                <p>پیگیری سفارشات اخیر شما</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="intrests-div col">
-                                <img src="{% static 'images/icons8-heart-96.png' %}">
-                                <h3>علاقه مندی ها</h3>
-                                <p>محصولات مورد علاقه ی شما</p>
-                            </div>
-                        </a>
-                        <a href="#">
-                            <div class="history-div col">
-                                <img src="{% static 'images/icons8-activity-history-100.png' %}">
-                                <h3>تاریخچه ی خرید</h3>
-                                <p>تاریخچه ی تمام خرید های شما</p>
-                            </div>
-                        </a>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-{% endblock %}
+	</div>
 
 
-    <div class="footer-warning">
-        <p>۱۴۰۳ © تمامی حقوق این سایت محفوظ است.</p>
+	<!-- منوی کناری -->
+	<div class="side-menu" id="sideMenu">
+		<div class="close-btn" id="closeBtn">&times;</div>
+		<div class="tabs">
+			<a href="{% url 'user_panel:dashboard' %}">
+				<button class="tab-button active">
+					<img src="{% static 'images/icons8-dashboard-48.png' %}" class="side-menu-icons">
+					داشبورد
+				</button>
+			</a>
 
-    </div>
+			<!-- منو برای کاربران عادی -->
+			{% if user.profile.user_type == 1 or user.profile.user_type == 3 %}
+				<a href="{% url 'user_panel:view_cart' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-add-to-cart-30.png' %}" class="side-menu-icons">
+						سبد خرید
+					</button>
+				</a>
+				<a href="{% url 'user_panel:my_orders' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-list-64.png' %}" class="side-menu-icons">
+						سفارشات من
+					</button>
+				</a>
+			{% endif %}
+
+			<!-- منو برای تولیدکنندگان -->
+			{% if user.profile.user_type == 2 %}
+				<a href="{% url 'user_panel:add_seller_product' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-add-to-cart-30.png' %}" class="side-menu-icons">
+						ثبت محصول جدید
+					</button>
+				</a>
+				<a href="{% url 'user_panel:my_products' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-list-64.png' %}" class="side-menu-icons">
+						محصولات من
+					</button>
+				</a>
+			{% endif %}
+
+			<!-- منو برای فروشندگان -->
+			{% if user_type == 3 %}
+
+				<a href="{% url 'user_panel:add_seller_product' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-add-to-cart-30.png' %}" class="side-menu-icons">
+						ثبت محصول جدید
+					</button>
+				</a>
+				<a href="{% url 'user_panel:my_products' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-list-64.png' %}" class="side-menu-icons">
+						محصولات من
+					</button>
+				</a>
+				<a href="{% url 'user_panel:seller_orders' %}">
+					<button class="tab-button">
+						<img src="{% static 'images/icons8-list-64.png' %}" class="side-menu-icons">
+						فروش من
+					</button>
+				</a>
+			{% endif %}
+
+			<a href="{% url 'user_panel:change_password' %}">
+				<button class="tab-button">
+					<img src="{% static 'images/icons8-password-48.png' %}" class="side-menu-icons">
+					تغییر رمز عبور
+				</button>
+			</a>
+			<a href="{% url 'account:logout' %}" id="exit-link">
+				<button class="tab-button" id="exit-button">
+					<img src="{% static 'images/icons8-exit-30.png' %}" class="side-menu-icons">
+					خروج
+				</button>
+			</a>
+		</div>
+	</div>
+
+
+	<!-- محتوای تب‌ها -->
+	<div class="tab-content active" id="tab1">
+		<div class="all-div-container">
+			<div class="all-container">
+				<div class="header-container">
+					<h3 class="top-welcome">خوش آمدید</h3>
+				</div>
+				<div class="panel">
+					<img class="panel-icon" src="{% static 'images/icons8-customer-64.png' %}">
+					<span class="panel-name">{% if user_type == 1 %}خریدار {% elif user_type == 2 %}فروشنده
+						عمده{% else %}فروشنده {% endif %}</span>
+				</div>
+			</div>
+
+			{% block content %}
+				<div class="container">
+					<div class="all-header-container"></div>
+
+					<div class="head-container">
+						<img class="head-container-icon" src="{% static 'images/icons8-bag-24.png' %}">
+						<span class="head-container-name">پنل {% if user_type == 1 %}خریدار {% elif user_type == 2 %}
+							فروشنده عمده{% else %}فروشنده {% endif %}</span>
+					</div>
+					<div class="main-container">
+						<div class="main-container-header">
+							<img src="{% static 'images/icons8-customer-72.png' %}" width="90px">
+							<p class="main-container-p">شما به عنوان <span
+									class="panel-name-change">{% if user_type == 1 %}خریدار {% elif user_type == 2 %}
+								فروشنده عمده{% else %}فروشنده {% endif %}</span><br>
+								از امکانات ویژه ی <span class="panel-name2-change">{% if user_type == 1 %}
+									خریدار {% elif user_type == 2 %} عمده فروشنده{% else %}فروشنده {% endif %} </span>استفاده
+								کنید</p>
+						</div>
+
+						{% if user_type == 1 and section == 'dashboard' %}
+							<div class="all-three-div">
+								<a href="{% url 'user_panel:view_cart' %}">
+									<div class="orders-div col">
+										<img src="{% static 'images/icons8-add-to-cart-96.png' %}">
+										<h3>سفارشات من</h3>
+										<p>پیگیری سفارشات اخیر شما</p>
+									</div>
+								</a>
+								<a href="#">
+									<div class="intrests-div col">
+										<img src="{% static 'images/icons8-heart-96.png' %}">
+										<h3>علاقه مندی ها</h3>
+										<p>محصولات مورد علاقه ی شما</p>
+									</div>
+								</a>
+								<a href="#">
+									<div class="history-div col">
+										<img src="{% static 'images/icons8-activity-history-100.png' %}">
+										<h3>تاریخچه ی خرید</h3>
+										<p>تاریخچه ی تمام خرید های شما</p>
+									</div>
+								</a>
+							</div>
+						{% elif user_type == 2 %}
+							<div class="all-three-div">
+								<a href="{% url 'user_panel:view_cart' %}">
+									<div class="orders-div col">
+										<img src="{% static 'images/icons8-add-to-cart-96.png' %}">
+										<h3>سفارشات من</h3>
+										<p>پیگیری سفارشات اخیر شما</p>
+									</div>
+								</a>
+								<a href="#">
+									<div class="intrests-div col">
+										<img src="{% static 'images/icons8-heart-96.png' %}">
+										<h3>علاقه مندی ها</h3>
+										<p>محصولات مورد علاقه ی شما</p>
+									</div>
+								</a>
+								<a href="#">
+									<div class="history-div col">
+										<img src="{% static 'images/icons8-activity-history-100.png' %}">
+										<h3>تاریخچه ی خرید</h3>
+										<p>تاریخچه ی تمام خرید های شما</p>
+									</div>
+								</a>
+							</div>
+						{% else %}
+							<div class="all-three-div">
+								<a href="{% url 'user_panel:view_cart' %}">
+									<div class="orders-div col">
+										<img src="{% static 'images/icons8-add-to-cart-96.png' %}">
+										<h3>سفارشات من</h3>
+										<p>پیگیری سفارشات اخیر شما</p>
+									</div>
+								</a>
+								<a href="#">
+									<div class="intrests-div col">
+										<img src="{% static 'images/icons8-heart-96.png' %}">
+										<h3>علاقه مندی ها</h3>
+										<p>محصولات مورد علاقه ی شما</p>
+									</div>
+								</a>
+								<a href="#">
+									<div class="history-div col">
+										<img src="{% static 'images/icons8-activity-history-100.png' %}">
+										<h3>تاریخچه ی خرید</h3>
+										<p>تاریخچه ی تمام خرید های شما</p>
+									</div>
+								</a>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+
+			{% endblock %}
+		</div>
+	</div>
+
+</div>
+<div class="footer-warning">
+	<p>    {{ current_jalali_year }} © تمامی حقوق این سایت محفوظ است.</p>
+
 </div>
 
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/jquery.js' %}"></script>
 
 <script>
-const hamburger = document.getElementById('hamburger');
-const closeBtn = document.getElementById('closeBtn');
-const sideMenu = document.getElementById('sideMenu');
-const allDivContainer = document.querySelector('.all-div-container');
+    const hamburger = document.getElementById('hamburger');
+    const closeBtn = document.getElementById('closeBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const allDivContainer = document.querySelector('.all-div-container');
 
-// حالت اولیه
-allDivContainer.style.width = '90%';
-allDivContainer.style.marginRight = '5%';
-
-hamburger.addEventListener('click', () => {
-    sideMenu.classList.add('open');
-    allDivContainer.style.width = '70%';
-    allDivContainer.style.marginRight = '20%';
-
-    // مخفی کردن همبرگر
-    hamburger.style.visibility = 'hidden';
-    // یا می‌تونی display رو هم امتحان کنی: hamburger.style.display = 'none';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.classList.remove('open');
+    // حالت اولیه
     allDivContainer.style.width = '90%';
     allDivContainer.style.marginRight = '5%';
 
-    // نمایش مجدد همبرگر
-    hamburger.style.visibility = 'visible';
-    // یا hamburger.style.display = 'block';
-});
+    hamburger.addEventListener('click', () => {
+        sideMenu.classList.add('open');
+        allDivContainer.style.width = '70%';
+        allDivContainer.style.marginRight = '20%';
 
-{% block custom_js %}{% endblock %}
+        // مخفی کردن همبرگر
+        hamburger.style.visibility = 'hidden';
+        // یا می‌تونی display رو هم امتحان کنی: hamburger.style.display = 'none';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        sideMenu.classList.remove('open');
+        allDivContainer.style.width = '90%';
+        allDivContainer.style.marginRight = '5%';
+
+        // نمایش مجدد همبرگر
+        hamburger.style.visibility = 'visible';
+        // یا hamburger.style.display = 'block';
+    });
+
+
 </script>
+{% block custom_js %}{% endblock %}

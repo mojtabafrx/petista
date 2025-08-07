@@ -1,25 +1,31 @@
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db import transaction
+from django.db.models import Count
 from django.db.models.expressions import RawSQL
-from django.shortcuts import render , get_object_or_404
-from django.http import JsonResponse
-from .decorators import user_panel_access, seller_required
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
+
 from account.models import Profile
 from product.models import Category, Product
-from .models import SellerProduct , Cart , CartItem ,Order, OrderItem
-from django.core.paginator import Paginator
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
-from django.db import transaction
-from django.views.decorators.http import require_POST
-from django.db.models import Count
+from .decorators import user_panel_access, seller_required, redirect_superusers
+from .forms import ProductForm
+from .models import SellerProduct, Cart, CartItem
 
+
+@login_required(login_url='account:login')
 @user_panel_access
+@redirect_superusers
 def dashboard(request):
     """ویو اصلی پنل کاربری"""
     # فقط برای فروشندگان دسته‌بندی‌ها را فراخوانی می‌کنیم
     categories = None
     if request.user.profile.user_type == Profile.SELLER_USER:
         categories = Category.objects.active()
-    
+
     context = {
         'user_type': request.user.profile.user_type,
         'categories': categories,
@@ -27,19 +33,29 @@ def dashboard(request):
     }
     return render(request, 'user_panel/dashboard.html', context)
 
+
 @user_panel_access
 def get_products(request):
     """دریافت محصولات با AJAX بر اساس دسته‌بندی"""
     category_id = request.GET.get('category_id')
     if not category_id:
         return JsonResponse([], safe=False)
-    
-    products = Product.objects.filter(
-        category_id=category_id,
-        status=1  # موجود
-    ).values('id', 'title')
-    
+    user_type = request.user.profile.user_type
+    if user_type == Profile.SELLER_USER:
+        products = Product.objects.filter(
+            category_id=category_id,
+            product_type=2,
+            status=1  # موجود
+        ).values('id', 'title')
+    else:
+        products = Product.objects.filter(
+            category_id=category_id,
+            product_type=1,
+            status=1  # موجود
+        ).values('id', 'title')
+
     return JsonResponse(list(products), safe=False)
+
 
 @user_panel_access
 @seller_required
@@ -49,18 +65,19 @@ def add_seller_product(request):
         product_id = request.POST.get('product')
         price = request.POST.get('price')
         stock = request.POST.get('stock')
-        
+
         try:
             product = Product.objects.get(id=product_id)
             # ایجاد یا به‌روزرسانی محصول فروشنده
             SellerProduct.objects.update_or_create(
                 seller=request.user,
                 product=product,
-                defaults={'price': price, 'stock': stock , 'available_count': stock}
+                defaults={'price': price, 'stock': stock, 'available_count': stock}
             )
-            return JsonResponse({'success': True, 'message': 'محصول با موفقیت ثبت شد'})
+
+            return (HttpResponseRedirect(reverse('user_panel:my_products')))
         except Product.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'محصول معتبر نیست'})
+            return (HttpResponseRedirect(reverse('user_panel:add_seller_product')))
     else:
         categories = Category.objects.active().annotate(product_count=Count('products')).filter(product_count__gt=0)
         context = {
@@ -68,8 +85,7 @@ def add_seller_product(request):
             'categories': categories,
             'section': 'dashboard'  # بخش پیش‌فرض
         }
-        return render(request, 'user_panel/add_seller_product.html' , context)
-
+        return render(request, 'user_panel/add_seller_product.html', context)
 
 
 @user_panel_access
@@ -78,18 +94,18 @@ def my_products(request):
     """نمایش محصولات ثبت شده توسط فروشنده"""
     # دریافت محصولات فروشنده
     seller_products = SellerProduct.objects.filter(seller=request.user).order_by('-created_at')
-    
+
     # صفحه‌بندی
     page = request.GET.get('page', 1)
     paginator = Paginator(seller_products, 10)  # 10 محصول در هر صفحه
-    
+
     try:
         products_page = paginator.page(page)
     except PageNotAnInteger:
         products_page = paginator.page(1)
     except EmptyPage:
         products_page = paginator.page(paginator.num_pages)
-    
+
     context = {
         'user_type': request.user.profile.user_type,
         'products_page': products_page,
@@ -104,7 +120,7 @@ def delete_product(request):
     """حذف محصول فروشنده با AJAX"""
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
-        
+
         try:
             product = SellerProduct.objects.get(
                 id=product_id,
@@ -114,8 +130,9 @@ def delete_product(request):
             return JsonResponse({'success': True, 'message': 'محصول با موفقیت حذف شد'})
         except SellerProduct.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'محصول یافت نشد'})
-    
+
     return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+
 
 # اضافه کردن ویو برای دریافت اطلاعات محصول جهت ویرایش
 @user_panel_access
@@ -136,26 +153,21 @@ def get_product_details(request):
     except SellerProduct.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'محصول یافت نشد'})
 
+
 # اضافه کردن ویو برای ذخیره تغییرات ویرایش
 @user_panel_access
 @seller_required
-def edit_seller_product(request):
+def edit_seller_product(request, product_id=None):
     """ویرایش محصول فروشنده"""
+    product = SellerProduct.objects.get(id=product_id, seller=request.user)
+    form = ProductForm(request.POST or None, instance=product)
+
     if request.method == 'POST':
-        product_id = request.POST.get('product_id')
-        price = request.POST.get('price')
-        stock = request.POST.get('stock')
-        
-        try:
-            product = SellerProduct.objects.get(id=product_id, seller=request.user)
-            product.price = price
-            product.stock = stock
-            product.save()
-            return JsonResponse({'success': True, 'message': 'تغییرات با موفقیت ذخیره شد'})
-        except SellerProduct.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'محصول یافت نشد'})
-    
-    return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse("user_panel:my_products"))
+
+    return render(request, 'user_panel/seller_edit_product.html', context={'form': form})
 
 
 @user_panel_access
@@ -166,7 +178,8 @@ def change_password(request):
             user = form.save()
             # بروزرسانی session برای جلوگیری از خروج کاربر
             update_session_auth_hash(request, user)
-            return render(request, 'user_panel/dashboard.html', context={'message': 'رمز عبور شما با موفقیت تغییر یافت'})
+            return render(request, 'user_panel/dashboard.html',
+                          context={'message': 'رمز عبور شما با موفقیت تغییر یافت'})
         else:
             errors = []
             for field, field_errors in form.errors.items():
@@ -182,22 +195,24 @@ def change_password(request):
         return render(request, 'user_panel/change_password.html', context)
 
 
-
+@redirect_superusers
 @user_panel_access
 def view_cart(request):
     """نمایش سبد خرید"""
     # یافتن سبد خرید فعال کاربر
     # cart = Cart.objects.get_or_create(user=request.user, is_active=True)
-    cart = Cart.objects.filter(user=request.user, is_active=True)
+    cart = Cart.objects.filter(user=request.user, is_active=True).first()
     context = {
         'cart': cart,
         'user_type': request.user.profile.user_type,
         'section': 'cart'
     }
-    if cart :
+    if cart:
         return render(request, 'user_panel/shopping-cart.html', context)
     return render(request, 'user_panel/no_product.html', context)
 
+
+@redirect_superusers
 @user_panel_access
 def add_to_cart(request, product_id):
     """افزودن محصول به سبد خرید"""
@@ -274,17 +289,17 @@ def add_to_cart(request, product_id):
         }, status=400)
 
 
-
-@user_panel_access
-def cart_detail(request):
-    """نمایش جزئیات سبد خرید"""
-    cart = get_object_or_404(Cart, user=request.user, is_active=True)
-    context = {
-        'cart': cart,
-        'user_type': request.user.profile.user_type,
-        'section': 'cart'
-    }
-    return render(request, 'user_panel/cart_detail.html', context)
+#
+# @user_panel_access
+# def cart_detail(request):
+#     """نمایش جزئیات سبد خرید"""
+#     cart = get_object_or_404(Cart, user=request.user, is_active=True)
+#     context = {
+#         'cart': cart,
+#         'user_type': request.user.profile.user_type,
+#         'section': 'cart'
+#     }
+#     return render(request, 'user_panel/cart_detail.html', context)
 
 
 @user_panel_access
@@ -347,14 +362,12 @@ def remove_cart_item(request, item_id):
         return JsonResponse({'success': False, 'error': str(e)})
 
 
-
-
 # for Orders section ->
 
 @user_panel_access
 def my_orders(request):
     """نمایش سفارشات کاربر"""
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    orders = Cart.objects.filter(user=request.user).exclude(status=Cart.PROCESSING).order_by('-created_at')
 
     # صفحه‌بندی
     page = request.GET.get('page', 1)
@@ -372,13 +385,13 @@ def my_orders(request):
         'orders_page': orders_page,
         'section': 'my_orders'  # برای شناسایی بخش در تمپلیت
     }
-    return render(request, 'user_panel/dashboard.html', context)
+    return render(request, 'user_panel/orders_list.html', context)
 
 
 @user_panel_access
 def order_details(request, order_id):
     """دریافت جزئیات یک سفارش به صورت JSON"""
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(Cart, id=order_id, user=request.user)
     items = order.items.all().select_related('seller_product__product', 'seller_product__seller')
 
     # ساخت لیست آیتم‌ها
@@ -407,11 +420,10 @@ def order_details(request, order_id):
 
 
 @user_panel_access
-@require_POST
 @transaction.atomic
-def checkout(request):
+def checkout(request, cart_id):
     """پرداخت نهایی و ایجاد سفارش"""
-    cart = get_object_or_404(Cart, user=request.user, is_active=True)
+    cart = get_object_or_404(Cart, user=request.user, pk=cart_id)
 
     # بررسی وجود آیتم در سبد خرید
     if cart.items.count() == 0:
@@ -419,48 +431,33 @@ def checkout(request):
 
     # بررسی موجودی کافی برای همه محصولات
     for item in cart.items.all():
-        if ( item.seller_product.stock - item.seller_product.sell_count ) < item.quantity:
+        if (item.seller_product.stock - item.seller_product.sell_count) < item.quantity:
             return JsonResponse({
                 'success': False,
                 'error': f'موجودی کافی برای محصول {item.seller_product.product.title} وجود ندارد'
             })
 
     try:
-        # ایجاد سفارش جدید
-        order = Order.objects.create(
-            user=request.user,
-            total_price=cart.total_price(),
-            status='processing'  # وضعیت اولیه: در حال پردازش
-        )
+        #     # ایجاد سفارش جدید
+        #     order = Cart.objects.create(
+        #         user=request.user,
+        #         total_price=cart.total_price(),
+        #         status='pending'  # وضعیت اولیه: در حال پردازش
+        #     )
+        #
+        #     # ایجاد آیتم‌های سفارش
+        #     for cart_item in cart.items.all():
+        #
+        #         # ایجاد آیتم سفارش
+        #         OrderItem.objects.create(
+        #             order=order,
+        #             seller_product=cart_item.seller_product,
+        #             quantity=cart_item.quantity,
+        #             price=cart_item.seller_product.price
+        #         )
 
-        # ایجاد آیتم‌های سفارش
-        for cart_item in cart.items.all():
-            # کاهش موجودی اصلی (stock) و افزایش sell_count
-            seller_product = cart_item.seller_product
-            # seller_product.available_count -= cart_item.quantity
-            seller_product.sell_count += cart_item.quantity
-            seller_product.save()
+        return HttpResponseRedirect(reverse('transaction:request', kwargs={'order_id': cart.id}))
 
-            # ایجاد آیتم سفارش
-            OrderItem.objects.create(
-                order=order,
-                seller_product=cart_item.seller_product,
-                quantity=cart_item.quantity,
-                price=cart_item.seller_product.price
-            )
-
-
-        # غیرفعال کردن سبد خرید فعلی و ایجاد سبد جدید
-        cart.is_active = False
-        cart.save()
-        Cart.objects.create(user=request.user)
-
-
-        return JsonResponse({
-            'success': True,
-            'message': 'سفارش شما با موفقیت ثبت شد',
-            'order_id': order.id
-        })
 
     except Exception as e:
         return JsonResponse({
@@ -469,4 +466,5 @@ def checkout(request):
         })
 
 
-
+def seller_orders(request):
+    return render(request, 'user_panel/seller_orders.html')

@@ -18,18 +18,18 @@ class Profile(models.Model):
     MARKERE_USER = 5
 
     USER_TYPES = (
-        (1, 'خریدار معمولی'),
-        (2, 'تولیدکننده'),
-        (3, 'فروشنده'),
-        (4, 'ادمین'),
-        (5, 'بازاریاب'),
+        (NORMAL_USER, 'خریدار معمولی'),
+        (PRODUCER_USER, 'تولیدکننده'),
+        (SELLER_USER, 'فروشنده'),
+        (ADMIN_USER, 'ادمین'),
+        (MARKERE_USER, 'بازاریاب'),
     )
 
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     user_type = models.IntegerField(
         choices=USER_TYPES,
-        default=1,
+        default=NORMAL_USER,
         null=True,
         blank=True
     )

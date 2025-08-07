@@ -19,7 +19,7 @@
     background-color: #8ae2d2;
     color: #000;
     font-weight: bold;
-    margin-top: 1%;
+    margin: 1%;
 }
 
 .qty-controls {
@@ -64,7 +64,7 @@
 }
 
 .cart-summary {
-    margin-top: 30px;
+    margin: 1%;
     text-align: left;
     font-size: 18px;
     font-weight: bold;
@@ -76,35 +76,43 @@
 .cart-actions {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px;
+    margin: 2% 0px;
 }
 
 .cart-actions button {
     flex: 1;
-    padding: 12px;
+    padding: 15px 35px;
     font-size: 16px;
-    border-radius: 8px;
+    border-radius: 7px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .continue-btn {
     background-color: var(--main-color);
-    border: 1px solid gray;
-    color: #333;
+    border: none;
+    color: #1c1c1c;
+    width: 98%;
+    margin-right: 2%;
 }
-.continue-btn:hover{
+
+.continue-btn:hover {
     background-color: var(--main-color-two);
+    color: #fff;
 }
+
 .checkout-btn {
     background-color: var(--main-color);
     border: none;
-    color: #000;
+    color: #1c1c1c;
+    width: 98%;
 }
 
 .checkout-btn:hover {
     background-color: var(--main-color-two);
+    color: #fff;
 }
 
 @media (max-width: 768px) {
@@ -151,4 +159,11 @@
     width: 100%;
 }
 
+.head-container-icon {
+    margin: 1%;
+}
+
 /*footer warning*/
+.cart-actions a {
+    width: 50%;
+}
