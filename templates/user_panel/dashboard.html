@@ -13,6 +13,7 @@
 <body>
 
 <div class="all-header-div-main-site">
+
 	<div class="all-header">
 		<div class="header-div">
 			<!-- آیکن همبرگر -->
@@ -22,6 +23,12 @@
 			</div>
 			<div class="header-left-content">
 				<div class="main-home-col">
+					<a href="{% url 'account:logout' %}" class="exit-link">
+						<button class="exit-but">
+							<img src="{% static 'images/icons8-exit-100.png' %}">
+							خروج
+						</button>
+					</a>
 					<a href="{% url 'home:home' %}">
 						<img src="{% static 'images/icons8-home-100.png' %}" width="50px" height="50px"/>
 
@@ -38,7 +45,52 @@
 		</div>
 
 	</div>
+	{% if messages %}
+		{% for message in messages %}
+			<div class="all-alert-bar">
+				<div id="alertBar"
+				     class="alert-bar {% if message.tags == "error" %} error {% endif %}">
+					<div class="right-alert">
+						<img class="alert-icon" src="
 
+
+
+
+
+
+
+
+
+
+
+
+
+								{% if "error" in message.tags %}{% static 'images/icons8-error-100.png' %}{% else %}{% static 'images/icons8-tick-box-48.png' %}{% endif %}">
+						<p>{{ message }}</p>
+					</div>
+					<button onclick="closeAlert()"
+					        class="{% if "error" in message.tags %}exit-button error{% else %} exit-button {% endif %}">
+						<img src="
+
+
+
+
+
+
+
+
+
+
+
+
+
+								{% if "error" in message.tags %}{% static 'images/icons8-error-50.png' %}{% else %}{% static 'images/icons8-close-48.png' %}{% endif %}"
+						     class="exit-button-img">
+					</button>
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
 
 	<!-- منوی کناری -->
 	<div class="side-menu" id="sideMenu">
@@ -125,16 +177,18 @@
 	<!-- محتوای تب‌ها -->
 	<div class="tab-content active" id="tab1">
 		<div class="all-div-container">
-			<div class="all-container">
-				<div class="header-container">
-					<h3 class="top-welcome">خوش آمدید</h3>
+			{% block welcome %}
+				<div class="all-container">
+					<div class="header-container">
+						<h3 class="top-welcome">خوش آمدید</h3>
+					</div>
+					<div class="panel">
+						<img class="panel-icon" src="{% static 'images/icons8-customer-64.png' %}">
+						<span class="panel-name">{% if user_type == 1 %}خریدار {% elif user_type == 2 %}فروشنده
+							عمده{% else %}فروشنده {% endif %}</span>
+					</div>
 				</div>
-				<div class="panel">
-					<img class="panel-icon" src="{% static 'images/icons8-customer-64.png' %}">
-					<span class="panel-name">{% if user_type == 1 %}خریدار {% elif user_type == 2 %}فروشنده
-						عمده{% else %}فروشنده {% endif %}</span>
-				</div>
-			</div>
+			{% endblock %}
 
 			{% block content %}
 				<div class="container">
@@ -147,7 +201,7 @@
 					</div>
 					<div class="main-container">
 						<div class="main-container-header">
-							<img src="{% static 'images/icons8-customer-72.png' %}" width="90px">
+							<img src="{% static 'images/icons8-user-100.png' %}" width="90px">
 							<p class="main-container-p">شما به عنوان <span
 									class="panel-name-change">{% if user_type == 1 %}خریدار {% elif user_type == 2 %}
 								فروشنده عمده{% else %}فروشنده {% endif %}</span><br>
@@ -161,22 +215,22 @@
 								<a href="{% url 'user_panel:view_cart' %}">
 									<div class="orders-div col">
 										<img src="{% static 'images/icons8-add-to-cart-96.png' %}">
-										<h3>سفارشات من</h3>
-										<p>پیگیری سفارشات اخیر شما</p>
+										<h3>سبد خرید</h3>
+										<p>دیدن سبد خرید شما</p>
 									</div>
 								</a>
-								<a href="#">
-									<div class="intrests-div col">
-										<img src="{% static 'images/icons8-heart-96.png' %}">
-										<h3>علاقه مندی ها</h3>
-										<p>محصولات مورد علاقه ی شما</p>
-									</div>
-								</a>
-								<a href="#">
+								{#								<a href="#">#}
+								{#									<div class="intrests-div col">#}
+								{#										<img src="{% static 'images/icons8-heart-96.png' %}">#}
+								{#										<h3>علاقه مندی ها</h3>#}
+								{#										<p>محصولات مورد علاقه ی شما</p>#}
+								{#									</div>#}
+								{#								</a>#}
+								<a href="{% url 'user_panel:my_orders' %}">
 									<div class="history-div col">
 										<img src="{% static 'images/icons8-activity-history-100.png' %}">
-										<h3>تاریخچه ی خرید</h3>
-										<p>تاریخچه ی تمام خرید های شما</p>
+										<h3>سفارشات شما</h3>
+										<p>دیدن سفارشات شما</p>
 									</div>
 								</a>
 							</div>
@@ -185,22 +239,16 @@
 								<a href="{% url 'user_panel:view_cart' %}">
 									<div class="orders-div col">
 										<img src="{% static 'images/icons8-add-to-cart-96.png' %}">
-										<h3>سفارشات من</h3>
-										<p>پیگیری سفارشات اخیر شما</p>
+										<h3>سبد خرید</h3>
+										<p>دیدن سبد خرید شما</p>
 									</div>
 								</a>
-								<a href="#">
-									<div class="intrests-div col">
-										<img src="{% static 'images/icons8-heart-96.png' %}">
-										<h3>علاقه مندی ها</h3>
-										<p>محصولات مورد علاقه ی شما</p>
-									</div>
-								</a>
-								<a href="#">
+
+								<a href="{% url 'user_panel:my_orders' %}">
 									<div class="history-div col">
 										<img src="{% static 'images/icons8-activity-history-100.png' %}">
-										<h3>تاریخچه ی خرید</h3>
-										<p>تاریخچه ی تمام خرید های شما</p>
+										<h3>سفارشات شما</h3>
+										<p>دیدن سفارشات شما</p>
 									</div>
 								</a>
 							</div>
@@ -209,22 +257,16 @@
 								<a href="{% url 'user_panel:view_cart' %}">
 									<div class="orders-div col">
 										<img src="{% static 'images/icons8-add-to-cart-96.png' %}">
-										<h3>سفارشات من</h3>
-										<p>پیگیری سفارشات اخیر شما</p>
+										<h3>سبد خرید</h3>
+										<p>دیدن سبد خرید شما</p>
 									</div>
 								</a>
-								<a href="#">
-									<div class="intrests-div col">
-										<img src="{% static 'images/icons8-heart-96.png' %}">
-										<h3>علاقه مندی ها</h3>
-										<p>محصولات مورد علاقه ی شما</p>
-									</div>
-								</a>
-								<a href="#">
+
+								<a href="{% url 'user_panel:my_orders' %}">
 									<div class="history-div col">
 										<img src="{% static 'images/icons8-activity-history-100.png' %}">
-										<h3>تاریخچه ی خرید</h3>
-										<p>تاریخچه ی تمام خرید های شما</p>
+										<h3>سفارشات شما</h3>
+										<p>دیدن سفارشات شما</p>
 									</div>
 								</a>
 							</div>
@@ -243,9 +285,25 @@
 </div>
 
 
+<div id="loader-overlay">
+	<div class="loader">
+		<span></span>
+		<span></span>
+		<span></span>
+		<span></span>
+	</div>
+	<div class="processing-text">در حال پردازش</div>
+</div>
+
+<div class="processing-text">در حال پردازش</div>
 <script src="{% static 'js/jquery.js' %}"></script>
 
 <script>
+
+    function closeAlert() {
+        document.getElementById('alertBar').classList.add('hidden');
+    }
+
     const hamburger = document.getElementById('hamburger');
     const closeBtn = document.getElementById('closeBtn');
     const sideMenu = document.getElementById('sideMenu');
@@ -275,6 +333,22 @@
         // یا hamburger.style.display = 'block';
     });
 
+    // توابع کنترل لودر
+    function showLoader(duration = 0) {
+        const loader = document.getElementById('loader-overlay');
+        loader.classList.add('active');
+
+        if (duration > 0) {
+            setTimeout(() => {
+                hideLoader();
+            }, duration);
+        }
+    }
+
+    function hideLoader() {
+        const loader = document.getElementById('loader-overlay');
+        loader.classList.remove('active');
+    }
 
 </script>
 {% block custom_js %}{% endblock %}

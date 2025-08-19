@@ -122,17 +122,18 @@
     overflow: hidden;
     transition: max-height 0.3s ease;
     background-color: #f9f9f9;
-    padding: 0 15px;
+    /*padding: 0 15px;*/
     margin-bottom: 10px;
     font-size: 14px;
     color: #333;
     border-right: 3px solid var(--main-color);
 }
 
+
 .order-collapse.open {
-    max-height: 200px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    max-height: fit-content;
+    /*padding-top: 10px;*/
+    /*padding-bottom: 10px;*/
 }
 
 .arrow-icon {
@@ -148,10 +149,12 @@
     flex-grow: 1;
     height: 10vh;
     width: 100%;
+    flex-direction: column;
+    height: fit-content;
 }
 
 .all-collapse-content div {
-    width: 50%;
+    width: 100%;
 }
 
 .all-collapse-content label {
@@ -161,6 +164,10 @@
 
 /* حالت موبایل */
 @media (max-width: 995px) {
+    .bottom-content h3 {
+        font-size: 13px;
+    }
+
     .order-header {
         display: none;
     }
@@ -212,25 +219,199 @@
     }
 
     .all-collapse-content {
-        flex-direction: column;
+        flex-direction: row;
         width: 100%;
     }
 
     .all-collapse-content div {
-        width: 100%;
-        height: 6vh;
+        width: 50%;
+        height: fit-content;
         display: flex;
         align-items: center;
+        flex-direction: column;
     }
-    .order-row{
+
+    .product-header {
+        gap: 15px;
+    }
+
+    .product-item {
+        gap: 5px;
+    }
+
+    .order-row {
         padding-bottom: 0;
     }
+
+    .order-collapse {
+        width: 97%;
+    }
 }
-.all-collapse-content{
+
+.all-collapse-content {
     padding-left: 0;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 
 }
-.order-collapse{
+
+.order-collapse {
     padding-left: 0;
+}
+
+/* استایل‌های جدید برای بخش محصولات */
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.product-info {
+    display: flex;
+    gap: 10px;
+}
+
+.collapse-summary {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+    font-weight: bold;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    color: #888;
+}
+
+/* بهبود استایل وضعیت‌ها */
+.status {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.paid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.processing {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* استایل‌های جدید برای بخش محصولات */
+.product-header {
+    /*display: grid;*/
+    /*grid-template-columns: 2fr 1fr 1fr 1fr;*/
+    font-weight: bold;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 10px;
+    display: flex;
+    width: 100%;
+}
+
+.product-item {
+    /*display: grid;*/
+    /*grid-template-columns: 2fr 1fr 1fr 1fr;*/
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.product-name, .product-quantity, .product-price, .product-total {
+    padding: 5px;
+}
+
+.collapse-summary {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+    font-weight: bold;
+    text-align: right;
+}
+
+.no-orders {
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    color: #888;
+}
+
+/* بهبود استایل وضعیت‌ها */
+.status {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.paid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.processing {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* چرخش فلش */
+.rotate {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+.product-item div, .product-header div {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.bottom-content {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 3%;
+    gap: 5%;
+}
+
+.bottom-botton {
+    background: none;
+    border: none;
+    background-color: var(--main-color);
+    cursor: pointer;
+    padding: 10px 15px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(138, 226, 210, 0.4); /* سایه رنگ‌دار */
+
+}
+
+.bottom-botton:hover {
+    background-color: var(--main-color-two);
+    transition: all 0.3s ease-in;
+    color: white;
+
+
 }

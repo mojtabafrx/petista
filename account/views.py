@@ -5,8 +5,9 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth import login as default_login, authenticate, logout as auth_logout
 from django.contrib.auth.models import User
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
@@ -19,28 +20,43 @@ def signup(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             # ساخت کاربر جدید
-            user = form.save(commit=False)
-            user.username = form.cleaned_data['phone_number']  # استفاده از شماره تلفن به عنوان نام کاربری
-            user.set_password = form.cleaned_data['password1']
-            user.is_active = False
-            user.save()
+            if not form.user_exist:
+                user = form.save(commit=False)
+                user.username = form.cleaned_data['phone_number']  # استفاده از شماره تلفن به عنوان نام کاربری
+                user.set_password = form.cleaned_data['password1']
+                user.is_active = False
+                user.save()
 
-            # ساخت پروفایل
-            profile = Profile.objects.create(
-                user=user,
-                user_type=form.cleaned_data['user_type'],
-            )
+                # ساخت پروفایل
+                profile = Profile.objects.create(
+                    user=user,
+                    user_type=form.cleaned_data['user_type'],
+                )
 
-            ver = VerificationCode.objects.create(
-                code_type=VerificationCode.REGISTRATION_VERIFY,
-                code=str(random.randint(100000, 999999)),
-                profile=profile,
-                expires_at=timezone.now() + timedelta(minutes=5)
-            )
+                ver = VerificationCode.objects.create(
+                    code_type=VerificationCode.REGISTRATION_VERIFY,
+                    code=str(random.randint(100000, 999999)),
+                    profile=profile,
+                    expires_at=timezone.now() + timedelta(minutes=2)
+                )
+            else:
+                ver = VerificationCode.objects.create(
+                    code_type=VerificationCode.REGISTER_EXIST_USER,
+                    code=str(random.randint(100000, 999999)),
+                    profile=form.user_exist.profile,
+                    expires_at=timezone.now() + timedelta(minutes=2)
+                )
             # اینجا باید کد تأیید را به شماره کاربر ارسال کنید (با استفاده از سرویس SMS)
             # send_sms(profile.phone_number, f'کد تأیید شما: {profile.verification_code}')
 
             return redirect('account:verify', ver.id)
+        else:
+            # messages.error(request, 'اطلاعات ورودی را بررسی کنید')
+            for err in form.errors.values():
+                messages.error(request, err)
+            return render(request, 'registration/signup.html', {
+                'form': form,
+            })
     else:
         form = SignupForm()
     return render(request, 'registration/signup.html', {'form': form})
@@ -72,8 +88,13 @@ def verify(request, ver_id):
                     profile.save()
                     user.save()
                     default_login(request, user)
-                    return redirect('home:home')  # صفحه اصلی بعد از ورود
-
+                    return redirect('home:home')
+                    # صفحه اصلی بعد از ورود
+                elif ver.code_type == VerificationCode.REGISTER_EXIST_USER:
+                    messages.error(request,
+                                   "کاربری شما با این شماره از قبل وجود داشت در دفعات بعدی برای ورود از صفحه ورود استفاده کنید.")
+                    default_login(request, ver.profile.user)
+                    return redirect('user_panel:dashboard')
             else:
                 messages.error(request, 'کد تأیید نامعتبر است یا زمان آن به پایان رسیده است.')
                 # form.add_error('verification_code', 'کد تأیید نامعتبر است')
@@ -85,6 +106,49 @@ def verify(request, ver_id):
         'phone_number': phone_number,
         'expires_at': ver.expires_at
 
+    })
+
+
+def verify_otp(request, ver_id):
+    ver = VerificationCode.objects.filter(id=ver_id).first()
+
+    if ver is None:
+        expires_at = timezone.now() + timedelta(minutes=2)
+        messages.error(request, "کاربری با این شماره وجود ندارد")
+        return render(request, 'registration/verify_otp.html', {
+            'phone': request.session['phone_number'],
+            'ver_id': ver_id,
+            'expires_at': expires_at,
+        })
+    print(ver.code)
+    # print(ver.code)
+    profile = ver.profile
+    # استفاده از user.username به جای phone_number
+    phone_number = profile.user.username
+
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        now = timezone.now()
+
+        # بررسی کد
+        if code == ver.code and now < ver.expires_at:
+            # علامت گذاری کد به عنوان استفاده شده
+            ver.delete()
+
+            # ورود کاربر
+            default_login(request, profile.user)
+            return redirect('user_panel:dashboard')
+        else:
+            messages.error(request, 'کد وارد شده نامعتبر یا منقضی شده است')
+            return render(request, 'registration/verify_otp.html', {
+                'phone': phone_number,
+                'ver_id': ver_id,
+                'expires_at': ver.expires_at
+            })
+    return render(request, 'registration/verify_otp.html', {
+        'phone': phone_number,
+        'ver_id': ver_id,
+        'expires_at': ver.expires_at
     })
 
 
@@ -107,9 +171,20 @@ def login(request):
             # بررسی فعال بودن حساب کاربری
             if user.is_active:
                 default_login(request, user)
-                return redirect('home:home')
+                return redirect('user_panel:dashboard')
             else:
-                messages.error(request, 'حساب کاربری شما فعال نیست. لطفاً ابتدا حساب خود را تأیید کنید')
+                profile = Profile.objects.filter(user=user, is_active=False)
+
+                ver = VerificationCode.objects.create(
+                    code_type=VerificationCode.REGISTRATION_VERIFY,
+                    code=str(random.randint(100000, 999999)),
+                    profile=profile,
+                    expires_at=timezone.now() + timedelta(minutes=2)
+                )
+
+                messages.error(request,
+                               'حساب کاربری شما فعال نیست. لطفاً برای فعالسازی حساب خود کد تایید ارسال شده را وارد کنید')
+                return HttpResponseRedirect(reverse('account:verify', kwargs={'ver_id': ver.id}))
                 # password_form.add_error(None, "حساب کاربری شما فعال نیست. لطفاً ابتدا حساب خود را تأیید کنید")
         else:
             messages.error(request, 'شماره تلفن یا رمز عبور نادرست است.')
@@ -141,11 +216,12 @@ def login(request):
 
                 # ذخیره شناسه کاربر در سشن برای مرحله بعد
                 request.session['otp_user_id'] = user.id
+                #
+                # request.session['expires_at'] = ver.expires_at
 
                 return redirect('account:verify_otp', ver.id)
 
         except User.DoesNotExist:
-            print("nono")
             request.session['phone_number'] = username
             return redirect('account:verify_otp', uuid.uuid4())
             # messages.error(request, 'کاربری با این شماره تلفن ثبت‌نام نکرده است')
@@ -175,69 +251,32 @@ def login(request):
     return render(request, 'registration/login.html', context)
 
 
-def verify_otp(request, ver_id):
-    ver = VerificationCode.objects.filter(id=ver_id).first()
-    if ver is None:
-        expires_at = timezone.now() + timedelta(minutes=2)
-        return render(request, 'registration/verify_otp.html', {
-            'phone': request.session['phone_number'],
-            'ver_id': ver_id,
-            'expires_at': expires_at,
-        })
-
-    print(ver.code)
-    profile = ver.profile
-    # استفاده از user.username به جای phone_number
-    phone_number = profile.user.username
-
-    if request.method == 'POST':
-        code = request.POST.get('code')
-        now = timezone.now()
-
-        # بررسی کد
-        if code == ver.code and now < ver.expires_at:
-            # علامت گذاری کد به عنوان استفاده شده
-            ver.delete()
-
-            # ورود کاربر
-            default_login(request, profile.user)
-            return redirect('home:home')
-        else:
-            messages.error(request, 'کد وارد شده نامعتبر یا منقضی شده است')
-            return render(request, 'registration/verify_otp.html', {
-                'phone': phone_number,
-                'ver_id': ver_id,
-                'expires_at': ver.expires_at
-            })
-
-    return render(request, 'registration/verify_otp.html', {
-        'phone': phone_number,
-        'ver_id': ver_id,
-        'expires_at': ver.expires_at
-    })
-
-
 @csrf_exempt
-def resend_otp(request):
+def resend_otp(request, ver_id):
     if request.method == 'POST':
-        import json
-        data = json.loads(request.body)
-        ver_id = data.get('ver_id')
+        # import json
+        # data = json.loads(request.body)
+        # data = request.POST.get('data')['ver_id']
+        # ver_id = data.get('ver_id')
 
         try:
             ver = VerificationCode.objects.get(id=ver_id)
+            if (timezone.now() < ver.expires_at):
+                messages.error(request, 'هنوز زمان کافی برای ارسال دوباره کد سپری نشده')
+                return HttpResponseRedirect(reverse("account:verify_otp", kwargs={"ver_id": ver_id}))
             # ایجاد کد جدید
             new_code = str(random.randint(100000, 999999))
             ver.code = new_code
-            ver.expires_at = timezone.now() + timedelta(minutes=5)
+            ver.expires_at = timezone.now() + timedelta(minutes=2)
             ver.save()
-
             # ارسال پیامک (در حالت واقعی)
             # send_sms(ver.profile.phone_number, f"کد جدید شما: {new_code}")
 
-            return JsonResponse({'success': True})
+            messages.success(request, 'کد جدید ارسال شد')
+            return HttpResponseRedirect(reverse("account:verify_otp", kwargs={"ver_id": ver_id}))
         except VerificationCode.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'کد تأیید یافت نشد'})
+            messages.error(request, 'کد تأیید یافت نشد')
+            return HttpResponseRedirect(reverse("account:verify_otp", kwargs={"ver_id": ver_id}))
 
     return JsonResponse({'success': False, 'error': 'درخواست نامعتبر'})
 
@@ -246,4 +285,4 @@ def logout(request):
     """ویو ساده برای خروج کاربر"""
     auth_logout(request)
     messages.success(request, 'شما با موفقیت از سیستم خارج شدید.')
-    return redirect('home:home')
+    return redirect('account:login')

@@ -1,248 +1,273 @@
 {% extends 'base/base.html' %}
 {% load static %}
-
+{% load humanize %}
 {% block title %}{{ product.title }}{% endblock %}
-
+{% block custom_css %}
+	<link rel="stylesheet" href={% static '/css/detail.css' %}>
+{% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-md-12 mb-4">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'product:product_list' %}">خانه</a></li>
-                {% if product.category %}
-                    <li class="breadcrumb-item">
-                        <a href="{{ product.category.get_absolute_url }}">
-                            {{ product.category.title }}
-                        </a>
-                    </li>
-                {% endif %}
-                <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
-            </ol>
-        </nav>
-    </div>
-</div>
+	<div class="container">
+		<div class="product-container">
+			<!-- ستون سمت راست: گالری محصول -->
+			<div class="product-gallery">
+				<div class="gallery-main">
+					{% if images %}
+						<img id="main-image" src="{{ images.0.image.url }}" alt="{{ product.title }}">
+					{% else %}
+						<img id="main-image" src="{% static 'images/default-product.jpg' %}" alt="{{ product.title }}">
+					{% endif %}
+				</div>
+				<div class="gallery-thumbs" id="gallery-thumbs">
 
-<div class="row">
-    <!-- گالری تصاویر -->
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-body">
-                <!-- تصویر اصلی -->
-                <div class="text-center mb-3">
-                    {% if images %}
-                        <img src="{{ images.image.url }}" 
-                             class="img-fluid rounded" 
-                             alt="{{ product.title }}"
-                             id="main-image">
-                    {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center rounded" 
-                             style="height: 400px;">
-                            <span class="text-muted">بدون تصویر</span>
-                        </div>
-                    {% endif %}
-                </div>
-                
-                <!-- تصاویر فرعی -->
-                <div class="d-flex flex-wrap justify-content-center">
-                    {% for image in additional_images %}
-                        <div class="m-2" style="width: 80px; cursor: pointer;" 
-                             onclick="document.getElementById('main-image').src = '{{ image.image.url }}'">
-                            <img src="{{ image.image.url }}" 
-                                 class="img-thumbnail" 
-                                 alt="{{ image.alt_text|default:product.title }}"
-                                 style="height: 80px; width: 100%; object-fit: cover;">
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- اطلاعات محصول -->
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-body">
-                <h1 class="h2">{{ product.title }}</h1>
-                
-                <div class="d-flex justify-content-between align-items-center my-3">
-                    <div>
-                        <span class="h3 text-primary">{{ product.min_price|floatformat:"0" }}
-                        {% if product.total_available > 0 %}
+				</div>
+			</div>
 
-                                    تومان
-                        {% else %}
-                                    محصول موجود نیست
-                        {% endif %}
-                        </span>
-                    </div>
-                    
-                    <div>
-                        <span class="badge {% if product.total_available > 0 %}bg-success{% else %}bg-danger{% endif %}">
-                                {% if product.total_available > 0 %}
-                                    {{ product.total_available  }}
-                                    موجود
-                                {% else %}
-                                    ناموجود
-                                {% endif %}
-                        </span>
-                        <span class="badge bg-info ms-2">
-                            {{ product.get_product_type_display }}
-                        </span>
-                    </div>
-                </div>
-                
-                <hr>
-                
-                <div class="mb-4">
-                    <h5>مشخصات محصول</h5>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>موجودی:</span>
-                            <span class="badge">
-                                {% if product.total_available > 0 %}
-                                    {{ product.total_available  }}
-                                    عدد
-                                {% else %}
-                                    ناموجود
-                                {% endif %}
-                            </span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>حداقل سفارش:</span>
-                            <span>{{ product.minimum_order }} عدد</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between">
-                            <span>دسته‌بندی:</span>
-                            <span>
-                                {% if product.category %}
-                                    <a href="{{ product.category.get_absolute_url }}">
-                                        {{ product.category.title }}
-                                    </a>
-                                {% else %}
-                                    -
-                                {% endif %}
-                            </span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="d-grid gap-2 mb-4">
-                    <!-- جایگزینی دکمه قدیمی -->
-                    {% if product.total_available > 0 %}
-                        <button class="btn btn-primary btn-lg add-to-cart" type="button" data-id="{{ product.id }}">
-                            <i class="fas fa-cart-plus me-2"></i>افزودن به سبد خرید
-                        </button>
-                    {% else %}
-                        <button class="btn btn-primary btn-lg add-to-cart" type="button" data-id="{{ product.id }}" disabled>
-                            <i class="fas fa-cart-plus me-2"></i>افزودن به سبد خرید
-                        </button>
-                    {% endif %}
+			<!-- ستون وسط: توضیحات محصول -->
+			<div class="product-description">
+				<h2>{{ product.title }}</h2>
+				<p>{{ product.description|safe }}</p>
+			</div>
 
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+			<!-- ستون سمت چپ: اطلاعات محصول -->
+			<div class="product-info">
+				<div class="price-container">
+					<div class="price">{% if product.min_price == None %} عدم موجودی در انبار{% else %}{{ product.min_price|intcomma }} تومان {% endif %}</div>
+{#					{% if product.old_price %}#}
+{#						<div class="original-price">{{ product.old_price|intcomma }} تومان</div>#}
+{#						{% if product.old_price > product.min_price %}#}
+{#							<div class="discount">#}
+{#								{% with discount=((product.old_price - product.min_price) / product.old_price * 100)|floatformat:"0" %}#}
+{#									{{ discount }}% تخفیف#}
+{#								{% endwith %}#}
+{#							</div>#}
+{#						{% endif %}#}
+{#					{% endif %}#}
+				</div>
 
-<!-- توضیحات محصول -->
-<div class="row mt-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">توضیحات محصول</h5>
-            </div>
-            <div class="card-body">
-                {% if product.description %}
-                    <p class="card-text">{{ product.description|linebreaks }}</p>
-                {% else %}
-                    <p class="text-muted">توضیحاتی برای این محصول ثبت نشده است.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+				<div class="rating">
+					<!-- امتیاز محصول -->
+					{% for i in "12345" %}
+						{% if forloop.counter <= product.average_rating|add:"0" %}
+							<i class="fas fa-star"></i>
+						{% else %}
+							<i class="far fa-star"></i>
+						{% endif %}
+					{% endfor %}
+					<span style="color: #5a7a9a; font-size: 1rem; margin-right: 5px;">
+						({{ product.review_count }} نظر)
+					</span>
+				</div>
 
-<!-- محصولات مرتبط -->
-{% if related_products %}
-    <div class="row mt-5">
-        <div class="col-12">
-            <h3 class="mb-4">محصولات مشابه</h3>
-            <div class="row">
-                {% for product in related_products %}
-                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                        <div class="card h-100">
-                            {% if product.main_image %}
-                                <img src="{{ product.main_image.url }}" 
-                                     class="card-img-top" 
-                                     alt="{{ product.title }}"
-                                     style="height: 150px; object-fit: cover;">
-                            {% else %}
-                                <div class="bg-light d-flex align-items-center justify-content-center" 
-                                     style="height: 150px;">
-                                    <span class="text-muted">بدون تصویر</span>
-                                </div>
-                            {% endif %}
-                            
-                            <div class="card-body">
-                                <h6 class="card-title">
-                                    <a href="{{ product.get_absolute_url }}" class="text-decoration-none">
-                                        {{ product.title|truncatechars:30 }}
-                                    </a>
-                                </h6>
-                                <p class="card-text text-success fw-bold">
-                                    {{ product.base_price|floatformat:"0" }} تومان
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-{% endif %}
+				<div class="stock">
+					{% if product.total_available > 0 %}
+						<i class="fas fa-check-circle" style="color: green;"></i>
+						<span class="product-q" >موجود در انبار ( <span class="cart-count">{{ product.total_available }}</span> عدد)</span>
+					{% else %}
+						<i class="fas fa-times-circle" style="color: red;"></i>
+						<span class=" no-product">ناموجود</span>
+					{% endif %}
+				</div>
+				{% if product.total_available > 0 %}
+				<div class="actions">
+					<div class="quantity">
+						<button class="qty-btn decrement minus" data-id="{{ item.id }}"> - </button>
+						<span id="quantity">1</span>
+						<button class="qty-btn increment plus" {% if product.total_available == 0 %}disabled{% endif %} data-id="{{ item.id }}"> + </button>
+					</div>
+
+					<button class="add-to-cart">
+						افزودن به سبد خرید
+					</button>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+		<!-- Modal Overlay -->
+		<!-- Modal Overlay -->
+			  <div id="modalOverlay" class="modal-overlay">
+			    <div class="modal">
+			      <div class="close-icon-div">
+			        <button class="close-icon-button" onclick="closeModal()">
+			          <img src="{% static 'images/icons8-close-48.png' %}">
+			        </button>
+			      </div>
+			      <div class="main-image-div">
+			        <img class="img-main" src="{% static 'images/icons8-add-to-cart-100.png' %}">
+			      </div>
+			      <p id="modal-message">محصول به سبد خرید اضافه شد</p>
+			      <div class="close-button-div">
+			        <button onclick="closeModal()" class="close-button">بستن</button>
+			      </div>
+			    </div>
+			  </div>
+	</div>
+{% endblock %}
 
 
+{% block extra_js %}
+	<script>
+        // لیست تصاویر محصول به صورت داینامیک
+        const productImages = [
+            {% for image in images %}
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+                {main: '{{ image.image.url }}', thumb: '{{ image.image.url }}', alt: '{{ image.alt_text }}'},
 
-<script>
-    $(document).ready(function() {
-        $('.add-to-cart').click(function() {
-            const productId = $(this).data('id');
-            // بررسی اینکه آیا کاربر لاگین کرده یا نه
-            {% if not request.user.is_authenticated %}
-                alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
-                window.location.href = "{% url 'account:login' %}";
-                return;
-            {% endif %}
-            // درخواست AJAX برای افزودن به سبد خرید
-            $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
-                {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                function(response) {
-                    if (response.success) {
-                        let badge = $(".badge");
-                        if(parseInt(badge.text()) -1 == 0){
-                            badge.removeClass("bg-success")
-                            badge.addClass("bg-danger");
-                            badge.text("ناموجود" );
-                            $('button.add-to-cart').prop("disabled",true);
-                        }
-                        else{
-                            badge.text(parseInt(badge.text()) - 1 + "موجود");
-                            }
-                        // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید
-                        $('.cart-count').text(response.cart_items_count);
-                        alert(response.message);
-                    } else {
-                        alert('خطا در افزودن محصول به سبد خرید: ' + response.error);
-                    }
-                }
-            );
+
+            {% endfor %}
+        ];
+
+
+        // ایجاد گالری تصاویر به صورت داینامیک
+        const galleryThumbs = document.getElementById('gallery-thumbs');
+        const mainImage = document.getElementById('main-image');
+
+        productImages.forEach((image, index) => {
+            const thumb = document.createElement('div');
+            thumb.className = 'thumb';
+            thumb.dataset.image = image.main;
+            thumb.dataset.alt = image.alt;
+
+            const thumbImg = document.createElement('img');
+            thumbImg.src = image.thumb;
+            thumbImg.alt = image.alt;
+
+            thumb.appendChild(thumbImg);
+            galleryThumbs.appendChild(thumb);
+
+            // تنظیم اولین تصویر به عنوان تصویر اصلی
+            if (index === 0) {
+                thumb.classList.add('active');
+                mainImage.src = image.main;
+                mainImage.alt = image.alt;
+            }
         });
-    });
-</script>
+
+        // تغییر تصویر اصلی با کلیک بر روی تصاویر کوچک
+        const thumbs = document.querySelectorAll('.thumb');
+
+        thumbs.forEach(thumb => {
+            thumb.addEventListener('click', function () {
+                // حذف کلاس active از همه تصاویر
+                thumbs.forEach(t => t.classList.remove('active'));
+
+                // اضافه کردن کلاس active به تصویر انتخاب شده
+                this.classList.add('active');
+
+                // تغییر تصویر اصلی
+                mainImage.src = this.dataset.image;
+                mainImage.alt = this.dataset.alt;
+
+                // افزودن انیمیشن برای تغییر تصویر
+                mainImage.style.opacity = 0;
+                setTimeout(() => {
+                    mainImage.style.opacity = 1;
+                    mainImage.style.transform = 'scale(1.05)';
+                }, 100);
+                setTimeout(() => {
+                    mainImage.style.transform = 'scale(1)';
+                }, 300);
+            });
+        });
+
+        // مدیریت تعداد محصول - نسخه اصلاح شده
+        const minusBtn = document.querySelector('.quantity .minus');
+        const plusBtn = document.querySelector('.quantity .plus');
+        const quantityElement = document.getElementById('quantity');
+
+        minusBtn.addEventListener('click', function () {
+            let quantity = parseInt(quantityElement.textContent);
+            if (quantity > 1) {
+                quantity--;
+                quantityElement.textContent = quantity;
+            }
+        });
+
+        plusBtn.addEventListener('click', function () {
+            let quantity = parseInt(quantityElement.textContent);
+            quantity++;
+            quantityElement.textContent = quantity;
+        });
+
+	</script>
+	<script>
+        function openModal(mymessage) {
+            // فعال کردن مودال
+            document.getElementById('modalOverlay').classList.add('active');
+
+            // به‌روزرسانی متن مودال
+            const messageElement = document.getElementById('modal-message');
+            messageElement.textContent = mymessage
+            {#if (productName) {#}
+            {#    messageElement.textContent = `${productName} به سبد خرید اضافه شد`;#}
+            {# } else {#}
+            {#    messageElement.textContent = "محصول به سبد خرید اضافه شد";#}
+            {# }#}
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+	</script>
+	<script>
+        $(document).ready(function () {
+
+
+            // افزودن به سبد خرید (در صفحات محصولات)
+            $('.add-to-cart').click(function () {
+                let mymessage;
+                // اگر کاربر وارد نشده باشد
+                {% if not request.user.is_authenticated %}
+                    mymessage = "برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید"
+                    openModal(mymessage)
+                    window.location.href = "{% url 'account:login' %}";
+                    return;
+                {% endif %}
+                let quantity = parseInt(quantityElement.textContent);
+
+                // درخواست AJAX برای افزودن به سبد خرید
+                $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', {{ product.id }}),
+                    {
+                        count: quantity,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    function (response) {
+                        if (response.success) {
+                            // به‌روزرسانی تعداد آیتم‌ها در هدر
+	                        console.log(response.cart_items_count);
+	                        console.log(response.available_count);
+	                        if(response.available_count == 0){
+                                let actions = $('.actions');
+								actions.remove();
+		                        $('.product-q').addClass('no-product');
+
+								$('.product-q').text("ناموجود");
+                                $('.cart-count').addClass('no-product');
+                                $('.price').text("عدم موجودی در انبار").addClass('no-product')
+
+	                        }
+	                        else{
+	                            $('.cart-count').text(response.available_count);
+							}
+                            // نمایش پیام موفقیت
+                            mymessage = response.message
+                            openModal(mymessage)
+
+                        } else {
+                            mymessage = response.error || 'خطا در افزودن محصول به سبد خرید';
+                            openModal(mymessage)
+                            // نمایش خطای خاص برگشتی از سرور
+                        }
+                    }
+                ).fail(function (xhr) {
+                    // مدیریت خطاهای شبکه/سرور
+                    mymessage = 'خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید';
+                    openModal(mymessage)
+                    console.error('Error:', xhr.responseText);
+                });
+            });
+        });
+
+	</script>
+
+
 {% endblock %}

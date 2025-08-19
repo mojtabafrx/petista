@@ -1,9 +1,9 @@
+from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.db.models.expressions import RawSQL
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -12,7 +12,7 @@ from django.urls import reverse
 from account.models import Profile
 from product.models import Category, Product
 from .decorators import user_panel_access, seller_required, redirect_superusers
-from .forms import ProductForm
+from .forms import ProductForm, ChangePasswordForm
 from .models import SellerProduct, Cart, CartItem
 
 
@@ -65,16 +65,30 @@ def add_seller_product(request):
         product_id = request.POST.get('product')
         price = request.POST.get('price')
         stock = request.POST.get('stock')
-
+        if price and stock:
+            if type(price) != int or type(stock) != int:
+                messages.error(request, 'قیمت و موجودی باید عدد وارد شود.')
+                return HttpResponseRedirect(reverse('user_panel:add_seller_product'))
+        else:
+            messages.error(request, 'باید هر دو مقدار قیمت و موجودی را وارد کنید.')
+            return HttpResponseRedirect(reverse('user_panel:add_seller_product'))
         try:
-            product = Product.objects.get(id=product_id)
-            # ایجاد یا به‌روزرسانی محصول فروشنده
-            SellerProduct.objects.update_or_create(
-                seller=request.user,
-                product=product,
-                defaults={'price': price, 'stock': stock, 'available_count': stock}
-            )
+            exist = SellerProduct.objects.filter(product_id=product_id, seller=request.user, price=price).first()
 
+            def create_seller(seller, product_id, price, stock):
+                SellerProduct.objects.create(
+                    seller=seller,
+                    product_id=product_id,
+                    price=int(price),
+                    stock=int(stock),
+                    available_count=int(stock)
+                )
+
+            if exist:
+                exist.stock += int(stock)
+                exist.save()
+            else:
+                create_seller(request.user, product_id, price, stock)
             return (HttpResponseRedirect(reverse('user_panel:my_products')))
         except Product.DoesNotExist:
             return (HttpResponseRedirect(reverse('user_panel:add_seller_product')))
@@ -159,7 +173,10 @@ def get_product_details(request):
 @seller_required
 def edit_seller_product(request, product_id=None):
     """ویرایش محصول فروشنده"""
-    product = SellerProduct.objects.get(id=product_id, seller=request.user)
+    product = SellerProduct.objects.filter(id=product_id, seller=request.user).first()
+    if not product:
+        messages.error(request, "این محصول در محصولات شما موجود نمی باشد.")
+        return HttpResponseRedirect(reverse("user_panel:my_products"))
     form = ProductForm(request.POST or None, instance=product)
 
     if request.method == 'POST':
@@ -173,7 +190,7 @@ def edit_seller_product(request, product_id=None):
 @user_panel_access
 def change_password(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = ChangePasswordForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             # بروزرسانی session برای جلوگیری از خروج کاربر
@@ -184,8 +201,9 @@ def change_password(request):
             errors = []
             for field, field_errors in form.errors.items():
                 for error in field_errors:
-                    errors.append(error)
-            return JsonResponse({'success': False, 'errors': errors})
+                    # errors.append(error)
+                    messages.error(request, error)
+            return HttpResponseRedirect(reverse("user_panel:change_password"))
     else:
         """ویو تغییر رمز عبور"""
         context = {
@@ -218,6 +236,7 @@ def add_to_cart(request, product_id):
     """افزودن محصول به سبد خرید"""
     try:
         with transaction.atomic():
+            count = int(request.POST.get('count', 1))
             product = Product.objects.select_for_update().filter(id=product_id)
             # cart = get_object_or_404(Cart, user=request.user, is_active=True)
             product = product.annotate(
@@ -241,7 +260,7 @@ def add_to_cart(request, product_id):
             # یافتن محصول با کمترین قیمت و موجودی کافی
             seller_product = SellerProduct.objects.select_for_update().filter(
                 product_id=product_id,
-                available_count__gt=0,
+                available_count__gte=count,
                 price=product.min_price
             ).order_by('price').first()
 
@@ -250,7 +269,7 @@ def add_to_cart(request, product_id):
 
             # کاهش available_count
 
-            seller_product.available_count -= 1
+            seller_product.available_count -= count
             seller_product.save()
 
             # یافتن سبد خرید فعال کاربر یا ایجاد یک سبد جدید
@@ -266,19 +285,21 @@ def add_to_cart(request, product_id):
                 seller_product=seller_product,
                 defaults={
                     'seller_product': seller_product,
-                    'quantity': 1
+                    'quantity': count,
+                    'price': seller_product.price,
                 }
             )
 
             # اگر محصول قبلاً در سبد وجود داشته، تعداد را افزایش می‌دهیم
             if not item_created:
-                cart_item.quantity += 1
+                cart_item.quantity += count
                 cart_item.save()
 
             return JsonResponse({
                 'success': True,
                 'message': 'محصول به سبد خرید اضافه شد',
-                'cart_items_count': cart.total_items()
+                'cart_items_count': cart.total_items(),
+                'available_count': seller_product.available_count,
             })
 
     except Exception as e:
@@ -308,30 +329,34 @@ def update_cart_item(request, item_id):
 
     try:
         with transaction.atomic():
+            count = request.POST.get('count', 1)
             cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
             seller_product = SellerProduct.objects.select_for_update().get(id=cart_item.seller_product.id)
 
             action = request.POST.get('action')
             if action == 'increment':
-                if seller_product.available_count > 0:
-                    seller_product.available_count -= 1
+                if seller_product.available_count >= count:
+                    seller_product.available_count -= count
                     seller_product.save()
-                    cart_item.quantity += 1
+                    cart_item.quantity += count
                     cart_item.save()
                 else:
                     return JsonResponse({'success': False, 'error': 'موجودی کافی نیست'})
 
-            elif action == 'decrement' and cart_item.quantity > 1:
-                seller_product.available_count += 1
+            elif action == 'decrement' and cart_item.quantity >= count:
+                seller_product.available_count += count
                 seller_product.save()
-                cart_item.quantity -= 1
+                cart_item.quantity -= count
                 cart_item.save()
+
+                if cart_item.quantity <= 0:
+                    cart_item.delete()
 
             return JsonResponse({
                 'success': True,
                 'new_quantity': cart_item.quantity,
                 'item_total': cart_item.total_price(),
-                'cart_total': cart_item.cart.total_price()
+                'cart_total': cart_item.cart.total_price(),
             })
 
     except Exception as e:
@@ -367,7 +392,7 @@ def remove_cart_item(request, item_id):
 @user_panel_access
 def my_orders(request):
     """نمایش سفارشات کاربر"""
-    orders = Cart.objects.filter(user=request.user).exclude(status=Cart.PROCESSING).order_by('-created_at')
+    orders = Cart.objects.filter(user=request.user).order_by('-created_at')
 
     # صفحه‌بندی
     page = request.GET.get('page', 1)
@@ -424,47 +449,112 @@ def order_details(request, order_id):
 def checkout(request, cart_id):
     """پرداخت نهایی و ایجاد سفارش"""
     cart = get_object_or_404(Cart, user=request.user, pk=cart_id)
+    if cart.status != Cart.PENDING:
+        messages.error(request, "این سفارش در وضعیت انتظار پرداخت نیست.")
+        return HttpResponseRedirect(reverse("user_panel:my_orders"))
 
     # بررسی وجود آیتم در سبد خرید
     if cart.items.count() == 0:
-        return JsonResponse({'success': False, 'error': 'سبد خرید شما خالی است'})
+        cart.delete()
+        messages.error(request, "سبد خرید شما خالی است")
+        return HttpResponseRedirect(reverse("user_panel:my_orders"))
 
     # بررسی موجودی کافی برای همه محصولات
     for item in cart.items.all():
-        if (item.seller_product.stock - item.seller_product.sell_count) < item.quantity:
-            return JsonResponse({
-                'success': False,
-                'error': f'موجودی کافی برای محصول {item.seller_product.product.title} وجود ندارد'
-            })
+        if (item.seller_product.stock - item.seller_product.sell_count) < item.seller_product.available_count:
+            messages.error(request, f'موجودی کافی برای محصول {item.seller_product.product.title} وجود ندارد')
+            return HttpResponseRedirect(reverse("user_panel:my_orders"))
 
     try:
-        #     # ایجاد سفارش جدید
-        #     order = Cart.objects.create(
-        #         user=request.user,
-        #         total_price=cart.total_price(),
-        #         status='pending'  # وضعیت اولیه: در حال پردازش
-        #     )
-        #
-        #     # ایجاد آیتم‌های سفارش
-        #     for cart_item in cart.items.all():
-        #
-        #         # ایجاد آیتم سفارش
-        #         OrderItem.objects.create(
-        #             order=order,
-        #             seller_product=cart_item.seller_product,
-        #             quantity=cart_item.quantity,
-        #             price=cart_item.seller_product.price
-        #         )
-
         return HttpResponseRedirect(reverse('transaction:request', kwargs={'order_id': cart.id}))
-
-
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': f'خطا در ثبت سفارش: {str(e)}'
-        })
+        messages.error(request, f'خطا در ثبت سفارش: {str(e)}')
+        return HttpResponseRedirect(reverse("user_panel:my_orders"))
 
 
 def seller_orders(request):
-    return render(request, 'user_panel/seller_orders.html')
+    seller = request.user
+
+    # دریافت سفارشات مرتبط با محصولات فروشنده
+    carts = Cart.objects.filter(
+        items__seller_product__seller=seller,
+    ).exclude(status__in=[Cart.PENDING]  # فقط سفارشات پرداخت شده و در حال پردازش
+              ).distinct().prefetch_related(
+        Prefetch(
+            'items',
+            queryset=CartItem.objects.filter(seller_product__seller=seller)
+            .select_related('seller_product__product'),
+            to_attr='seller_items'
+        )
+    ).order_by('-created_at')  # مرتب سازی بر اساس تاریخ جدیدترین
+    total_seller_price = 0
+    for cart in carts:
+        for item in cart.seller_items:
+            total_seller_price += item.total_price()
+    context = {
+        'carts': carts,
+        'user_type': request.user.profile.user_type,
+        'total_seller_price': total_seller_price,
+    }
+    return render(request, 'user_panel/seller_orders.html', context)
+
+
+@login_required
+def cart_item_detail(request, cart_id):
+    # دریافت سبد خرید با بررسی مالکیت کاربر
+    cart = get_object_or_404(
+        Cart.objects.select_related('user')
+        .prefetch_related('items__seller_product__product',
+                          'items__seller_product__seller'),
+        id=cart_id,
+        user=request.user
+    )
+
+    # محاسبه قیمت نهایی با احتساب مالیات و تخفیف (در صورت نیاز)
+    # total_price = cart.total_price()
+    # final_price = total_price  # می‌توانید محاسبات بیشتری انجام دهید
+
+    context = {
+        'cart': cart,
+        # 'final_price': final_price,
+    }
+    return render(request, 'user_panel/cart_item_detail.html', context)
+
+
+def chang_cart_item_status(request, cart_id):
+    seller = request.user
+
+    # دریافت سفارشات مرتبط با محصولات فروشنده
+    carts = Cart.objects.filter(
+        id=cart_id,
+        items__seller_product__seller=seller,
+    ).distinct().prefetch_related(
+        Prefetch(
+            'items',
+            queryset=CartItem.objects.filter(seller_product__seller=seller)
+            .select_related('seller_product__product'),
+            to_attr='seller_items'
+        )
+    ).order_by('-created_at').first()
+    for item in carts.items.all():
+        item.status = item.PROCESSING
+        item.save()
+
+    cart = Cart.objects.get(id=cart_id)
+    all_status = cart.items.first().status
+    cart_status = {
+        CartItem.START: Cart.PAID,
+        CartItem.PROCESSING: Cart.PROCESSING,
+        CartItem.TRANSFER: Cart.PROCESSING,
+        CartItem.SEND: Cart.SEND,
+    }
+
+    for item in cart.items.all():
+        if item.status != all_status:
+            break
+    else:
+        cart.status = cart_status[all_status]
+        cart.save()
+
+    messages.success(request, 'وضعیت سفارش با موفقیت تغییر یافت')
+    return HttpResponseRedirect(reverse('user_panel:seller_orders'))

@@ -61,9 +61,9 @@
                 </div>
 
                 <div class="cart-actions">
-                    <a href="{% url 'product:product_list' %}"><button class="continue-btn">ادامه خرید</button></a>
+                    <a onclick="showLoader()" href="{% url 'product:product_list' %}"><button  class="continue-btn">ادامه خرید</button></a>
 
-                    <a href="{% url 'user_panel:checkout' cart.id %}"><button class="checkout-btn" data-id="{{ cart.id }}" > پرداخت نهایی </button></a>
+                    <a onclick="showLoader()" href="{% url 'user_panel:checkout' cart.id %}"><button class="checkout-btn" data-id="{{ cart.id }}" > پرداخت نهایی </button></a>
                 </div>
 
             </div>
@@ -73,107 +73,116 @@
 {% endblock %}
 {% block custom_js %}
 <script>
-
 $(document).ready(function() {
     console.log("sa");
-        // افزایش تعداد
-        $('.increment').click(function() {
-            const itemId = $(this).data('id');
-            updateCartItem(itemId, 'increment');
 
-        });
+    // افزایش تعداد
+    $('.increment').click(function() {
+        const itemId = $(this).data('id');
+        updateCartItem(itemId, 'increment');
+    });
 
-        // کاهش تعداد
-        $('.decrement').click(function() {
-            const itemId = $(this).data('id');
-            updateCartItem(itemId, 'decrement');
-        });
+    // کاهش تعداد
+    $('.decrement').click(function() {
+        const itemId = $(this).data('id');
+        updateCartItem(itemId, 'decrement');
+    });
 
-        // حذف آیتم
-        $('.remove-item').click(function() {
-            const itemId = $(this).data('id');
-            removeCartItem(itemId);
-        });
+    // حذف آیتم
+    $('.remove-item').click(function() {
+        const itemId = $(this).data('id');
+        removeCartItem(itemId);
+    });
 
-        function updateCartItem(itemId, action) {
-            $.post('{% url "user_panel:update_cart_item" 0 %}'.replace('0', itemId),
-                {
-                    action: action,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                function(response) {
-                    if (response.success) {
-                        // به‌روزرسانی تعداد و قیمت در ردیف
+    function updateCartItem(itemId, action) {
+        $.post('{% url "user_panel:update_cart_item" 0 %}'.replace('0', itemId),
+            {
+                action: action,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            function(response) {
+                if (response.success) {
+                    // به‌روزرسانی تعداد و قیمت در ردیف
+                    if(response.new_quantity > 0){
+	                    const row = $(`button[data-id="${itemId}"]`).closest('.cart-row');
+	                    row.find('.item-quantity').text(response.new_quantity);
+	                    row.find('.item-total').text(response.item_total + ' تومان');
+
+	                    // به‌روزرسانی جمع کل سبد خرید
+	                    $('.cart-summary').text(response.cart_total + ' تومان');
+                    }else{
                         const row = $(`button[data-id="${itemId}"]`).closest('.cart-row');
-                        row.find('.item-quantity').text(response.new_quantity);
+                        row.remove()
                         row.find('.item-total').text(response.item_total + ' تومان');
-
                         // به‌روزرسانی جمع کل سبد خرید
-                        $('.cart-summary').text(response.cart_total + ' تومان');
+	                    $('.cart-summary').text(response.cart_total + ' تومان');
                     }
                 }
-            );
-        }
+            }
+        );
+    }
 
-        function removeCartItem(itemId) {
-            if (!confirm('آیا مطمئن هستید که می‌خواهید این محصول را از سبد خرید حذف کنید؟')) return;
+    function removeCartItem(itemId) {
+        if (!confirm('آیا مطمئن هستید که می‌خواهید این محصول را از سبد خرید حذف کنید؟')) return;
 
-            $.post('{% url "user_panel:remove_cart_item" 0 %}'.replace('0', itemId),
-                {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                function(response) {
-                    if (response.success) {
-                        // حذف ردیف از جدول
-                        const row = $(`button[data-id="${itemId}"]`).closest('.cart-row');
-                        row.fadeOut(400, function() { $(this).remove(); });
+        $.post('{% url "user_panel:remove_cart_item" 0 %}'.replace('0', itemId),
+            {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            function(response) {
+                if (response.success) {
+                    // حذف ردیف از جدول
+                    const row = $(`button[data-id="${itemId}"]`).closest('.cart-row');
+                    row.fadeOut(400, function() { $(this).remove(); });
 
-                        // به‌روزرسانی جمع کل سبد خرید
-                        $('.cart-summary').text(response.cart_total + ' تومان');
+                    // به‌روزرسانی جمع کل سبد خرید
+                    $('.cart-summary').text(response.cart_total + ' تومان');
 
-                        // به‌روزرسانی تعداد آیتم‌ها در هدر
-                        $('.cart-count').text(response.cart_items_count);
+                    // به‌روزرسانی تعداد آیتم‌ها در هدر
+                    $('.cart-count').text(response.cart_items_count);
 
-                        // اگر سبد خرید خالی شد، نمایش پیام
-                        if (response.cart_items_count == 0) {
-                            location.reload();
-                        }
+                    // اگر سبد خرید خالی شد، نمایش پیام
+                    if (response.cart_items_count == 0) {
+                        location.reload();
                     }
                 }
-            );
-        }
-        // افزودن به سبد خرید (در صفحات محصولات)
-        $('.add-to-cart').click(function() {
-            const productId = $(this).data('id');
-            // اگر کاربر وارد نشده باشد
-            {% if not request.user.is_authenticated %}
-                alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
-                window.location.href = "{% url 'account:login' %}";
-                return;
-            {% endif %}
-            // درخواست AJAX برای افزودن به سبد خرید
-            $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
-                {
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                function(response) {
-                    if (response.success) {
-                        // به‌روزرسانی تعداد آیتم‌ها در هدر
-                        $('.cart-count').text(response.cart_items_count);
+            }
+        );
+    }
 
-                        // نمایش پیام موفقیت
-                        alert(response.message);
-                    } else {
-                        // نمایش خطای خاص برگشتی از سرور
-                        alert(response.error || 'خطا در افزودن محصول به سبد خرید');
-                    }
+    // افزودن به سبد خرید (در صفحات محصولات)
+    $('.add-to-cart').click(function() {
+        const productId = $(this).data('id');
+        // اگر کاربر وارد نشده باشد
+        {% if not request.user.is_authenticated %}
+            alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
+            window.location.href = "{% url 'account:login' %}";
+            return;
+        {% endif %}
+
+        // درخواست AJAX برای افزودن به سبد خرید
+        $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),
+            {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            function(response) {
+                if (response.success) {
+                    // به‌روزرسانی تعداد آیتم‌ها در هدر
+                    $('.cart-count').text(response.cart_items_count);
+
+                    // نمایش پیام موفقیت
+                    alert(response.message);
+                } else {
+                    // نمایش خطای خاص برگشتی از سرور
+                    alert(response.error || 'خطا در افزودن محصول به سبد خرید');
                 }
-            ).fail(function(xhr) {
-                // مدیریت خطاهای شبکه/سرور
-                alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید');
-                console.error('Error:', xhr.responseText);
-            });
+            }
+        ).fail(function(xhr) {
+            // مدیریت خطاهای شبکه/سرور
+            alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید');
+            console.error('Error:', xhr.responseText);
         });
+    });
 });
 
 </script>

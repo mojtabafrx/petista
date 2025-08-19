@@ -129,18 +129,15 @@
                         </nav>
                         {% endif %}
             {% else %}
-                    <div class="text-center py-5">
-                        <div class="mb-3">
-                            <i class="fas fa-box-open fa-4x text-muted"></i>
-                        </div>
-                        <h5 class="text-muted">شما هنوز هیچ محصولی ثبت نکرده‌اید!</h5>
-                        <p class="text-muted">برای شروع، از بخش ثبت محصول جدید استفاده کنید</p>
-                        <a href="{% url 'user_panel:dashboard' %}">
-                            <button id="show-add-product-btn" class="btn btn-primary mt-3">
-                                <i class="fas fa-plus-circle me-2"></i> ثبت محصول جدید
-                            </button>
-                        </a>
-                    </div>
+                    <div class="all-message-box">
+						<div class="message-box">
+							<img src="{% static 'images/icons8-add-to-cart-96%20(1).png' %}">
+							<div class="message">شما هنوز هیچ محصولی ثبت نکرده‌اید!</div>
+							<a href="{% url 'user_panel:add_seller_product' %}">
+								<button class="back-product-button">ثبت محصول</button>
+							</a>
+						</div>
+					</div>
             {% endif %}
 
             </div>

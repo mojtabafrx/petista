@@ -15,7 +15,6 @@
 
 {#    {% include 'category/category_list.html' %}#}
 
-
 <div class="menu-divv glass" id="menuDiv">
 	<div class="menu-grabber-div">
 		<div class="tach-div" id="tachDiv">
@@ -112,11 +111,19 @@
 		</div>
 		<div class="header-left-content-col">
 			{% if not request.user.is_authenticated %}
+				<a href="{% url 'account:signup' %}">
+					<div class="login-button-div">
+						<button class="login-button">
+							<img class="login-img" src="{% static 'images/icons8-sign-up-96.png' %}">
+							<span>ثبت نام</span>
+						</button>
+					</div>
+				</a>
 				<a href="{% url 'account:login' %}">
 					<div class="login-button-div">
 						<button class="login-button">
 							<img class="login-img" src="{% static 'images/login-img.png' %}">
-							<span>ورود | ثبت نام</span>
+							<span>ورود</span>
 						</button>
 					</div>
 				</a>
@@ -142,13 +149,62 @@
 
 	</div>
 
+	{% if messages %}
+		{% for message in messages %}
+			<div class="all-alert-bar">
+				<div id="alertBar"
+				     class="alert-bar {% if message.tags == "error" %} error {% endif %}">
+					<div class="right-alert">
+						<img class="alert-icon" src="
+
+
+
+
+								{% if "error" in message.tags %}{% static 'images/icons8-error-100.png' %}{% else %}{% static 'images/icons8-tick-box-48.png' %}{% endif %}">
+						<p>{{ message }}</p>
+					</div>
+					<button onclick="closeAlert()"
+					        class="{% if "error" in message.tags %}exit-button error{% else %} exit-button {% endif %}">
+						<img src="
+
+
+
+
+								{% if "error" in message.tags %}{% static 'images/icons8-error-50.png' %}{% else %}{% static 'images/icons8-close-48.png' %}{% endif %}"
+						     class="exit-button-img">
+					</button>
+				</div>
+			</div>
+		{% endfor %}
+	{% endif %}
+
+	{% if password_form.captcha.errors %}
+
+		<div class="all-alert-bar">
+			<div id="alertBar" class="alert-bar error">
+				<div class="right-alert">
+					<img src="{% static 'images/icons8-error-100.png' %}" class="alert-icon">
+					<p>{{ password_form.captcha.errors.0 }}</p>
+				</div>
+				<button onclick="closeAlert()" class="exit-button">
+					<img src="{% static 'images/icons8-error-50.png' %}" class="exit-button-img">
+				</button>
+			</div>
+		</div>
+
+
+	{% endif %}
 	{% block content %}{% endblock %}
 </div>
 
 
-<script src=" https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/jquery.js' %}"></script>
 
 <script type="text/javascript">
+    function closeAlert() {
+        document.getElementById('alertBar').classList.add('hidden');
+    }
+
 
     const menuDiv = document.getElementById("menuDiv");
     const grabber = document.getElementById("grabber");

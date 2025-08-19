@@ -7,6 +7,15 @@ from .models import Profile
 
 
 class SignupForm(UserCreationForm):
+    error_messages = {
+        "password_mismatch": "پسورد ها یکسان نیستند.",
+    }
+
+    def __init__(self, *args, **kwargs):
+        super(SignupForm, self).__init__(*args, **kwargs)
+        self.fields['password1'].error_messages["required"] = "پسورد الزامی است."
+        self.fields['password2'].error_messages["required"] = "تکرار پسورد الزامی است."
+
     class CaptchaFieldCustomInput(CaptchaTextInput):
         template_name = "fields/custom_captcha.html"
 
@@ -32,6 +41,16 @@ class SignupForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data['phone_number']
+        setattr(self, "user_exist", False)
+        # بررسی وجود کاربر با این شماره تلفن
+        user = User.objects.filter(username=phone_number).first()
+        if user:
+            setattr(self, "user_exist", user)
+
+        return phone_number
 
 
 class VerificationForm(forms.Form):

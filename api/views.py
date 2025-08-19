@@ -1,19 +1,20 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from product.models import Product
-from .serializer import ProductSerializer,OTPSerializer,PhoneSerializer
-from account.models import VerificationCode, Profile
-from django.utils import timezone
 import random
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
 
-from django.contrib.auth.models import User
-@api_view(['PUT', 'GET', 'DELETE'])
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from account.models import VerificationCode, Profile
+from product.models import Product
+from .serializer import ProductSerializer, OTPSerializer, PhoneSerializer
+
+
 # @permision()
+@api_view(['PUT', 'GET', 'DELETE'])
 def Product_detail(request, pk):
     try:
         product = Product.objects.get(pk=pk)
@@ -23,7 +24,7 @@ def Product_detail(request, pk):
 
     if request.method == 'GET':
         # if request.user.profile.type in []
-        serializer = ProductSerializer(product,)
+        serializer = ProductSerializer(product, )
         return Response(serializer.data)
 
     elif request.method == 'PUT':
@@ -38,17 +39,20 @@ def Product_detail(request, pk):
         product.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-#api
+
+# api
 
 class ProtectedView(APIView):
     permissionclass = [IsAuthenticated]
 
-    def get(self,request):
+    def get(self, request):
         return Response({'message': f"Hey, you are successfully signed in."})
+
 
 class OTPLoginView(APIView):
     authentication_classes = []
     permission_classes = []
+
     def post(self, request):
         print(request.data)
         serializer = OTPSerializer(data=request.data)
@@ -59,8 +63,8 @@ class OTPLoginView(APIView):
 class SendOTPView(APIView):
     authentication_classes = []
     permission_classes = []
-    def post(self, request):
 
+    def post(self, request):
         print("hjkn")
         serializer = PhoneSerializer(data=request.data)
         if not serializer.is_valid():
@@ -76,7 +80,7 @@ class SendOTPView(APIView):
         ver_code = VerificationCode.objects.create(
             profile=profile,
             code_type=VerificationCode.LOGIN_OTP,
-            code=code ,
+            code=code,
             expires_at=timezone.now() + timezone.timedelta(minutes=10))
 
         # ارسال پیامک (پیاده‌سازی واقعی این بخش)
@@ -98,6 +102,7 @@ class SendOTPView(APIView):
 class VerifyOTPView(APIView):
     authentication_classes = []
     permission_classes = []
+
     def post(self, request):
         serializer = OTPSerializer(data=request.data)
         if not serializer.is_valid():
@@ -117,8 +122,8 @@ class VerifyOTPView(APIView):
         return Response({
             'status': 'success',
             'message': 'ورود موفقیت‌آمیز',
-            'access_token': access_token,
-            'refresh_token': str(refresh),
+            'access': access_token,
+            'refresh': str(refresh),
             'user_id': profile.user.id,
             'phone': profile.phone_number
         }, status=status.HTTP_200_OK)

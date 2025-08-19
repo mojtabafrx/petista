@@ -4,6 +4,7 @@
     justify-content: center;
     width: 90%;
     align-items: center;
+    margin: 5% auto;
     /*display: flex;*/
 
     /*direction: rtl;*/
@@ -33,7 +34,7 @@
     margin-bottom: 35px;
 }
 
-button {
+.back-product-button {
     background: linear-gradient(135deg, #2fc4b2, #0ca885);
     border: none;
     color: white;
@@ -49,7 +50,7 @@ button {
     outline-offset: 4px;
 }
 
-button:hover {
+.back-product-button:hover {
     background: linear-gradient(135deg, #0ca885, #2fc4b2);
     box-shadow: 0 12px 20px rgba(12, 168, 133, 0.6);
     transform: translateY(-3px);

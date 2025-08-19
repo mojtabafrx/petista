@@ -51,9 +51,20 @@
     display: inline-block;
 }
 
-.paid { background-color: #d9fdf6; color: #06796b; }
-.pending { background-color: #fff8e1; color: #a67700; }
-.canceled { background-color: #ffe2e5; color: #c62828; }
+.paid {
+    background-color: #d9fdf6;
+    color: #06796b;
+}
+
+.pending {
+    background-color: #fff8e1;
+    color: #a67700;
+}
+
+.canceled {
+    background-color: #ffe2e5;
+    color: #c62828;
+}
 
 .details-btn {
     padding: 8px 12px;
@@ -80,7 +91,8 @@
 .edit-button-link {
     text-decoration: none;
 }
-.head-container-order-icon{
+
+.head-container-order-icon {
     width: 25px;
     margin-left: 5px;
 }
@@ -130,4 +142,67 @@
         width: 100%;
         font-size: 15px;
     }
+}
+
+.all-message-box {
+
+    display: flex;
+    justify-content: center;
+    width: 90%;
+    align-items: center;
+    margin: 5% auto;
+    /*display: flex;*/
+
+    /*direction: rtl;*/
+}
+
+.message-box {
+    background: white;
+    padding: 40px 50px 50px 50px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    /*max-width: 400px;*/
+    width: 90%;
+    animation: fadeIn 0.8s ease forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+}
+
+.message {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.4;
+    margin-bottom: 35px;
+}
+
+.back-product-button {
+    background: linear-gradient(135deg, #2fc4b2, #0ca885);
+    border: none;
+    color: white;
+    padding: 14px 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 35px;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(12, 168, 133, 0.4);
+    transition: all 0.3s ease;
+    letter-spacing: 0.03em;
+    user-select: none;
+    outline-offset: 4px;
+}
+
+.back-product-button:hover {
+    background: linear-gradient(135deg, #0ca885, #2fc4b2);
+    box-shadow: 0 12px 20px rgba(12, 168, 133, 0.6);
+    transform: translateY(-3px);
+}
+
+button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 10px rgba(12, 168, 133, 0.5);
 }

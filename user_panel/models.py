@@ -19,7 +19,7 @@ class SellerProduct(models.Model):
     class Meta:
         verbose_name = 'محصول فروشنده'
         verbose_name_plural = 'محصولات فروشندگان'
-        unique_together = ['seller', 'product']
+        # unique_together = ['seller', 'product']
 
     def __str__(self):
         return f"{self.product.title} توسط {self.seller.username}"
@@ -36,11 +36,14 @@ class Cart(models.Model):
     PAID = 1
     CANCELLED = 2
     PROCESSING = 3
+    SEND = 4
     STATUS_CHOICES = (
         (PENDING, 'در انتظار پرداخت'),
         (PAID, 'پرداخت شده'),
         (CANCELLED, 'لغو شده'),
-        (PROCESSING, 'در حال آماده سازی')
+        (PROCESSING, 'در حال آماده سازی'),
+        (SEND, 'تحویل به پست'),
+
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -57,18 +60,40 @@ class Cart(models.Model):
         return f"سبد خرید {self.user.username} - {self.created_at}"
 
     def total_price(self):
+        """محاسبه مجموع قیمت تمام آیتم‌های سبد خرید"""
         return sum(item.total_price() for item in self.items.all())
 
     def total_items(self):
         return self.items.count()
 
+    def get_status_display_class(self):
+        status_classes = {
+            self.PENDING: 'pending',
+            self.PAID: 'paid',
+            self.CANCELLED: 'cancelled',
+            self.PROCESSING: 'processing'
+        }
+        return status_classes.get(self.status, '')
+
 
 class CartItem(models.Model):
+    START = 0
+    PROCESSING = 1
+    TRANSFER = 2
+    SEND = 3
+
+    STATUS_CHOICES = (
+        (START, 'در انتظار تایید'),
+        (PROCESSING, 'تایید شده'),
+        (TRANSFER, 'در حال جمع آوری'),
+        (SEND, 'تحویل به پست')
+    )
+    status = models.IntegerField(choices=STATUS_CHOICES, default=START)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     seller_product = models.ForeignKey(SellerProduct, on_delete=models.CASCADE, verbose_name="محصول فروشنده")
     quantity = models.PositiveIntegerField(default=1, verbose_name="تعداد")
     added_at = models.DateTimeField(auto_now_add=True)
-    price = models.PositiveIntegerField(verbose_name="قیمت خریداری شده")
+    price = models.PositiveIntegerField(default=None, null=True, verbose_name="قیمت خریداری شده")
 
     # price
 
@@ -81,7 +106,7 @@ class CartItem(models.Model):
         return f"{self.quantity} عدد {self.seller_product.product.title}"
 
     def total_price(self):
-        return self.quantity * self.seller_product.price
+        return self.quantity * self.price
 
     def unit_price(self):
         return self.seller_product.price

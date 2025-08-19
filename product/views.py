@@ -1,9 +1,15 @@
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models.expressions import RawSQL
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import viewsets, filters
 
 from account.models import Profile
-from .models import Product, Category, ProductImage
+from .models import Category, ProductImage, Product
+from .serializers import ProductSerializer
 
 
 # Create your views here.
@@ -18,7 +24,10 @@ def product_list(request, category_slug=None):
     category = None
     menu_list = Category.objects.filter(parent__isnull=True)
     if category_slug:
-        category = get_object_or_404(Category, slug=category_slug)
+        category = Category.objects.filter(slug=category_slug).first()
+        if not category:
+            messages.error(request, "دسته بندی با این نام وجود ندارد.")
+            return HttpResponseRedirect(reverse("product:product_list"))
         menu_list = Category.objects.filter(parent=category)
         products = products.filter(category__in=category.get_all_child())
 
@@ -53,10 +62,17 @@ def product_list(request, category_slug=None):
         products = products.filter(product_type=Product.RETAIL)
     elif request.user.profile.user_type == Profile.SELLER_USER:
         products = products.filter(product_type=Product.WHOLESALE)
-    # صفحه‌بندی
+
+    # تغییر در بخش صفحه‌بندی
     paginator = Paginator(products, 12)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    # ایجاد لیستی از تمام تصاویر برای هر محصول
+    product_images = {}
+    for product in page_obj:
+        images = ProductImage.objects.filter(product=product)
+        product_images[product.id] = images
 
     context = {
         'products': products,
@@ -64,8 +80,8 @@ def product_list(request, category_slug=None):
         'categories': categories,
         'page_obj': page_obj,
         'menu_list': menu_list,
+        'product_images': product_images,  # اضافه کردن این خط
     }
-    # return JsonResponse({})
     return render(request, 'shop/product/list.html', context)
 
 
@@ -87,7 +103,7 @@ def product_detail(request, id, slug):
             """, []
         )
     ).order_by('-created_at').first()
-    images = get_object_or_404(ProductImage, product=product)
+    images = ProductImage.objects.filter(product=product)
 
     # محصولات مرتبط
     related_products = Product.objects.filter(
@@ -100,3 +116,21 @@ def product_detail(request, id, slug):
         'related_products': related_products,
     }
     return render(request, 'shop/product/detail.html', context)
+
+
+# api section :
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter
+    ]
+
+    # فیلترها
+    filterset_fields = ['category', 'status']  # فیلتر بر اساس دسته‌بندی/وضعیت
+    search_fields = ['title', 'description']  # جستجو در عنوان/توضیحات
+    ordering_fields = ['created_at', 'title']  # مرتب‌سازی بر اساس تاریخ/عنوان

@@ -1,74 +1,78 @@
 {% extends 'user_panel/dashboard.html' %}
 {% load static %}
-{% block custom_css %}<link rel="stylesheet" href="{% static '/css/transaction/transaction-fail.css' %}"/>{% endblock %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static '/css/transaction/transaction-fail.css' %}"/>{% endblock %}
+{% block welcome %}
+
+{% endblock %}
 {% block content %}
 
-<!-- محتوای تب‌ها -->
-    <div class="tab-content active" id="tab1">
-        <div class="all-div-container">
-            <div class="all-container">
-                <div class="header-container">
-                    <h3 class="top-welcome">خوش آمدید</h3>
-                </div>
-                <div class="panel">
-                    <img class="panel-icon" src="{% static 'images/icons8-seller-96.png' %}">
-                    <span class="panel-name">فروشنده</span>
-                </div>
-            </div>
-            <div class="container">
-                <div class="all-header-container"></div>
+	<!-- محتوای تب‌ها -->
+	<div class="tab-content active" id="tab1">
+		<div class="all-div-container">
+			<div class="all-container">
+				<div class="header-container">
+					<h3 class="top-welcome">خوش آمدید</h3>
+				</div>
+				<div class="panel">
+					<img class="panel-icon" src="{% static 'images/icons8-seller-96.png' %}">
+					<span class="panel-name">فروشنده</span>
+				</div>
+			</div>
+			<div class="container">
+				<div class="all-header-container"></div>
 
-                <div class="head-container">
-                    <img class="head-container-icon" src="{% static 'images/icons8-bag-24.png' %}">
-                    <span class="head-container-name">پنل خریدار</span>
-                </div>
-                <div class="main-container">
-                    <div class="all-success-container">
-                        <div class="success-icon-div">
-                            <img src="{% static 'images/icons8-cancel-120.png' %}" class="success-icon">
-                        </div>
-                        {% if message %}
-                        <h3>{{ message }}</h3>
-                        {% else %}
-                        <h3>پرداخت شما ناموفق بود!</h3>
-                        {% endif %}
-                        <div class="all-tracking-code-div">
-                            {% if ref_id %}
-                            <div class="tracking-code-div">
-                                <p>کد رهگیری سفارش شما: </p>
-                                <p>{{ ref_id }}</p>
-                            </div>
-                            {% elif message %}
-                            <div class="tracking-code-div">
-                                <p>{{ message }}</p>
-                            </div>
-                            {% else %}
-                            <div class="tracking-code-div">
-                                <p>متاسفانه در اتصال به درگاه پرداخت به مشکل خوردیم.</p>
+				<div class="head-container">
+					<img class="head-container-icon" src="{% static 'images/icons8-bag-24.png' %}">
+					<span class="head-container-name">پنل خریدار</span>
+				</div>
+				<div class="main-container">
+					<div class="all-success-container">
+						<div class="success-icon-div">
+							<img src="{% static 'images/icons8-cancel-120.png' %}" class="success-icon">
+						</div>
+						{% if message %}
+							<h3>{{ message }}</h3>
+						{% else %}
+							<h3>پرداخت شما ناموفق بود!</h3>
+						{% endif %}
+						<div class="all-tracking-code-div">
+							{% if ref_id %}
+								<div class="tracking-code-div">
+									<p>کد رهگیری سفارش شما: </p>
+									<p>{{ ref_id }}</p>
+								</div>
+							{% elif message %}
+								<div class="tracking-code-div">
+									<p>{{ message }}</p>
+								</div>
+							{% else %}
+								<div class="tracking-code-div">
+									<p>متاسفانه در اتصال به درگاه پرداخت به مشکل خوردیم.</p>
 
-                            </div>
-                            {% endif %}
+								</div>
+							{% endif %}
 
-                        </div>
-                        <div class="button-div">
-                            <a href="{% url 'user_panel:view_cart' %}" class="back-button-link">
-                                <button class="back-button">بازگشت به سبد خرید</button>
-                            </a>
-                        </div>
+						</div>
+						<div class="button-div">
+							<a href="{% url 'user_panel:my_orders' %}" class="back-button-link">
+								<button class="back-button">بازگشت به سفارشات من</button>
+							</a>
+						</div>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 
 
 {% endblock %}
 {% block custom_js %}
-<script>
-</script>
+	<script>
+	</script>
 {% endblock %}
 
 

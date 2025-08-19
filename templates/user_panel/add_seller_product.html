@@ -1,93 +1,115 @@
 {% extends 'user_panel/dashboard.html' %}
 {% load static %}
-{% block custom_css %}<link rel="stylesheet" href="{% static '/css/userpanel/add-seller-product.css' %}"/>{% endblock %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static '/css/userpanel/add-seller-product.css' %}"/>{% endblock %}
 {% block content %}
-<div class="container">
-    <div class="all-header-container"></div>
+	<div class="container">
+		<div class="all-header-container"></div>
 
-    <div class="head-container">
-        <img class="head-container-icon" src="{% static 'images/icons8-add-to-cart-30.png' %}">
-        <span class="head-container-name">افزودن محصول جدید</span>
-    </div>
-    <div class="main-container">
-        <div class="form-container">
-            <form id="productForm" method="post" action="{% url 'user_panel:add_seller_product' %}">
-            {% csrf_token %}
-                <div class="all-div-select">
-                    <div class="div-category select">
-                        <label for="categorySelect" class="category-label label">دسته‌بندی را انتخاب
-                            کنید</label>
-                        <select id="category-select" required>
-                            <option value="" selected disabled>دسته‌بندی را انتخاب کنید</option>
-                            {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.title }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+		<div class="head-container">
+			<img class="head-container-icon" src="{% static 'images/icons8-add-to-cart-30.png' %}">
+			<span class="head-container-name">افزودن محصول جدید</span>
+		</div>
+		<div class="main-container">
+			<div class="form-container">
+				<form id="productForm" method="post" action="{% url 'user_panel:add_seller_product' %}">
+					{% csrf_token %}
+					<div class="all-div-select">
+						<div class="div-category select">
+							<label for="categorySelect" class="category-label label">دسته‌بندی را انتخاب
+								کنید</label>
+							<select id="category-select" required>
+								<option value="" selected disabled>دسته‌بندی را انتخاب کنید</option>
+								{% for category in categories %}
+									<option value="{{ category.id }}">{{ category.title }}</option>
+								{% endfor %}
+							</select>
+						</div>
 
-                    <div class="div-product-select select">
-                        <label for="productSelect" class="product-label label">محصول را انتخاب کنید</label>
-                        <select name="product" id="product-select" disabled required>
-                            <option value="" selected disabled>ابتدا دسته‌بندی را انتخاب کنید</option>
-                        </select>
-                    </div>
-                </div>
+						<div class="div-product-select select">
+							<label for="productSelect" class="product-label label">محصول را انتخاب کنید</label>
+							<select name="product" id="product-select" disabled required>
+								<option value="" selected disabled>ابتدا دسته‌بندی را انتخاب کنید</option>
+							</select>
+						</div>
+					</div>
 
-                <div class="all-div-inputs">
+					<div class="all-div-inputs">
 
-                    <div class="count-input-div input-div">
-                        <label for="quantityInput">تعداد</label>
-                        <input name="stock" class="count-input main-input" type="number" id="quantityInput" min="1"
-                               placeholder="تعداد را وارد کنید" required/>
+						<div class="count-input-div input-div">
+							<label for="quantityInput">تعداد</label>
+							<input name="stock" class="count-input main-input" type="number" id="quantityInput" min="1"
+							       placeholder="تعداد را وارد کنید" required/>
 
-                    </div>
-                    <div class="price-input-div input-div">
-                        <label for="priceInput">قیمت (تومان)</label>
-                        <input class="price-input main-input" name="price" type="number" id="priceInput" min="0"
-                               placeholder="قیمت را وارد کنید" required/>
+						</div>
+						<div class="price-input-div input-div">
+							<label for="priceInput">قیمت (تومان)</label>
+							<input class="price-input main-input" name="price" type="number" id="priceInput" min="0"
+							       placeholder="قیمت را وارد کنید" required/>
 
-                    </div>
+						</div>
 
-                </div>
-                <button type="submit">ثبت محصول</button>
-            </form>
-        </div>
+					</div>
+					<button type="submit">ثبت محصول</button>
+				</form>
+			</div>
 
-    </div>
-</div>
+		</div>
+	</div>
 {% endblock %}
 
 {% block custom_js %}
-<script>
-// تغییر دسته‌بندی (AJAX)
-$('#category-select').change(function() {
-    const categoryId = $(this).val();
-    $('#product-select').prop('disabled', true).html('<option>در حال بارگذاری...</option>');
+	<script>
+        // تابع برای بارگیری محصولات
+        function loadProducts(categoryId) {
+            if (!categoryId) {
+                $('#product-select').html('<option value="">ابتدا دسته‌بندی را انتخاب کنید</option>').prop('disabled', true);
+                return;
+            }
 
-    if (!categoryId) {
-        $('#product-select').html('<option>ابتدا دسته‌بندی را انتخاب کنید</option>');
-        return;
-    }
+            // نمایش وضعیت بارگذاری
+            $('#product-select').prop('disabled', true).html('<option>در حال بارگذاری...</option>');
 
-    // درخواست AJAX برای دریافت محصولات
-    $.get('{% url "user_panel:get_products" %}', {category_id: categoryId}, function(products) {
-        let options = '<option value="">انتخاب محصول</option>';
+            $.get('{% url "user_panel:get_products" %}', {category_id: categoryId}, function (products) {
+                let options = '<option value="">انتخاب محصول</option>';
 
-        if (products.length > 0) {
-            products.forEach(product => {
-                options += `<option value="${product.id}">${product.title}</option>`;
+                if (products.length > 0) {
+                    products.forEach(product => {
+                        options += `<option value="${product.id}">${product.title}</option>`;
+                    });
+                } else {
+                    options = '<option value="">محصولی یافت نشد</option>';
+                }
+
+                $('#product-select').html(options).prop('disabled', false);
+            }).fail(function () {
+                $('#product-select').html('<option value="">خطا در دریافت اطلاعات</option>').prop('disabled', false);
+                showMessage('خطا در دریافت محصولات. لطفاً دوباره تلاش کنید', false);
             });
-        } else {
-            options = '<option value="">محصولی یافت نشد</option>';
         }
 
-        $('#product-select').html(options).prop('disabled', false);
-    }).fail(function() {
-        $('#product-select').html('<option>خطا در دریافت اطلاعات</option>');
-        showMessage('خطا در دریافت محصولات. لطفاً دوباره تلاش کنید', false);
-    });
-});
+        // تغییر دسته‌بندی
+        $('#category-select').change(function () {
+            const categoryId = $(this).val();
+            loadProducts(categoryId);
+        });
 
+        // کلیک روی سلکتور محصول (برای بارگیری مجدد)
+        $('#product-select').click(function () {
+            const $this = $(this);
+            const currentOptions = $this.find('option');
 
-</script>
+            // اگر فقط یک گزینه وجود دارد و آن گزینه خالی است یا پیام خطاست
+            if (currentOptions.length === 1 ||
+                (currentOptions.length === 2 && currentOptions.eq(1).val() === '') ||
+                currentOptions.text().includes('محصولی یافت نشد') ||
+                currentOptions.text().includes('خطا')) {
+
+                const categoryId = $('#category-select').val();
+                if (categoryId) {
+                    loadProducts(categoryId);
+                }
+            }
+        });
+	</script>
 {% endblock %}

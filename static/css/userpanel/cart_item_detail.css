@@ -1,0 +1,175 @@
+.order-details-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.order-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-label {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    font-size: 1.1rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+.paid {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.canceled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.processing {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.order-items-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.order-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.item-header {
+    background-color: var(--main-color);
+    font-weight: bold;
+}
+
+.order-total {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .order-item {
+        grid-template-columns: 1fr;
+        gap: 5px;
+        padding: 10px;
+        position: relative;
+        padding-top: 40px;
+    }
+
+    .order-item > div::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 3px;
+        color: #555;
+    }
+
+    .item-header {
+        display: none;
+    }
+}
+
+.all-header-div-main-site {
+    width: 100%;
+}
+
+
+.container {
+    margin-top: 5%;
+}
+
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.pending {
+    background-color: #ff9800;
+    color: white;
+}
+
+.paid {
+    background-color: #4caf50;
+    color: white;
+}
+
+.cancelled {
+    background-color: #f44336;
+    color: white;
+}
+
+.processing {
+    background-color: #2196f3;
+    color: white;
+}
+
+
+.back-button-container {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-back i {
+    margin-left: 5px;
+}

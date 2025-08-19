@@ -1,6 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
-
+{% load make_menu %}
 {% block title %}محصولات{% if category %} - {{ category.title }}{% endif %}{% endblock %}
 {% block custom_css %}
 
@@ -24,28 +24,29 @@
                         <div class="all-slider-one">
                             <div class="slider-one-div shop">
                             {% for product in page_obj %}
-                            <a href="{{ product.get_absolute_url }}" class="sliders-link">
+                            <a href="{% url 'product:product_detail' id=product.id slug=product.slug %}" class="sliders-link" data-id="{{ product.id }}">
                                     <div class="slider-one content {% if product.total_available == 0 %} no-product-content {% endif %}">
                                         <div class="slider-container">
                                             <!--                              slider slider -->
                                             <div class="slider">
 
                                                 <button class="arrow prev">&#10094;</button>
-                                                {% if product.additional_images %}
                                                 <div class="slides">
-                                                    <img class="slide-img" src="{{ product.additional_images.all.0.image.url }}"
-                                                         alt="{{ product.title }}"/>
-                                                    <img class="slide-img" src="{% static 'images/images%20(1).jpeg' %}"
-                                                         alt="عکس ۳"/>
-                                                    <img class="slide-img" src="{% static 'images/images.jpeg' %}"
-                                                         alt="عکس ۱"/>
-                                                </div>
-                                                {% else %}
-                                                    <div class="bg-light d-flex align-items-center justify-content-center"
-                                                         style="height: 200px;">
-                                                        <span class="text-muted">بدون تصویر</span>
-                                                    </div>
-                                                {% endif %}
+			                                    {% with product_images|get_item:product.id as images %}
+			                                        {% if images %}
+			                                            {% for image in images %}
+			                                                <img class="slide-img"
+			                                                     src="{{ image.image.url }}"
+			                                                     alt="{{ image.alt_text|default:product.title }}">
+			                                            {% endfor %}
+			                                        {% else %}
+			                                            <div class="bg-light d-flex align-items-center justify-content-center"
+			                                                 style="height: 200px;">
+			                                                <span class="text-muted">بدون تصویر</span>
+			                                            </div>
+			                                        {% endif %}
+			                                    {% endwith %}
+			                                </div>
 
                                                 <button class="arrow next">&#10095;</button>
                                             </div>
@@ -67,7 +68,7 @@
 
                                             <div class="flex-col-button-price">
                                             <span>قیمت : {{ product.min_price|floatformat:"0" }}  تومان</span>
-                                            <button class="button add-to-cart" data-id="{{ product.id }}">
+                                            <button  onclick="" class="button add-to-cart" data-id="{{ product.id }}">
                                                 <img class="add-to-cart-img" src="{% static '/images/icons8-add-to-cart-96.png' %}" />
                                             </button>
                                         </div>
@@ -98,94 +99,26 @@
 
                         </div>
                     </div>
-
-
-
-
-{##}
-{#                    <div class="slider-two-div shop">#}
-{#                        <a href="#" class="sliders-link">#}
-{#                            <div class="slider-one content">#}
-{#                                <div class="slider-container">#}
-{#                                    <!--                              slider start-->#}
-{#                                    <div class="slider">#}
-{##}
-{#                                        <button class="arrow prev">&#10094;</button>#}
-{#                                        <div class="slides">#}
-{#                                            <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>#}
-{#                                            <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>#}
-{#                                            <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>#}
-{#                                        </div>#}
-{#                                        <button class="arrow next">&#10095;</button>#}
-{#                                    </div>#}
-{#                                    <!--                              slider end-->#}
-{#                                </div>#}
-{#                                <h3>نام محصول</h3>#}
-{#                                <span>موجود</span><br>#}
-{#                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"#}
-{#                                                                              src="shopping-cart.png"></button>#}
-{##}
-{#                                <span>100,000تومان</span>#}
-{##}
-{#                            </div>#}
-{#                        </a>#}
-{##}
-{#                        <a href="#" class="sliders-link">#}
-{#                            <div class="slider-one content">#}
-{#                                <!--                              slider start-->#}
-{#                                <div class="slider">#}
-{##}
-{#                                    <button class="arrow prev">&#10094;</button>#}
-{#                                    <div class="slides">#}
-{#                                        <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>#}
-{#                                        <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>#}
-{#                                        <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>#}
-{#                                    </div>#}
-{#                                    <button class="arrow next">&#10095;</button>#}
-{#                                </div>#}
-{#                                <!--                              slider end-->#}
-{#                                <h3>نام محصول</h3>#}
-{#                                <span>موجود</span><br>#}
-{#                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"#}
-{#                                                                              src="shopping-cart.png"></button>#}
-{##}
-{#                                <span>100,000تومان</span>#}
-{##}
-{##}
-{#                            </div>#}
-{#                        </a>#}
-{##}
-{#                        <a href="#" class="sliders-link">#}
-{#                            <div class="slider-one content">#}
-{#                                <!--                              slider start-->#}
-{#                                <div class="slider">#}
-{##}
-{#                                    <button class="arrow prev">&#10094;</button>#}
-{#                                    <div class="slides">#}
-{#                                        <img class="slide-img" src="assets/images/images%20(2).jpeg" alt="عکس ۲"/>#}
-{#                                        <img class="slide-img" src="assets/images/images%20(1).jpeg" alt="عکس ۳"/>#}
-{#                                        <img class="slide-img" src="assets/images/images.jpeg" alt="عکس ۱"/>#}
-{#                                    </div>#}
-{#                                    <button class="arrow next">&#10095;</button>#}
-{#                                </div>#}
-{#                                <!--                              slider end-->#}
-{#                                <h3>نام محصول</h3>#}
-{#                                <span>موجود</span><br>#}
-{#                                <button class="button">افزودن به سبد خرید<img class="add-to-cart-img"#}
-{#                                                                              src="shopping-cart.png"></button>#}
-{##}
-{#                                <span>100,000تومان</span>#}
-{##}
-{##}
-{#                            </div>#}
-{#                        </a>#}
-{##}
-{#                    </div>#}
-
-
                 </div>
             </div>
 </div>
+<!-- Modal Overlay -->
+			  <div id="modalOverlay" class="modal-overlay">
+			    <div class="modal">
+			      <div class="close-icon-div">
+			        <button class="close-icon-button" onclick="closeModal()">
+			          <img src="{% static 'images/icons8-close-48.png' %}">
+			        </button>
+			      </div>
+			      <div class="main-image-div">
+			        <img class="img-main" src="{% static 'images/icons8-add-to-cart-100.png' %}">
+			      </div>
+			      <p id="modal-message">محصول به سبد خرید اضافه شد</p>
+			      <div class="close-button-div">
+			        <button onclick="closeModal()" class="close-button">بستن</button>
+			      </div>
+			    </div>
+			  </div>
 
 </div>
 
@@ -194,6 +127,13 @@
 
 {% block extra_js %}
 <script>
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
 
 function initializeSlider(slider) {
     const slides = slider.querySelector('.slides');
@@ -249,7 +189,7 @@ $(document).ready(function() {
 
         // بررسی لاگین بودن کاربر
         {% if not request.user.is_authenticated %}
-        alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');
+        {#alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');#}
         window.location.href = "{% url 'account:login' %}";
         return;
         {% endif %}
@@ -265,18 +205,20 @@ $(document).ready(function() {
                     const currentText = countBadge.text().trim();
                     const currentCount = parseInt(currentText);
                     const newCount = currentCount - 1;
-
-                    if (newCount === 0) {
+					openModal()
+                    if (newCount == 0) {
                         // ایجاد ساختار جدید برای حالت ناموجود
                         const newUnavailableDiv = $('<div class="div-unavailable"></div>');
                         const newUnavailableSpan = $('<span class="unavailable">ناموجود</span>');
 
                         newUnavailableDiv.append(newUnavailableSpan);
-
+						button.closest('.flex-col-button-price').remove();
+	                    productCard.addClass('no-product-content');
                         // جایگزینی المان قدیمی با ساختار جدید
                         availableDiv.replaceWith(newUnavailableDiv);
 
                         button.prop('disabled', true);
+
                     } else {
                         // به‌روزرسانی مقدار با واحد "عدد"
                         countBadge.text(newCount + ' عدد');
@@ -284,9 +226,9 @@ $(document).ready(function() {
 
                     // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید
                     $('.cart-count').text(response.cart_items_count);
-                    alert(response.message);
+                    {#alert(response.message);#}
                 } else {
-                    alert('خطا در افزودن محصول به سبد خرید: ' + response.error);
+                    {#alert('خطا در افزودن محصول به سبد خرید: ' + response.error);#}
                 }
             }
         );
@@ -295,189 +237,17 @@ $(document).ready(function() {
 
 </script>
 
+<script>
+    // ایجاد فیلتر جدید برای دسترسی به دیکشنری
+    django.jQuery(function($) {
+        $.extend($.expr[':'], {
+            'get_item': function(el, i, match) {
+                return $(el).data(match[3]);
+            }
+        });
+    });
+</script>
 {% endblock %}
 
 
-{#<div class="row">#}
-{#    <!-- سایدبار دسته‌بندی‌ها -->#}
-{#    <div class="col-md-3">#}
-{#        <div class="card mb-4">#}
-{#            <div class="card-header bg-danger text-white">#}
-{#                <h5 class="mb-0">دسته‌بندی‌ها</h5>#}
-{#            </div>#}
-{#            <div class="list-group list-group-flush">#}
-{#                <a href="{% url 'product:product_list' %}" #}
-{#                   class="list-group-item list-group-item-action {% if not category %}active{% endif %}">#}
-{#                    همه دسته‌بندی‌ها#}
-{#                </a>#}
-{#                {% for cat in categories %}#}
-{#                    <a href="{% url 'product:product_list_by_category' cat.slug %}" #}
-{#                       class="list-group-item list-group-item-action {% if category and cat.id == category.id %}active{% endif %}">#}
-{#                        {{ cat.title }}#}
-{#                    </a>#}
-{#                {% endfor %}#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
-{##}
-{#    <!-- لیست محصولات -->#}
-{#    <div class="col-md-9">#}
-{#        <div class="d-flex justify-content-between align-items-center mb-4">#}
-{#            <h2>#}
-{#                {% if category %}#}
-{#                    {{ category.title }}#}
-{#                {% else %}#}
-{#                    همه محصولات#}
-{#                {% endif %}#}
-{#            </h2>#}
-{#            <div class="d-flex">#}
-{#                <!-- دکمه‌های مرتب‌سازی -->#}
-{#            </div>#}
-{#        </div>#}
-{##}
-{#        <div class="row">#}
-{#            {% for product in page_obj %}#}
-{#                <div class="col-lg-4 col-md-6 mb-4">#}
-{#                    <div class="card h-100 shadow-sm">#}
-{#                        {% if product.additional_images %}#}
-{#                            <img src="{{ product.additional_images.all.0.image.url }}" #}
-{#                                 class="card-img-top" #}
-{#                                 alt="{{ product.title }}"#}
-{#                                 style="height: 200px; object-fit: cover;">#}
-{#                        {% else %}#}
-{#                            <div class="bg-light d-flex align-items-center justify-content-center" #}
-{#                                 style="height: 200px;">#}
-{#                                <span class="text-muted">بدون تصویر</span>#}
-{#                            </div>#}
-{#                        {% endif %}#}
-{#                        #}
-{#                        <div class="card-body">#}
-{#                            <h5 class="card-title">#}
-{#                                <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">#}
-{#                                    {{ product.title }}#}
-{#                                </a>#}
-{#                            </h5>#}
-{#                            #}
-{#                            <div class="d-flex justify-content-between align-items-center mt-3">#}
-{#                                <span class="text-success fw-bold">#}
-{#                                    {{ product.min_price|floatformat:"0" }} تومان#}
-{#                                </span>#}
-{#                                #}
-{#                                <span class="badge {% if product.total_available > 0 %}bg-success{% else %}bg-danger{% endif %}">#}
-{#                                {% if product.total_available > 0 %}#}
-{#                                    {{ product.total_available  }}#}
-{#                                    موجود#}
-{#                                {% else %}#}
-{#                                    ناموجود#}
-{#                                {% endif %}#}
-{#                                </span>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        #}
-{#                        <!-- در قسمت کارت محصول -->#}
-{#                        <div class="card-footer bg-white">#}
-{#                            <div class="d-grid gap-2">#}
-{#                                <a href="{% url 'product:product_detail' product.id product.slug %}" class="btn btn-outline-primary">#}
-{#                                    مشاهده جزئیات#}
-{#                                </a>#}
-{#                                <button class="btn btn-outline-success add-to-cart" data-id="{{ product.id }}">#}
-{#                                    افزودن به سبد خرید#}
-{#                                </button>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            {% empty %}#}
-{#                <div class="col-12">#}
-{#                    <div class="alert alert-info text-center">#}
-{#                        محصولی یافت نشد#}
-{#                    </div>#}
-{#                </div>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{##}
-{#        <!-- صفحه‌بندی -->#}
-{#        {% if page_obj.paginator.num_pages > 1 %}#}
-{#            <nav class="mt-4">#}
-{#                <ul class="pagination justify-content-center">#}
-{#                    {% if page_obj.has_previous %}#}
-{#                        <li class="page-item">#}
-{#                            <a class="page-link" href="?page=1">&laquo; ابتدا</a>#}
-{#                        </li>#}
-{#                        <li class="page-item">#}
-{#                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">قبلی</a>#}
-{#                        </li>#}
-{#                    {% endif %}#}
-{#                    #}
-{#                    {% for num in page_obj.paginator.page_range %}#}
-{#                        {% if page_obj.number == num %}#}
-{#                            <li class="page-item active">#}
-{#                                <span class="page-link">{{ num }}</span>#}
-{#                            </li>#}
-{#                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}#}
-{#                            <li class="page-item">#}
-{#                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>#}
-{#                            </li>#}
-{#                        {% endif %}#}
-{#                    {% endfor %}#}
-{#                    #}
-{#                    {% if page_obj.has_next %}#}
-{#                        <li class="page-item">#}
-{#                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">بعدی</a>#}
-{#                        </li>#}
-{#                        <li class="page-item">#}
-{#                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">انتها &raquo;</a>#}
-{#                        </li>#}
-{#                    {% endif %}#}
-{#                </ul>#}
-{#            </nav>#}
-{#        {% endif %}#}
-{#    </div>#}
-{#</div>#}
-{##}
-{##}
-{#<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>#}
-{#<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>#}
-{#<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />#}
-{#<script>#}
-{#$(document).ready(function() {#}
-{#    $('.add-to-cart').click(function() {#}
-{#        const productId = $(this).data('id');#}
-{##}
-{#        // بررسی اینکه آیا کاربر لاگین کرده یا نه#}
-{#        {% if not request.user.is_authenticated %}#}
-{#        alert('برای افزودن محصول به سبد خرید، باید وارد حساب کاربری خود شوید');#}
-{#        window.location.href = "{% url 'account:login' %}";#}
-{#        return;#}
-{#        {% endif %}#}
-{#        // درخواست AJAX برای افزودن به سبد خرید#}
-{#        $.post('{% url "user_panel:add_to_cart" 0 %}'.replace('0', productId),#}
-{#            {#}
-{#                csrfmiddlewaretoken: '{{ csrf_token }}'#}
-{#            },#}
-{#            function(response) {#}
-{#                if (response.success) {#}
-{#                    let badge = $(".badge");#}
-{#                    if(parseInt(badge.text()) -1 == 0){#}
-{#                        badge.removeClass("bg-success")#}
-{#                        badge.addClass("bg-danger");#}
-{#                        badge.text("ناموجود" );#}
-{#                        $('button.add-to-cart').prop("disabled",true);#}
-{#                    }#}
-{#                    else{#}
-{#                        badge.text(parseInt(badge.text()) - 1 + "موجود");#}
-{#                        }#}
-{#                    // به‌روزرسانی تعداد آیتم‌ها در آیکون سبد خرید#}
-{#                    $('.cart-count').text(response.cart_items_count);#}
-{#                    alert(response.message);#}
-{#                } else {#}
-{#                    alert('خطا در افزودن محصول به سبد خرید: ' + response.error);#}
-{#                }#}
-{#            }#}
-{#        );#}
-{#    });#}
-{# });#}
-{#</script>#}
-{##}
-{#{% endblock %}#}
 

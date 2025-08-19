@@ -1,9 +1,11 @@
 import string
 
-from django.db import models
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.utils.text import slugify
+
 from utils import imageuploader
+
 
 # from utils.imageuploader import upload_product_image, make_image_function
 
@@ -11,6 +13,11 @@ from utils import imageuploader
 class CategoryManager(models.Manager):
     def active(self):
         return self.filter(status=True)
+
+
+class ProductManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
 
 
 # Create your models here.
@@ -43,7 +50,7 @@ class Category(models.Model):
 
     objects = CategoryManager()
 
-    def to_base64(self,num, length=2):
+    def to_base64(self, num, length=2):
         parent = self.parent
         parent_path = ""
         if parent:
@@ -69,16 +76,17 @@ class Category(models.Model):
                 result.append(chars[remainder])
             res = ''.join(result[::-1])
             # پر کردن با a اگر طول کمتر از حد مورد نیاز باشد
-            return parent_path+ res.zfill(length).replace('0', 'a')
+            return parent_path + res.zfill(length).replace('0', 'a')
 
     def get_all_child(self):
         return Category.objects.filter(path__startswith=self.path)
+
     def save(
-        self,
-        force_insert = False,
-        force_update = False,
-        using = None,
-        update_fields = None,
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None,
     ):
         create_flag = False
         if not self.id:
@@ -93,7 +101,6 @@ User = get_user_model()
 
 
 class Product(models.Model):
-
     # وضعیت محصول
 
     AVAILABLE = 1
@@ -113,10 +120,12 @@ class Product(models.Model):
 
     # اطلاعات پایه محصول
     title = models.CharField(max_length=200, verbose_name="نام محصول")
-    slug = models.SlugField(max_length=100, allow_unicode=True, unique=True, null=True, blank=True, verbose_name="آدرس محصول")
+    slug = models.SlugField(max_length=100, allow_unicode=True, unique=True, null=True, blank=True,
+                            verbose_name="آدرس محصول")
     description = models.TextField(verbose_name="توضیحات محصول")
     minimum_order = models.PositiveIntegerField(verbose_name="حداقل میزان سفارس", default=1)
-    related_product = models.ForeignKey('self', verbose_name="محصول مرتبط", on_delete=models.SET_NULL, null=True, blank=True)
+    related_product = models.ForeignKey('self', verbose_name="محصول مرتبط", on_delete=models.SET_NULL, null=True,
+                                        blank=True)
     product_type = models.IntegerField(choices=PRODUCT_TYPES, default=RETAIL, verbose_name="نوع محصول")
     # دسته‌بندی
     category = models.ForeignKey(
@@ -135,6 +144,10 @@ class Product(models.Model):
     # زمان‌های ایجاد و به‌روزرسانی
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین به‌روزرسانی")
+    barcode = models.CharField(max_length=100, verbose_name="بارکد محصول", unique=True, blank=True, null=True)
+    is_deleted = models.BooleanField(default=False, verbose_name="محصول حذف شده")
+
+    objects = ProductManager()
 
     class Meta:
         verbose_name = 'محصول'
@@ -153,8 +166,11 @@ class Product(models.Model):
         if not self.slug:
             slug_str = f"{self.title}"
             self.slug = slugify(slug_str, allow_unicode=True)
-        super(Product,self).save(*args, **kwargs)
+        super(Product, self).save(*args, **kwargs)
 
+    def delete(self, using=None, keep_parents=False):
+        self.is_deleted = True
+        self.save()
 
 
 class ProductImage(models.Model):
@@ -175,4 +191,4 @@ class ProductImage(models.Model):
         ordering = ['id']
 
     def __str__(self):
-        return f"تصویر برای {self.product.title}"
+        return f"تصویر {self.id} برای {self.product.title}"

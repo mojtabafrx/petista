@@ -1,0 +1,133 @@
+{% extends 'user_panel/dashboard.html' %}
+{% load static %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static '/css/userpanel/cart_item_detail.css' %}"/>{% endblock %}
+{% block welcome %}
+
+{% endblock %}
+{% block content %}
+
+<div class="all-header-div-main-site">
+    <!-- هدر و منوی کناری مانند نمونه اولیه شما -->
+    <!-- ... کدهای هدر و منو ... -->
+
+    <div class="all-div-container">
+
+        <div class="container">
+			<div class="back-button-container">
+                <a href="{% url 'user_panel:my_orders' %}" class="btn-back">
+                    <i class="fas fa-arrow-right"></i> بازگشت به لیست سفارشات
+                </a>
+            </div>
+            <div class="head-container-order head-container">
+                <img class="head-container-order-icon head-container-icon"
+                     src="{% static 'images/icons8-list-64.png' %}" alt="جزئیات سفارش">
+                <span class="head-container-order-name">جزئیات سفارش</span>
+            </div>
+
+            <div class="all-tables-div">
+                <div class="order-details-container">
+                    <!-- اطلاعات کلی سفارش -->
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">شماره سفارش:</span>
+                            <span class="summary-value">#{{ cart.id }}</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">تاریخ سفارش:</span>
+                            <span class="summary-value">{{ cart.created_at|date:"Y/m/d" }}</span>
+                        </div>
+
+                        <!-- استفاده از متد جدید برای کلاس وضعیت -->
+                        <div class="summary-item">
+                            <span class="summary-label">وضعیت سفارش:</span>
+                            <span class="summary-value">
+                                <span class="status-badge {{ cart.get_status_display_class }}">
+                                    {{ cart.get_status_display }}
+                                </span>
+                            </span>
+                        </div>
+
+                        <!-- نمایش کد رهگیری فقط اگر وجود داشته باشد -->
+                        {% if cart.tracking_code %}
+                        <div class="summary-item">
+                            <span class="summary-label">کد رهگیری:</span>
+                            <span class="summary-value">{{ cart.tracking_code }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- لیست آیتم های سفارش -->
+                    <div class="order-items-container">
+                        <!-- هدر آیتم ها -->
+                        <div class="order-item item-header">
+                            <div>محصول</div>
+{#                            <div>فروشنده</div>#}
+                            <div>تعداد</div>
+                            <div>قیمت واحد</div>
+                            <div>قیمت کل</div>
+                        </div>
+
+                        <!-- آیتم های سفارش -->
+{#                        {% for item in cart.items.all %}#}
+{#                        <div class="order-item">#}
+{#                            <div data-label="محصول">{{ item.seller_product.product.title }}</div>#}
+{#                            <div data-label="فروشنده">{{ item.seller_product.seller.username }}</div>#}
+{#                            <div data-label="تعداد">{{ item.quantity }}</div>#}
+{#                            <div data-label="قیمت واحد">{{ item.price }} تومان</div>#}
+{#                            <div data-label="قیمت کل">{{ item.total_price }} تومان</div>#}
+{#                        </div>#}
+{#                        {% endfor %}#}
+	                    {% for item in cart.items.all %}
+                        <div class="order-item">
+                            <div data-label="محصول">
+                                {% if item.seller_product.product.image %}
+                                <img src="{{ item.seller_product.product.image.url }}"
+                                     alt="{{ item.seller_product.product.title }}"
+                                     width="50" height="50">
+                                {% endif %}
+                                {{ item.seller_product.product.title }}
+                            </div>
+{#                            <div data-label="فروشنده">{{ item.seller_product.seller.username }}</div>#}
+                            <div data-label="تعداد">{{ item.quantity }}</div>
+                            <div data-label="`قیمت` واحد">{{ item.price|floatformat:"0" }} تومان</div>
+                            <div data-label="قیمت کل">{{ item.total_price|floatformat:"0" }} تومان</div>
+                        </div>
+                        {% empty %}
+                        <div class="order-item">
+                            <div colspan="5" class="text-center">هیچ آیتمی در این سفارش وجود ندارد</div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- جمع کل + مالیات و تخفیف -->
+                        <div class="order-total">
+                            <div>
+                                <span>جمع کل سفارش: </span>
+                                <span>{{ cart.total_price|floatformat:"0" }} تومان</span>
+                            </div>
+                            <!--
+                            <div class="mt-2">
+                                <span>تخفیف: </span>
+                                <span>-{{ discount|floatformat:"0" }} تومان</span>
+                            </div>
+                            <div class="mt-2">
+                                <span>مالیات: </span>
+                                <span>+{{ tax|floatformat:"0" }} تومان</span>
+                            </div>
+                            <div class="mt-2 fw-bold">
+                                <span>مبلغ قابل پرداخت: </span>
+                                <span>{{ final_price|floatformat:"0" }} تومان</span>
+                            </div>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}

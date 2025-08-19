@@ -1,4 +1,5 @@
 from django.urls import path
+
 from . import views
 
 app_name = 'user_panel'
@@ -19,6 +20,8 @@ urlpatterns = [
     path('my-orders/', views.my_orders, name='my_orders'),
     path('orders/<int:order_id>/details/', views.order_details, name='order_details'),
     path('checkout/<int:cart_id>/', views.checkout, name='checkout'),
-
+    path('cart-item-detail/<int:cart_id>/', views.cart_item_detail, name='cart_item_detail'),
     path('seller-orders/', views.seller_orders, name='seller_orders'),
+    path('change-cart-item-status/<str:cart_id>', views.chang_cart_item_status, name='chang_cart_item_status'),
+
 ]

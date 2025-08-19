@@ -290,10 +290,14 @@ body {
     .panel-icon {
         width: 10%;
     }
+
+    .exit-link {
+        display: none;
+    }
 }
 
 .header-left-content {
-    width: 10%;
+    /*width: 10%;*/
     display: flex;
     align-items: center;
 
@@ -317,3 +321,31 @@ body {
     display: flex;
     align-items: center;
 }
+
+.col {
+}
+
+.exit-but {
+    background: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    font-size: 15px;
+    padding: 5px 20px;
+    cursor: pointer;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.exit-link {
+    text-decoration: none;
+    margin-left: 5%;
+
+}
+
+.exit-but img {
+    width: 30px;
+}
+
+

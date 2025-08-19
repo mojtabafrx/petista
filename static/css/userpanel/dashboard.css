@@ -16,8 +16,12 @@
     display: flex;
     width: 100%;
     height: fit-content;
-    justify-content: space-evenly;
+    /*justify-content: space-evenly;*/
     margin-top: 5%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 5%;
 
 }
 
@@ -32,6 +36,7 @@
     transition: all 0.3s ease;
     padding: 10px;
 
+
 }
 
 .col:hover {
@@ -39,27 +44,16 @@
     transform: scale(1.05)
 }
 
-.all-three-div {
-    width: 100%;
-    margin-bottom: 5%;
-}
-
 .all-three-div a {
     text-decoration: none;
     color: inherit; /* برای اینکه رنگ متن تغییر نکنه */
 }
 
-.all-three-div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
-}
 
 .col {
     flex: 1 1 250px;
-    max-width: 300px;
-    min-width: 200px;
+    max-width: 500px;
+    min-width: 300px;
 }
 
 .all-div-container {
@@ -188,4 +182,211 @@ body {
 
 .all-container {
     height: fit-content;
+}
+
+.head-container-icon {
+    margin-right: 10px;
+    margin-left: 10px;
+    width: 30px;
+}
+
+
+.alert-bar {
+    background-color: #e44040;
+    color: white;
+    padding: 15px 20px;
+    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 80%;
+    border-radius: 20px;
+    animation: slideDown 0.5s ease forwards;
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+@keyframes slideDown {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.alert-bar p {
+    margin: 0;
+    font-size: 16px;
+}
+
+.hidden {
+    display: none;
+}
+
+.all-alert-bar {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.exit-button-img {
+    width: 24px;
+}
+
+.exit-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.exit-button:hover {
+    filter: hue-rotate(200deg);
+}
+
+.exit-button-error {
+    filter: hue-rotate(200deg);
+}
+
+.exit-button-error:hover {
+    filter: hue-rotate(100deg);
+}
+
+.right-alert {
+    display: flex;
+    width: 90%;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-icon {
+    width: 40px;
+}
+
+@media (max-width: 500px) {
+    .alert-bar p {
+        font-size: 13px;
+    }
+
+    .all-login-box {
+        height: 75vh;
+    }
+
+    .exit-but {
+        padding: 2px 5px;
+    }
+}
+
+.alert-bar {
+    background-color: #55d155;
+}
+
+
+.error {
+    background-color: red;
+}
+
+
+#loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+#loader-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.loader {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff8a00, #e52e71, #22c1c3);
+    animation: animate 1.2s linear infinite;
+}
+
+@keyframes animate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loader span {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff8a00, #e52e71, #22c1c3);
+}
+
+.loader span:nth-child(1) {
+    filter: blur(5px);
+}
+
+.loader span:nth-child(2) {
+    filter: blur(10px);
+}
+
+.loader span:nth-child(3) {
+    filter: blur(25px);
+}
+
+.loader span:nth-child(4) {
+    filter: blur(50px);
+}
+
+.loader:after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: #1d1c1c;
+    border-radius: 50%;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.processing-text {
+    font-size: 1.5rem;
+    margin-top: 30px;
+    color: #ffffff;
+    font-weight: 300;
+}
+
+.processing-text:after {
+    content: '';
+    animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% {
+        content: '.';
+    }
+    40% {
+        content: '..';
+    }
+    60% {
+        content: '...';
+    }
+    80%, 100% {
+        content: '';
+    }
 }

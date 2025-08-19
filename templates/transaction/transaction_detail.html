@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>جزئیات سفارش</title>
+    <link rel="stylesheet" href="/assets/css/common.css">
+    <link rel="stylesheet" href="/assets/css/orders.css"/>
+    <style>
+        .order-details-container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .order-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.1rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+        }
+
+        .paid { background-color: #d4edda; color: #155724; }
+        .pending { background-color: #fff3cd; color: #856404; }
+        .canceled { background-color: #f8d7da; color: #721c24; }
+        .processing { background-color: #cce5ff; color: #004085; }
+
+        .order-items-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .order-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-header {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .order-item {
+                grid-template-columns: 1fr;
+                gap: 5px;
+                padding: 10px;
+                position: relative;
+                padding-top: 40px;
+            }
+
+            .order-item > div::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+                margin-bottom: 3px;
+                color: #555;
+            }
+
+            .item-header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="all-header-div-main-site">
+    <!-- هدر و منوی کناری مانند نمونه اولیه شما -->
+    <!-- ... کدهای هدر و منو ... -->
+
+    <div class="all-div-container">
+        <div class="all-container">
+            <div class="header-container">
+                <h3 class="top-welcome">خوش آمدید</h3>
+            </div>
+            <div class="panel">
+                <img class="panel-icon" src="/assets/images/icons8-customer-64.png">
+                <span class="panel-name">خریدار معمولی</span>
+            </div>
+        </div>
+        <div class="container">
+            <div class="head-container-order head-container">
+                <img class="head-container-order-icon head-container-icon" src="/assets/images/icons8-list-64.png">
+                <span class="head-container-order-name">
+                    جزئیات سفارش
+                </span>
+            </div>
+
+            <div class="all-tables-div">
+                <div class="order-details-container">
+                    <!-- اطلاعات کلی سفارش -->
+                    <div class="order-summary">
+                        <div class="summary-item">
+                            <span class="summary-label">شماره سفارش:</span>
+                            <span class="summary-value">#{{ cart.id }}</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">تاریخ سفارش:</span>
+                            <span class="summary-value">{{ cart.created_at|date:"Y/m/d" }}</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">وضعیت سفارش:</span>
+                            <span class="summary-value">
+                                <span class="status-badge {{ cart.get_status_display|lower }}">{{ cart.get_status_display }}</span>
+                            </span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span class="summary-label">کد رهگیری:</span>
+                            <span class="summary-value">{{ cart.tracking_code }}</span>
+                        </div>
+                    </div>
+
+                    <!-- لیست آیتم های سفارش -->
+                    <div class="order-items-container">
+                        <!-- هدر آیتم ها -->
+                        <div class="order-item item-header">
+                            <div>محصول</div>
+                            <div>فروشنده</div>
+                            <div>تعداد</div>
+                            <div>قیمت واحد</div>
+                            <div>قیمت کل</div>
+                        </div>
+
+                        <!-- آیتم های سفارش -->
+                        {% for item in cart.items.all %}
+                        <div class="order-item">
+                            <div data-label="محصول">{{ item.seller_product.product.title }}</div>
+                            <div data-label="فروشنده">{{ item.seller_product.seller.username }}</div>
+                            <div data-label="تعداد">{{ item.quantity }}</div>
+                            <div data-label="قیمت واحد">{{ item.price }} تومان</div>
+                            <div data-label="قیمت کل">{{ item.total_price }} تومان</div>
+                        </div>
+                        {% endfor %}
+
+                        <!-- جمع کل سفارش -->
+                        <div class="order-total">
+                            <div>
+                                <span>جمع کل سفارش: </span>
+                                <span>{{ cart.total_price }} تومان</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-warning">
+        <p>۱۴۰۳ © تمامی حقوق این سایت محفوظ است.</p>
+    </div>
+</div>
+<script src="/assets/js/commmon.js"></script>
+</body>
+</html>

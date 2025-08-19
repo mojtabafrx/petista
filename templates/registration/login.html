@@ -35,9 +35,11 @@
 
         switchTab('{{ tabId }}')
 	</script>
+
 {% endblock %}
 {% block content %}
-	
+
+
 	<div class="all-login-box">
 		<div class="login-box">
 			<div class="tabs">
@@ -48,9 +50,9 @@
 					ورود با کد یکبار مصرف
 				</div>
 			</div>
-			
+
 			<!-- تب ورود با رمز -->
-			
+
 			<!-- تب ورود با رمز -->
 			<div id="password-tab" class="tab-content active">
 				<form method="post">
@@ -70,26 +72,15 @@
 					<div class="input-group">
 						<input type="password" name="password" placeholder="رمز عبور" required/>
 					</div>
-					
+
 					<!-- استفاده از کپچای فرم رمز عبور -->
 					<div>
 						{{ password_form.captcha }}
 					</div>
-					
+
 					<!-- نمایش خطاهای کپچای رمز عبور -->
-					{% if password_form.captcha.errors %}
-						<div class="error-message" style="color: red; font-size: 0.8rem;">
-							{{ password_form.captcha.errors.0 }}
-						</div>
-					{% endif %}
-					{% if messages %}
-						<ul class="messages" style="color: red; font-size: 0.8rem;">
-							{% for message in messages %}
-								<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-							{% endfor %}
-						</ul>
-					{% endif %}
-					
+
+
 					<button type="submit" name="password-login">ورود</button>
 				</form>
 			</div>
@@ -115,8 +106,8 @@
 			{#            <button type="submit"  name="password-login">ورود</button>#}
 			{#          </form>#}
 			{#        </div>#}
-			
-			
+
+
 			<!-- تب ورود با کد یکبار مصرف -->
 			<div id="otp-tab" class="tab-content">
 				<form method="post">
@@ -139,31 +130,45 @@
 						{#							</div>#}
 						{#						{% endif %}#}
 					</div>
-					
+
 					<!-- استفاده از کپچای فرم OTP با پیشوند -->
 					<div class="">
 						{{ otp_form.captcha }}
 					</div>
-					
-					<!-- نمایش خطاهای کپچای OTP -->
-					{% if otp_form.captcha.errors %}
-						<div class="error-message" style="color: red; font-size: 0.8rem;">
-							{{ otp_form.captcha.errors.0 }}
-						</div>
-					{% endif %}
 
-					
+					<!-- نمایش خطاهای کپچای OTP -->
+					{#					{% if otp_form.captcha.errors %}#}
+					{#						<div class="error-message" style="color: red; font-size: 0.8rem;">#}
+					{#							{{ otp_form.captcha.errors.0 }}#}
+					{#						</div>#}
+					{#					{% endif %}#}
+
+
 					<button type="submit" name="otp-login">ورود</button>
-					{% if messages %}
-						<ul class="messages" style="color: red; font-size: 0.8rem;">
-							{% for message in messages %}
-								<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-							{% endfor %}
-						</ul>
-					{% endif %}
+					{#					{% if messages %}#}
+					{#						{% for message in messages %}#}
+					{#							<div class="all-alert-bar">#}
+					{#								<div id="alertBar" class="alert-bar">#}
+					{#									<div class="right-alert">#}
+					{#										<img src="{% static 'images/icons8-tick-box-48.png' %}">#}
+					{#										<p>{{ message }}</p>#}
+					{#									</div>#}
+					{#									<button onclick="closeAlert()" class="exit-button">#}
+					{#										<img src="{% static 'images/icons8-close-48.png' %}" class="exit-button-img">#}
+					{#									</button>#}
+					{#								</div>#}
+					{#							</div>#}
+					{#						{% endfor %}#}
+					{#					{% endif %}#}
+					{#				<ul class="messages" style="color: red; font-size: 0.8rem;">#}
+					{#					{% for message in messages %}#}
+					{#						<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>#}
+					{#					{% endfor %}#}
+					{#				</ul>#}
+					{#				{% endif %}#}
 				</form>
 			</div>
-			
+
 			{#        <div id="otp-tab" class="tab-content">#}
 			{#          <form method="post">#}
 			{#            {% csrf_token %}#}
@@ -185,5 +190,9 @@
 			{#        </div>#}
 		</div>
 	</div>
+
+{% endblock %}
+{% block extra_js %}
+
 
 {% endblock %}

@@ -1,147 +1,155 @@
 {% extends 'user_panel/dashboard.html' %}
 {% load static %}
-{% block custom_css %}<link rel="stylesheet" href="{% static '/css/userpanel/seller-orders.css' %}"/>{% endblock %}
+{% load humanize %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static '/css/userpanel/seller-orders.css' %}"/>{% endblock %}
 {% block content %}
-<div class="all-div-container">
+	<div class="all-div-container">
 
-    <div class="container">
-        <!--            <div class="all-header-container"></div>-->
+		<div class="container">
+			<!--            <div class="all-header-container"></div>-->
 
-        <div class="head-container-order head-container">
-            <img class="head-container-order-icon head-container-icon" src="{% static 'images/icons8-list-64.png' %}">
-            <span class="head-container-order-name">
-                محصولات من
-            </span>
-        </div>
-        <div class="all-tables-div">
-            <div class="orders-container">
-                <!-- هدر دسکتاپ -->
-                <div class="order-header">
-                    <div></div>
-                    <div>نام محصول</div>
-                    <div>تاریخ</div>
-                    <div>مبلغ کل</div>
-                    <div>وضعیت</div>
-                    <div>کد رهگیری</div>
-                    <div>جزییات</div>
-                </div>
+			{#			<div class="head-container-order head-container">#}
+			{#				<img class="head-container-order-icon head-container-icon"#}
+			{#				     src="{% static 'images/icons8-list-64.png' %}">#}
+			{#				<span class="head-container-order-name">#}
+			{#                محصولات من#}
+			{#            </span>#}
+			{#			</div>#}
+			<div class="head-container-order head-container">
+				<img class="head-container-order-icon head-container-icon"
+				     src="{% static 'images/icons8-list-64.png' %}">
+				<span class="head-container-order-name">محصولات فروخته شده</span>
+			</div>
 
-                <!-- ردیف نمونه -->
+			<div class="all-tables-div">
+				<div class="orders-container">
+					<!-- هدر دسکتاپ -->
+					<div class="order-header">
+
+						<div></div>
+	                    <div>شماره سفارش</div>
+	                    <div>تاریخ</div>
+	                    <div>وضعیت</div>
+	                    <div>کد رهگیری</div>
+					</div>
+
+					<!-- ردیف نمونه -->
+					{#					<div class="order-row">#}
+					{#						<div class="collapse-toggle">#}
+					{#							<img class="arrow-icon" src="{% static 'images/icons8-down-button-64.png' %}">#}
+					{#						</div>#}
+					{#						<div class="order-row-col" data-label="شماره سفارش">#1001</div>#}
+					{#						<div class="order-row-col" data-label="تاریخ">1403/05/01</div>#}
+					{#						<div class="order-row-col" data-label="مبلغ">۱,۲۰۰,۰۰۰ تومان</div>#}
+					{#						<div class="order-row-col" data-label="وضعیت"><span class="status paid">پرداخت شده</span></div>#}
+					{#						<div class="order-row-col" data-label="کد رهگیری">TRK123456</div>#}
+					{#						<div data-label="جزییات" class="two-buttom order-row-col">#}
+					{#							<a class="edit-button-link" href="seller-edit-product.html">#}
+					{#								<button class="details-btn edit-button">ویرایش</button>#}
+					{#							</a>#}
+					{#							<button class="details-btn">حذف</button>#}
+					{#						</div>#}
+					{##}
+					{#					</div>#}
+					{#					<div class="order-collapse">#}
+					{#						<div class="all-collapse-content">#}
+					{#							<div class="address-collapse-content">#}
+					{#								<label>آدرس :</label>#}
+					{#								<span></span>#}
+					{#							</div>#}
+					{#							<div class="number-collapse-content">#}
+					{#								<label>شماره :</label>#}
+					{#								<span></span>#}
+					{#							</div>#}
+					{#						</div>#}
+					{#					</div>#}
+<!-- ردیف‌های سفارشات -->
+                {% for cart in carts %}
                 <div class="order-row">
                     <div class="collapse-toggle">
                         <img class="arrow-icon" src="{% static 'images/icons8-down-button-64.png' %}">
                     </div>
-                    <div class="order-row-col" data-label="شماره سفارش">#1001</div>
-                    <div class="order-row-col" data-label="تاریخ">1403/05/01</div>
-                    <div class="order-row-col" data-label="مبلغ">۱,۲۰۰,۰۰۰ تومان</div>
-                    <div class="order-row-col" data-label="وضعیت"><span class="status paid">پرداخت شده</span></div>
-                    <div class="order-row-col" data-label="کد رهگیری">TRK123456</div>
-                    <div data-label="جزییات" class="two-buttom order-row-col">
-                        <a class="edit-button-link" href="seller-edit-product.html">
-                            <button class="details-btn edit-button">ویرایش</button>
-                        </a>
-                        <button class="details-btn">حذف</button>
+                    <div class="order-row-col" data-label="شماره سفارش">#{{ cart.id }}</div>
+                    <div class="order-row-col" data-label="تاریخ">{{ cart.created_at|date:"Y/m/d" }}</div>
+                    <div class="order-row-col" data-label="وضعیت">
+                        <span class="status {{ cart.get_status_display_class }}">{{ cart.get_status_display }}</span>
                     </div>
-
+                    <div class="order-row-col" data-label="کد رهگیری">
+                        {{ cart.tracking_code|default:"-" }}
+                    </div>
                 </div>
+
+                <!-- بخش جمع‌شونده (جزییات محصولات فروخته شده) -->
                 <div class="order-collapse">
                     <div class="all-collapse-content">
-                        <div class="address-collapse-content">
-                            <label>آدرس :</label>
-                            <span></span>
+{#                        <h4>محصولات فروخته شده در این سفارش:</h4>#}
+                        <div class="product-header">
+                            <div>نام محصول</div>
+                            <div>تعداد</div>
+                            <div>قیمت واحد</div>
+                            <div>قیمت کل</div>
                         </div>
-                        <div class="number-collapse-content">
-                            <label>شماره :</label>
-                            <span></span>
+
+                        {% for item in cart.seller_items %}
+                        <div class="product-item">
+                            <div class="product-name">{{ item.seller_product.product.title }}</div>
+                            <div class="product-quantity">{{ item.quantity }} عدد</div>
+                            <div class="product-price">{{ item.price|intcomma }} تومان</div>
+                            <div class="product-total">{{ item.total_price|intcomma }} تومان</div>
                         </div>
+                        {% endfor %}
+
+
                     </div>
+                <div class="bottom-content">
+	                <h3>جمع کل محصولات فروخته شده : </h3>
+	                <span>{{ total_seller_price }}</span>
+	                {% if cart.status == cart.PAID %}
+	                <a href="{% url 'user_panel:chang_cart_item_status' cart.id %}"><button class="bottom-botton">تفییر وضغیت به در حال آماده سازی</button></a>
+	                {% endif %}
                 </div>
-
-
-                <div class="order-row">
-                    <div class="collapse-toggle">
-                        <img class="arrow-icon" src="{% static 'images/icons8-down-button-64.png' %}">
-                    </div>
-
-                    <div data-label="شماره سفارش">#1002</div>
-                    <div data-label="تاریخ">1403/05/03</div>
-                    <div data-label="مبلغ">۷۵۰,۰۰۰ تومان</div>
-                    <div data-label="وضعیت"><span class="status pending">در انتظار پرداخت</span></div>
-                    <div data-label="کد رهگیری">TRK789012</div>
-                    <div data-label="جزییات" class="two-buttom">
-                        <a class="edit-button-link" href="seller-edit-product.html">
-                            <button class="details-btn edit-button">ویرایش</button>
-                        </a>
-
-                        <button class="details-btn">حذف</button>
-                    </div>
                 </div>
-                <div class="order-collapse">
-                    <div class="all-collapse-content">
-                        <div class="address-collapse-content">
-                            <label>آدرس :</label>
-                            <span></span>
-                        </div>
-                        <div class="number-collapse-content">
-                            <label>شماره :</label>
-                            <span></span>
-                        </div>
-                    </div>
+                {% empty %}
+                <div class="no-orders">
+                    <p>هیچ سفارشی یافت نشد</p>
                 </div>
+                {% endfor %}
+				</div>
 
-                <div class="order-row">
-                    <div class="collapse-toggle">
-                        <img class="arrow-icon" src="icons8-down-button-64.png">
-                    </div>
-                    <div data-label="شماره سفارش">#1003</div>
-                    <div data-label="تاریخ">1403/05/05</div>
-                    <div data-label="مبلغ">۳۵۰,۰۰۰ تومان</div>
-                    <div data-label="وضعیت"><span class="status canceled">لغو شده</span></div>
-                    <div data-label="کد رهگیری">TRK456789</div>
-                    <div data-label="جزییات" class="two-buttom">
-                        <a class="edit-button-link" href="seller-edit-product.html">
-                            <button class="details-btn edit-button">ویرایش</button>
-                        </a>
+			</div>
 
-                        <button class="details-btn">حذف</button>
-                    </div>
-                </div>
-                <div class="order-collapse">
-                    <div class="all-collapse-content">
-                        <div class="address-collapse-content">
-                            <label>آدرس :</label>
-                            <span></span>
-                        </div>
-                        <div class="number-collapse-content">
-                            <label>شماره :</label>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-</div>
+		</div>
+	</div>
 {% endblock %}
 {% block custom_js %}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const toggles = document.querySelectorAll(".collapse-toggle");
+{#	<script>#}
+{##}
+{#        document.addEventListener("DOMContentLoaded", function () {#}
+{#            const toggles = document.querySelectorAll(".collapse-toggle");#}
+{#            toggles.forEach((toggle) => {#}
+{#                toggle.addEventListener("click", function () {#}
+{#                    const collapse = this.closest(".order-row").nextElementSibling;#}
+{#                    const arrow = this.querySelector(".arrow-icon");#}
+{#                    collapse.classList.toggle("open");#}
+{#                    arrow.classList.toggle("rotate");#}
+{#                });#}
+{#            });#}
+{#        });#}
+{##}
+{#	</script>#}
 
-    toggles.forEach((toggle, index) => {
-        toggle.addEventListener("click", function () {
-            const collapse = toggle.parentElement.nextElementSibling;
-            const arrow = toggle.querySelector(".arrow-icon");
-
-            collapse.classList.toggle("open");
-            arrow.classList.toggle("rotate");
-        });
-    });
-});
-
-
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+		    const toggles = document.querySelectorAll(".collapse-toggle");
+		    toggles.forEach((toggle) => {
+		        toggle.addEventListener("click", function () {
+		            const collapse = this.closest(".order-row").nextElementSibling;
+		            const arrow = this.querySelector(".arrow-icon");
+		            collapse.classList.toggle("open");
+		            arrow.classList.toggle("rotate");
+		        });
+		    });
+		});
 </script>
 {% endblock %}

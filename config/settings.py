@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+from django.contrib.messages import constants as messages
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,8 +45,9 @@ INSTALLED_APPS = [
     'api',
 
     # Crispy
+
     'crispy_forms',
-    "crispy_bootstrap4",
+    'crispy_bootstrap5',
 
     # Bootstrap
     'bootstrap5',
@@ -55,6 +58,7 @@ INSTALLED_APPS = [
     'account.apps.AccountConfig',
     'captcha',
     'transaction.apps.TransactionConfig',
+    'django.contrib.humanize',
 
     # local_kasra
     'administrator.apps.AdministratorConfig',
@@ -104,16 +108,29 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+#
+# REST_FRAMEWORK = {
+#
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#     ],
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated',
+#     ],
+# }
+# REST_FRAMEWORK = {
+#     'DEFAULT_FILTER_BACKENDS': [
+#         'django_filters.rest_framework.DjangoFilterBackend',
+#         'rest_framework.filters.SearchFilter',
+#         'rest_framework.filters.OrderingFilter',
+#     ]
+# }
 
 REST_FRAMEWORK = {
-
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
 }
 
 SIMPLE_JWT = {
@@ -170,8 +187,8 @@ MEDIA_ROOT = 'media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Crispy forms setting ->
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
-CRISPY_TEMPLATE_PACK = "bootstrap4"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # تنظیمات reCAPTCHA (برای استفاده از نسخه ساده)
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
@@ -183,9 +200,17 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # بعد از لاگین
-LOGIN_REDIRECT_URL = 'product:product_list'
-LOGOUT_REDIRECT_URL = 'home:home'
+LOGIN_REDIRECT_URL = 'user_panel:dashboard'
+LOGOUT_REDIRECT_URL = 'account:login'
 
 MERCHANT = "00000000-0000-0000-0000-000000000000"
 
 SANDBOX = True
+
+MESSAGE_TAGS = {
+    # messages.DEBUG: 'alert-secondary',
+    # messages.INFO: 'alert-info',
+    messages.SUCCESS: 'success',
+    # messages.WARNING: 'alert-warning',
+    messages.ERROR: 'error',
+}

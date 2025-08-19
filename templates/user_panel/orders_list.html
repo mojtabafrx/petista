@@ -33,22 +33,22 @@
                     <div data-label="شماره سفارش">#{{ order.id }}</div>
                     <div data-label="تاریخ">{{ order.created_at|date:"Y/m/d H:i" }}</div>
                     <div data-label="مبلغ">{{ order.total_price|floatformat:0 }} تومان</div>
-                    <div data-label="وضعیت"><span class="status {% if order.status == order.PENDING  %}pending {% elif order.status == order.PAID %} paid {% endif %}">{{ order.get_status_display }}</span></div>
+{#                    <div data-label="وضعیت"><span class="status {% if order.status == order.PENDING  %}pending {% elif order.status == order.PAID %} paid {% endif %}">{{ order.get_status_display }}</span></div>#}
+                    <div data-label="وضعیت"><span class="status {{ order.get_status_display_class }}">{{ order.get_status_display }}</span></div>
                     <div data-label="کد رهگیری">{{ order.tracking_code|default:"-" }}</div>
-                    <div data-label="جزییات">
+                    <div data-label="جزییات" class="two-button-div">
                     {% if order.status == order.PENDING %}
-                        <a href="{% url 'user_panel:checkout' order.id %}">
-                            <button class="details-btn view-order-details" data-id="{{ order.id }}">
+                        <a onclick="showLoader()" class="loader-form" href="{% url 'user_panel:checkout' order.id %}">
+                            <button type="submit" class="details-btn view-order-details" data-id="{{ order.id }}">
                                  <i class="fas fa-eye me-1"></i>  پرداخت
                             </button>
                         </a>
-                    {% else %}
-                        <a href="{% url 'user_panel:my_orders' %}">
-                            <button class="details-btn view-order-details" data-id="{{ order.id }}">
+                    {% endif %}
+	                    <a href="{% url 'user_panel:cart_item_detail' order.id %}">
+                            <button  class="details-btn view-order-details but-detail" data-id="{{ order.id }}">
                                  <i class="fas fa-eye me-1"></i>  جزییات
                             </button>
                         </a>
-                    {% endif %}
                     </div>
                 </div>
 
@@ -58,16 +58,15 @@
 
             </div>
             {% else %}
-                <div class="text-center py-5">
-                    <div class="mb-3">
-                        <i class="fas fa-box-open fa-4x text-muted"></i>
-                    </div>
-                    <h5 class="text-muted">شما هنوز هیچ سفارشی ثبت نکرده‌اید!</h5>
-                    <p class="text-muted">برای شروع خرید، از فروشگاه دیدن کنید</p>
-                    <a href="{% url 'product:product_list' %}" class="btn btn-primary mt-3">
-                        <i class="fas fa-store me-2"></i> بازگشت به فروشگاه
-                    </a>
-                </div>
+                <div class="all-message-box">
+					<div class="message-box">
+						<img src="{% static 'images/icons8-add-to-cart-96%20(1).png' %}">
+						<div class="message">شما هنوز هیچ سفارشی ثبت نکرده‌اید!</div>
+						<a href="{% url 'product:product_list' %}">
+							<button class="back-product-button">بازگشت به فروشگاه</button>
+						</a>
+					</div>
+				</div>
             {% endif %}
         </div>
 

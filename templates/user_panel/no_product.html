@@ -1,14 +1,17 @@
 {% extends 'user_panel/dashboard.html' %}
 {% load static %}
-{% block custom_css %}<link rel="stylesheet" href="{% static 'css/userpanel/no-product.css' %}" />{% endblock %}
+{% block custom_css %}
+	<link rel="stylesheet" href="{% static 'css/userpanel/no-product.css' %}"/>{% endblock %}
 
 {% block content %}
-<div class="all-message-box">
-    <div class="message-box">
-        <img src="{% static 'images/icons8-add-to-cart-96%20(1).png' %}">
-        <div class="message">شما محصولی انتخاب نکرده‌اید.</div>
-        <a href="{% url 'product:product_list' %}"><button>بازگشت به انتخاب محصول</button></a>
-    </div>
-</div>
+	<div class="all-message-box">
+		<div class="message-box">
+			<img src="{% static 'images/icons8-add-to-cart-96%20(1).png' %}">
+			<div class="message">شما محصولی انتخاب نکرده‌اید.</div>
+			<a href="{% url 'product:product_list' %}">
+				<button class="back-product-button">بازگشت به انتخاب محصول</button>
+			</a>
+		</div>
+	</div>
 
 {% endblock %}

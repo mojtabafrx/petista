@@ -1,16 +1,14 @@
-from django.utils import timezone
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 import uuid
+
+from django.contrib.auth.models import User
+from django.db import models
+from django.utils import timezone
+
 
 # Create your models here.
 
 
-
 class Profile(models.Model):
-
     NORMAL_USER = 1
     PRODUCER_USER = 2
     SELLER_USER = 3
@@ -21,10 +19,9 @@ class Profile(models.Model):
         (NORMAL_USER, 'خریدار معمولی'),
         (PRODUCER_USER, 'تولیدکننده'),
         (SELLER_USER, 'فروشنده'),
-        (ADMIN_USER, 'ادمین'),
-        (MARKERE_USER, 'بازاریاب'),
+        # (ADMIN_USER, 'ادمین'),
+        # (MARKERE_USER, 'بازاریاب'),
     )
-
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     user_type = models.IntegerField(
@@ -44,13 +41,14 @@ class VerificationCode(models.Model):
     LOGIN_OTP = 2
     PASSWORD_RESET = 3
     PHONE_CHANGE = 4
+    REGISTER_EXIST_USER = 5
 
     VERIFICATIONCODE_TYPE = (
         (REGISTRATION_VERIFY, 'ثبت نام'),
         (LOGIN_OTP, 'ورود یکبار مصرف'),
         (PASSWORD_RESET, 'بازیابی رمز عبور'),
         (PHONE_CHANGE, 'تغییر شماره تلفن'),
-        
+        (REGISTER_EXIST_USER, "ثبت نام دوباره کاربر")
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
