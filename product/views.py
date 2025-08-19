@@ -122,7 +122,7 @@ def product_detail(request, id, slug):
 
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().order_by('created_at')
     serializer_class = ProductSerializer
     filter_backends = [
         DjangoFilterBackend,
@@ -132,5 +132,5 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     # فیلترها
     filterset_fields = ['category', 'status']  # فیلتر بر اساس دسته‌بندی/وضعیت
-    search_fields = ['title', 'description']  # جستجو در عنوان/توضیحات
+    search_fields = ['title', 'barcode']  # جستجو در عنوان/توضیحات
     ordering_fields = ['created_at', 'title']  # مرتب‌سازی بر اساس تاریخ/عنوان
