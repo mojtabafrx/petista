@@ -41,3 +41,26 @@ class ProductSerializer(serializers.ModelSerializer):
             'minimum_order', 'category', 'status',
             'created_at', 'images', 'sellers', 'barcode'
         ]
+
+
+class SellerProductCreateSerializer(serializers.Serializer):
+    product_id = serializers.IntegerField()
+    price = serializers.IntegerField(min_value=1)
+    stock = serializers.IntegerField(min_value=1)
+
+    def validate_product_id(self, value):
+        # بررسی وجود محصول
+        try:
+            Product.objects.get(id=value)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("محصولی با این ID وجود ندارد.")
+        return value
+
+    def validate(self, data):
+        # بررسی اینکه کاربر فروشنده است
+        request = self.context.get('request')
+        if not request or not hasattr(request.user,
+                                      'profile') or request.user.profile.user_type != request.user.profile.SELLER_USER:
+            raise serializers.ValidationError("فقط فروشندگان می‌توانند محصول اضافه کنند.")
+
+        return data

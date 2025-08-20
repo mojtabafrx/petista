@@ -1,7 +1,7 @@
 from django.urls import path, re_path, include
 from rest_framework.routers import DefaultRouter
 
-from .views import product_list, product_detail, ProductViewSet
+from .views import product_list, product_detail, ProductViewSet, AddSellerProductAPIView
 
 app_name = "product"
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('category/<slug:category_slug>/', product_list, name='product_list_by_category'),
     # جزئیات محصول
     re_path(r'^products/(?P<id>\d+)/(?P<slug>[-\w]+)/$', product_detail, name='product_detail'),
+    path('api/add-seller-product/', AddSellerProductAPIView.as_view(), name='add-seller-product'),
     path('api/', include(router.urls)),
 
 ]
