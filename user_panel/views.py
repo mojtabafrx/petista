@@ -189,6 +189,8 @@ def edit_seller_product(request, product_id=None):
 
 @user_panel_access
 def change_password(request):
+    form = ChangePasswordForm(request.user, request.POST)
+
     if request.method == 'POST':
         form = ChangePasswordForm(request.user, request.POST)
         if form.is_valid():

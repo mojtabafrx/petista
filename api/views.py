@@ -127,3 +127,10 @@ class VerifyOTPView(APIView):
             'user_id': profile.user.id,
             'phone': profile.phone_number
         }, status=status.HTTP_200_OK)
+
+
+class HealthView(APIView):
+    permission_classes = []
+
+    def head(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_200_OK)

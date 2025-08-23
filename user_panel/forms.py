@@ -32,3 +32,4 @@ class ChangePasswordForm(PasswordChangeForm):
         super(ChangePasswordForm, self).__init__(*args, **kwargs)
         self.fields['new_password1'].error_messages["required"] = "پسورد الزامی است."
         self.fields['new_password2'].error_messages["required"] = "تکرار پسورد الزامی است."
+        self.fields['old_password'].initial = "asdfg"

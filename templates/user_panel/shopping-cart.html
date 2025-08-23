@@ -38,7 +38,7 @@
                         </div>
                         <div data-label="قیمت کل" class="total-price item-total">{{ item.total_price|floatformat:0 }}  تومان </div>
                         <div data-label="عملیات">
-                            <button class="remove-btn remove-item" data-id="{{ item.id }}">حذف</button>
+                            <button class="remove-btn remove-item" data-id="{{ item.id }}" onclick="openModal({{ item.id }})">حذف</button>
                         </div>
                     </div>
                     {% endfor %}
@@ -69,9 +69,42 @@
             </div>
         </div>
     </div>
+    <!-- Modal Overlay -->
+			  <div id="modalOverlay" class="modal-overlay">
+			    <div class="modal">
+			      <div class="close-icon-div">
+			        <button class="close-icon-button" onclick="closeModal()">
+			          <img src="{% static 'images/icons8-close-48.png' %}">
+			        </button>
+			      </div>
+			      <div class="main-image-div">
+			        <img class="img-main" src="{% static 'images/icons8-add-to-cart-100.png' %}">
+			      </div>
+			      <p id="modal-message">محصول به سبد خرید اضافه شد</p>
+			      <div class="close-button-div">
+			        <button onclick="closeModal()" class="close-button">بستن</button>
+			        <button class="submit-button-modal"  >تایید</button>
+			      </div>
+			    </div>
+			  </div>
 
 {% endblock %}
 {% block custom_js %}
+<script>
+    function openModal(item_id) {
+        console.log(item_id)
+
+      let modal = document.getElementById('modalOverlay')
+      modal.classList.add('active');
+       let submitBtn = modal.querySelector(".submit-button-modal")
+       submitBtn.setAttribute('data-id' , item_id);
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+</script>
 <script>
 $(document).ready(function() {
     console.log("sa");
@@ -89,9 +122,10 @@ $(document).ready(function() {
     });
 
     // حذف آیتم
-    $('.remove-item').click(function() {
+    $('.submit-button-modal').click(function() {
         const itemId = $(this).data('id');
         removeCartItem(itemId);
+        closeModal()
     });
 
     function updateCartItem(itemId, action) {
@@ -123,7 +157,6 @@ $(document).ready(function() {
     }
 
     function removeCartItem(itemId) {
-        if (!confirm('آیا مطمئن هستید که می‌خواهید این محصول را از سبد خرید حذف کنید؟')) return;
 
         $.post('{% url "user_panel:remove_cart_item" 0 %}'.replace('0', itemId),
             {
